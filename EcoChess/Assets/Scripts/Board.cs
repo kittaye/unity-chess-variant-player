@@ -128,13 +128,17 @@ public class Board {
 
         highlightedCoords.AddRange(coords);
         for (int i = 0; i < coords.Length; i++) {
-            coordinates[coords[i]].boardChunk.GetComponentInChildren<SpriteRenderer>().enabled = true;
+            if (ContainsCoord(coords[i])) {
+                coordinates[coords[i]].boardChunk.GetComponentInChildren<SpriteRenderer>().enabled = true;
+            }
         }
     }
 
     public void RemoveHighlightedCoordinates() {
         for (int i = 0; i < highlightedCoords.Count; i++) {
-            coordinates[highlightedCoords[i]].boardChunk.GetComponentInChildren<SpriteRenderer>().enabled = false;
+            if (ContainsCoord(highlightedCoords[i])) {
+                coordinates[highlightedCoords[i]].boardChunk.GetComponentInChildren<SpriteRenderer>().enabled = false;
+            }
         }
         highlightedCoords.Clear();
     }
