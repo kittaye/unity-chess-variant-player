@@ -1,0 +1,1 @@
+To play with this tool, download the latest version and ensure files are all in the same directory. Then run the exe to start.
