@@ -10,23 +10,26 @@ public class Empress : ChessPiece {
         return GetTeam() + "_Empress";
     }
 
-    public override void CalculateTemplateMoves() {
+    public override List<BoardCoord> CalculateTemplateMoves() {
+        List<BoardCoord> moves = new List<BoardCoord>();
         // Rook movements
-        AddTemplateMoves(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up));
-        AddTemplateMoves(chessGame.TryGetDirectionalMoves(this, MoveDirection.Left));
-        AddTemplateMoves(chessGame.TryGetDirectionalMoves(this, MoveDirection.Down));
-        AddTemplateMoves(chessGame.TryGetDirectionalMoves(this, MoveDirection.Right));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Left));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Down));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Right));
 
         // Vertical "L" movements
-        AddTemplateMoves(chessGame.TryGetCustomDirectionalMoves(this, 1, 2, cap: 1));
-        AddTemplateMoves(chessGame.TryGetCustomDirectionalMoves(this, -1, 2, cap: 1));
-        AddTemplateMoves(chessGame.TryGetCustomDirectionalMoves(this, 1, -2, cap: 1));
-        AddTemplateMoves(chessGame.TryGetCustomDirectionalMoves(this, -1, -2, cap: 1));
+        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 1, 2, cap: 1));
+        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -1, 2, cap: 1));
+        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 1, -2, cap: 1));
+        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -1, -2, cap: 1));
 
         // Horizontal "L" movements
-        AddTemplateMoves(chessGame.TryGetCustomDirectionalMoves(this, 2, 1, cap: 1));
-        AddTemplateMoves(chessGame.TryGetCustomDirectionalMoves(this, -2, 1, cap: 1));
-        AddTemplateMoves(chessGame.TryGetCustomDirectionalMoves(this, 2, -1, cap: 1));
-        AddTemplateMoves(chessGame.TryGetCustomDirectionalMoves(this, -2, -1, cap: 1));
+        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 2, 1, cap: 1));
+        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -2, 1, cap: 1));
+        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 2, -1, cap: 1));
+        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -2, -1, cap: 1));
+
+        return moves;
     }
 }

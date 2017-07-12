@@ -1,4 +1,5 @@
-﻿
+﻿using System.Collections.Generic;
+
 public class Knight : ChessPiece {
     public Knight(Team team, BoardCoord position) : base(team, position) {
 
@@ -8,17 +9,20 @@ public class Knight : ChessPiece {
         return GetTeam() + "_Knight";
     }
 
-    public override void CalculateTemplateMoves() {
+    public override List<BoardCoord> CalculateTemplateMoves() {
+        List<BoardCoord> moves = new List<BoardCoord>();
         // Vertical "L" movements
-        AddTemplateMoves(chessGame.TryGetCustomDirectionalMoves(this, 1, 2, cap: 1));
-        AddTemplateMoves(chessGame.TryGetCustomDirectionalMoves(this, -1, 2, cap: 1));
-        AddTemplateMoves(chessGame.TryGetCustomDirectionalMoves(this, 1, -2, cap: 1));
-        AddTemplateMoves(chessGame.TryGetCustomDirectionalMoves(this, -1, -2, cap: 1));
+        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 1, 2, cap: 1));
+        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -1, 2, cap: 1));
+        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 1, -2, cap: 1));
+        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -1, -2, cap: 1));
 
         // Horizontal "L" movements
-        AddTemplateMoves(chessGame.TryGetCustomDirectionalMoves(this, 2, 1, cap: 1));
-        AddTemplateMoves(chessGame.TryGetCustomDirectionalMoves(this, -2, 1, cap: 1));
-        AddTemplateMoves(chessGame.TryGetCustomDirectionalMoves(this, 2, -1, cap: 1));
-        AddTemplateMoves(chessGame.TryGetCustomDirectionalMoves(this, -2, -1, cap: 1));
+        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 2, 1, cap: 1));
+        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -2, 1, cap: 1));
+        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 2, -1, cap: 1));
+        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -2, -1, cap: 1));
+
+        return moves;
     }
 }

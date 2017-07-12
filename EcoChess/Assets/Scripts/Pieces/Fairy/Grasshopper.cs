@@ -9,7 +9,8 @@ public class Grasshopper : ChessPiece {
         return GetTeam() + "_Grasshopper";
     }
 
-    public override void CalculateTemplateMoves() {
+    public override List<BoardCoord> CalculateTemplateMoves() {
+        List<BoardCoord> moves = new List<BoardCoord>();
         int xModifier, yModifier;
 
         for (int i = 0; i <= 7; i++) {
@@ -18,12 +19,13 @@ public class Grasshopper : ChessPiece {
 
             while (chessGame.board.ContainsCoord(coord)) {
                 if(chessGame.board.GetCoordInfo(coord).occupier != null) {
-                    AddTemplateMoves(chessGame.TryGetSpecificMove(this, coord + new BoardCoord(xModifier, yModifier)));
+                    moves.Add(chessGame.TryGetSpecificMove(this, coord + new BoardCoord(xModifier, yModifier)));
                     break;
                 }
                 coord.x += xModifier;
                 coord.y += yModifier;
             }
         }
+        return moves;
     }
 }

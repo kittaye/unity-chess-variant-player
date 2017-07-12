@@ -10,10 +10,14 @@ public class Rook : ChessPiece {
         return GetTeam() + "_Rook";
     }
 
-    public override void CalculateTemplateMoves() {
-        AddTemplateMoves(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up));
-        AddTemplateMoves(chessGame.TryGetDirectionalMoves(this, MoveDirection.Left));
-        AddTemplateMoves(chessGame.TryGetDirectionalMoves(this, MoveDirection.Down));
-        AddTemplateMoves(chessGame.TryGetDirectionalMoves(this, MoveDirection.Right));
+    public override List<BoardCoord> CalculateTemplateMoves() {
+        List<BoardCoord> moves = new List<BoardCoord>();
+
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Left));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Down));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Right));
+
+        return moves;
     }
 }

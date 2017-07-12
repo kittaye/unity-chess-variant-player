@@ -19,19 +19,17 @@ public class Pawn : ChessPiece {
         return GetTeam() + "_Pawn";
     }
 
-    public override void ClearTemplateMoves() {
-        base.ClearTemplateMoves();
-        enPassantTargets.Clear();
-    }
-
-    public override void CalculateTemplateMoves() {
+    public override List<BoardCoord> CalculateTemplateMoves() {
+        List<BoardCoord> moves = new List<BoardCoord>();
         if (MoveCount == 0) {
-            AddTemplateMoves(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up, cap: initialMoveLimit, threatAttackLimit: 0));
+            moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up, cap: initialMoveLimit, threatAttackLimit: 0));
         } else {
-            AddTemplateMoves(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up, cap: 1, threatAttackLimit: 0));
+            moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up, cap: 1, threatAttackLimit: 0));
         }
 
-        AddTemplateMoves(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, cap: 1, threatsOnly: true));
-        AddTemplateMoves(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight, cap: 1, threatsOnly: true));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, cap: 1, threatsOnly: true));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight, cap: 1, threatsOnly: true));
+
+        return moves;
     }
 }
