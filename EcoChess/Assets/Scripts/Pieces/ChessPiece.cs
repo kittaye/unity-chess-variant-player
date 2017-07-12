@@ -12,7 +12,7 @@ public abstract class ChessPiece {
     protected Chess chessGame;
 
     public ChessPiece(Team team, BoardCoord position) {
-        chessGame = GameManager.chessGame;
+        chessGame = GameManager.Instance.chessGame;
         m_Team = team;
         m_BoardPosition = position;
         MoveCount = 0;
