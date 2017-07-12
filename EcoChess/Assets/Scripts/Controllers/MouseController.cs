@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class MouseController : MonoBehaviour {
     public Camera mainCamera;
@@ -7,6 +7,7 @@ public class MouseController : MonoBehaviour {
 
     private bool hasSelection;
     private Collider hoveredObj = null;
+    private List<BoardCoord> lastOccupierAvailableMoves = new List<BoardCoord>();
     private BoardCoord lastSelectedCoord;
     private Vector3 lastMousePos;
     private readonly Color defaultColor = new Color(0.001f, 0.001f, 0.001f, 1f);
@@ -26,8 +27,9 @@ public class MouseController : MonoBehaviour {
             if (hoveredObj != null) {
                 CoordInfo selectedCoord = chessGame.board.GetCoordInfo(GetHoveredBoardCoord());
 
-                if (hasSelection && chessGame.board.GetCoordInfo(lastSelectedCoord).occupier.CanMoveTo(GetHoveredBoardCoord())) {
+                if (hasSelection && lastOccupierAvailableMoves.Contains(GetHoveredBoardCoord())) {
                     if (chessGame.MovePiece(chessGame.board.GetCoordInfo(lastSelectedCoord).occupier, GetHoveredBoardCoord())) {
+                        lastOccupierAvailableMoves.Clear();
                         GameManager.Instance.OnTurnComplete();
                     }
                     DeSelect();
@@ -37,8 +39,8 @@ public class MouseController : MonoBehaviour {
                 if (selectedCoord.occupier != null && selectedCoord.occupier.GetTeam() == chessGame.GetCurrentTeamTurn()) {
                     hasSelection = true;
                     lastSelectedCoord = GetHoveredBoardCoord();
-                    chessGame.CalculateAvailableMoves(selectedCoord.occupier);
-                    chessGame.board.HighlightCoordinates(selectedCoord.occupier.GetAvailableMoves());
+                    lastOccupierAvailableMoves = chessGame.CalculateAvailableMoves(selectedCoord.occupier);
+                    chessGame.board.HighlightCoordinates(lastOccupierAvailableMoves.ToArray());
                     return;
                 }
             }
