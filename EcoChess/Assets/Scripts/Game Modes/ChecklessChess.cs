@@ -20,27 +20,29 @@ namespace ChessGameModes {
             return "Checkless Chess";
         }
 
-        public override void CalculateAvailableMoves(ChessPiece mover) {
-            mover.ClearAvailableMoves();
-            mover.ClearTemplateMoves();
+        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
+            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
+            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
 
-            mover.CalculateTemplateMoves();
-            BoardCoord[] templateMoves = mover.GetTemplateMoves();
             for (int i = 0; i < templateMoves.Length; i++) {
                 if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
                     if (IsPieceInCheckAfterThisMove(opposingRoyalPiece, mover, templateMoves[i]) == false) {
-                        mover.AddToAvailableMoves(templateMoves[i]);
+                        availableMoves.Add(templateMoves[i]);
                     } else if (IsPieceInCheckMateAfterThisMove(opposingRoyalPiece, mover, templateMoves[i])){
-                        //mover.AddToAvailableMoves(templateMoves[i]);
+                        availableMoves.Add(templateMoves[i]);
                     }
                 }
             }
 
             if (mover is King) {
-                AddAvailableCastleMoves(mover);
+                availableMoves.AddRange(TryAddAvailableCastleMoves(mover));
             } else if (mover is Pawn) {
-                AddAvailableEnPassantMoves(mover);
+                BoardCoord enPassantMove = TryAddAvailableEnPassantMove(mover);
+                if (enPassantMove != BoardCoord.NULL) {
+                    availableMoves.Add(enPassantMove);
+                }
             }
+            return availableMoves;
         }
 
         private bool IsPieceInCheckMateAfterThisMove(ChessPiece pieceToCheck, ChessPiece mover, BoardCoord dest) {
@@ -62,9 +64,15 @@ namespace ChessGameModes {
                 bool hasAnyMoves = false;
                 checkingForCheckmate = true;
                 foreach (ChessPiece piece in GetPieces(pieceToCheck.GetTeam())) {
-                    if (piece.IsAlive) {
-                        CalculateAvailableMoves(piece);
-                        if (piece.GetAvailableMoves().Length > 0) hasAnyMoves = true;
+                    if (piece.IsAlive && hasAnyMoves == false) {
+                        BoardCoord[] availableMoves = CalculateAvailableMoves(piece).ToArray();
+                        for (int i = 0; i < availableMoves.Length; i++) {
+                            if (IsPieceInCheckAfterThisMove(pieceToCheck, piece, availableMoves[i])) {
+                                continue;
+                            } else {
+                                hasAnyMoves = true;
+                            }
+                        }
                     }
                 }
                 checkingForCheckmate = false;
@@ -78,7 +86,7 @@ namespace ChessGameModes {
                 // Revert the temporary move back to normal
                 RevertSimulatedMove(mover, dest, originalOccupier, originalLastMover, oldPos);
 
-                return hasAnyMoves;
+                return hasAnyMoves == false;
             }
             return false;
         }

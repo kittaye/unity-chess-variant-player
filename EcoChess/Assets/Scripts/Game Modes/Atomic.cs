@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace ChessGameModes {
@@ -29,8 +29,7 @@ namespace ChessGameModes {
 
             foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
                 if (piece.IsAlive) {
-                    CalculateAvailableMoves(piece);
-                    if (piece.GetAvailableMoves().Length > 0) return false;
+                    if (CalculateAvailableMoves(piece).Count > 0) return false;
                 }
             }
 
@@ -42,38 +41,41 @@ namespace ChessGameModes {
             return true;
         }
 
-        public override void CalculateAvailableMoves(ChessPiece mover) {
-            mover.ClearAvailableMoves();
-            mover.ClearTemplateMoves();
+        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
+            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
+            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
 
-            mover.CalculateTemplateMoves();
-            for (int i = 0; i < mover.GetTemplateMoves().Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetTemplateMoves()[i])) {
+            for (int i = 0; i < templateMoves.Length; i++) {
+                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i])) {
                     continue;
                 }
-                if (IsThreat(mover, mover.GetTemplateMoves()[i]) == false) {
-                    mover.AddToAvailableMoves(mover.GetTemplateMoves()[i]);
+                if (IsThreat(mover, templateMoves[i]) == false) {
+                    availableMoves.Add(templateMoves[i]);
                     continue;
                 }
 
                 bool isValid = true;
                 for (int x = -1; x <= 1 && isValid; x++) {
                     for (int y = -1; y <= 1; y++) {
-                        BoardCoord coord = board.GetCoordInfo(mover.GetTemplateMoves()[i]).occupier.GetRelativeBoardCoord(x, y);
+                        BoardCoord coord = board.GetCoordInfo(templateMoves[i]).occupier.GetRelativeBoardCoord(x, y);
                         if (board.ContainsCoord(coord) && (x != 0 && y != 0) && board.GetCoordInfo(coord).occupier == currentRoyalPiece) {
                             isValid = false;
                             break;
                         }
                     }
                 }
-                if (isValid) mover.AddToAvailableMoves(mover.GetTemplateMoves()[i]);
+                if (isValid) availableMoves.Add(templateMoves[i]);
             }
 
             if (mover is King) {
-                AddAvailableCastleMoves((King)mover);
+                availableMoves.AddRange(TryAddAvailableCastleMoves((King)mover));
             } else if (mover is Pawn) {
-                AddAvailableEnPassantMoves(mover);
+                BoardCoord enPassantMove = TryAddAvailableEnPassantMove(mover);
+                if (enPassantMove != BoardCoord.NULL) {
+                    availableMoves.Add(enPassantMove);
+                }
             }
+            return availableMoves;
         }
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
@@ -108,18 +110,22 @@ namespace ChessGameModes {
         protected override bool IsPieceInCheck(ChessPiece king) {
             if (checkingForCheck) return false;
 
-            foreach (ChessPiece piece in GetPieces(GetOpposingTeamTurn())) {
+            opposingTeamCheckThreats = GetAllPossibleCheckThreats(king);
+
+            checkingForCheck = true;
+            foreach (ChessPiece piece in opposingTeamCheckThreats) {
                 if (piece.IsAlive) {
-                    CalculateAvailableMoves(piece);
-                    if (piece.CanMoveTo(king.GetBoardPosition()) && (piece is King) == false) {
+                    if ((piece is King) == false && CalculateAvailableMoves(piece).Contains(king.GetBoardPosition())) {
+                        checkingForCheck = false;
                         return true;
                     }
                 }
             }
+            checkingForCheck = false;
             return false;
         }
 
-        protected override void AddAvailableEnPassantMoves(ChessPiece mover) {
+        protected override BoardCoord TryAddAvailableEnPassantMove(ChessPiece mover) {
             const int LEFT = -1;
             const int RIGHT = 1;
 
@@ -134,19 +140,20 @@ namespace ChessGameModes {
                                 bool isValid = true;
                                 for (int x = -1; x <= 1 && isValid; x++) {
                                     for (int y = -1; y <= 1; y++) {
-                                        BoardCoord coord2 = board.GetCoordInfo(mover.GetTemplateMoves()[i]).occupier.GetRelativeBoardCoord(x, y);
+                                        BoardCoord coord2 = piece.GetRelativeBoardCoord(x, y);
                                         if (board.ContainsCoord(coord2) && (x != 0 && y != 0) && board.GetCoordInfo(coord2).occupier == currentRoyalPiece) {
                                             isValid = false;
                                             break;
                                         }
                                     }
                                 }
-                                if (isValid) mover.AddToAvailableMoves(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1)));
+                                if (isValid) return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1));
                             }
                         }
                     }
                 }
             }
+            return BoardCoord.NULL;
         }
     }
 }

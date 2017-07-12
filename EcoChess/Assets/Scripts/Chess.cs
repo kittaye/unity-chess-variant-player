@@ -26,7 +26,7 @@ public abstract class Chess {
 
     public abstract void PopulateBoard();
 
-    public abstract void CalculateAvailableMoves(ChessPiece mover);
+    public abstract List<BoardCoord> CalculateAvailableMoves(ChessPiece mover);
 
     public abstract bool MovePiece(ChessPiece mover, BoardCoord destination);
 

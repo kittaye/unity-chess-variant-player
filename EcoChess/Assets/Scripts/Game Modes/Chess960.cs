@@ -139,30 +139,26 @@ namespace ChessGameModes {
             BoardCoord oldPos = mover.GetBoardPosition();
             bool kingCastlingThisMove = false;
 
-            if (mover.CanMoveTo(destination)) {
-                ChessPiece destinationOccupier = board.GetCoordInfo(destination).occupier;
-                // If the selected destination has a friendly rook occupying it, the move is a castling move.
-                if (mover is King && mover.MoveCount == 0 && destinationOccupier is Rook) {
-                    // Switch the destination from the rook's position to the king's final castle position.
-                    kingCastlingThisMove = true;
+            ChessPiece destinationOccupier = board.GetCoordInfo(destination).occupier;
+            // If the selected destination has a friendly rook occupying it, the move is a castling move.
+            if (mover is King && mover.MoveCount == 0 && destinationOccupier is Rook) {
+                // Switch the destination from the rook's position to the king's final castle position.
+                kingCastlingThisMove = true;
 
-                    mover.RemoveAvailableMoves(destination);
-                    if (destination.x < mover.GetBoardPosition().x) {
-                        if(destinationOccupier.GetTeam() == Team.WHITE) {
-                            aSideWhiteRook = (Rook)destinationOccupier;
-                        } else {
-                            aSideBlackRook = (Rook)destinationOccupier;
-                        }
-                        destination = new BoardCoord(2, destination.y);
+                if (destination.x < mover.GetBoardPosition().x) {
+                    if (destinationOccupier.GetTeam() == Team.WHITE) {
+                        aSideWhiteRook = (Rook)destinationOccupier;
                     } else {
-                        if (destinationOccupier.GetTeam() == Team.WHITE) {
-                            hSideWhiteRook = (Rook)destinationOccupier;
-                        } else {
-                            hSideBlackRook = (Rook)destinationOccupier;
-                        }
-                        destination = new BoardCoord(6, destination.y);
+                        aSideBlackRook = (Rook)destinationOccupier;
                     }
-                    mover.AddToAvailableMoves(destination);
+                    destination = new BoardCoord(2, destination.y);
+                } else {
+                    if (destinationOccupier.GetTeam() == Team.WHITE) {
+                        hSideWhiteRook = (Rook)destinationOccupier;
+                    } else {
+                        hSideBlackRook = (Rook)destinationOccupier;
+                    }
+                    destination = new BoardCoord(6, destination.y);
                 }
             }
 
@@ -180,12 +176,14 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override void AddAvailableCastleMoves(ChessPiece king, bool canCastleLeftward = true, bool canCastleRightward = true) {
+        protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, bool canCastleLeftward = true, bool canCastleRightward = true) {
             const int LEFT = -1;
             const int RIGHT = 1;
 
             // If king is not in check and hasn't moved, it can try castle moves.
-            if (IsPieceInCheck(king) && king.MoveCount == 0) {
+            if (king.MoveCount == 0 && IsPieceInCheck(king)) {
+                List<BoardCoord> castleMoves = new List<BoardCoord>(2);
+
                 BoardCoord CASTLE_ROOKPOS;
                 BoardCoord CASTLE_KINGPOS;
 
@@ -252,11 +250,13 @@ namespace ChessGameModes {
                         if (IsAlly(currentRookPosOccupier, CASTLE_ROOKPOS) && currentRookPosOccupier != castlingRook && currentRookPosOccupier != king) {
                             continue;
                         } else if (currentKingPosOccupier == null || currentKingPosOccupier == castlingRook || currentKingPosOccupier == king) {
-                            king.AddToAvailableMoves(castlingRook.GetBoardPosition());
+                            castleMoves.Add(castlingRook.GetBoardPosition());
                         }
                     }
                 }
+                return castleMoves.ToArray();
             }
+            return new BoardCoord[0];
         }
     }
 }

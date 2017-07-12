@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace ChessGameModes {
@@ -78,11 +78,13 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override void AddAvailableCastleMoves(ChessPiece king, bool canCastleLeftward = true, bool canCastleRightward = true) {
+        protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, bool canCastleLeftward = true, bool canCastleRightward = true) {
             const int LEFT = -1;
             const int RIGHT = 1;
 
             if (IsPieceInCheck(king) == false && king.MoveCount == 0) {
+                List<BoardCoord> castleMoves = new List<BoardCoord>(2);
+
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     if (!canCastleLeftward && i == LEFT) continue;
                     if (!canCastleRightward && i == RIGHT) break;
@@ -95,10 +97,10 @@ namespace ChessGameModes {
                         ChessPiece occupier = board.GetCoordInfo(coord).occupier;
                         if (occupier != null) {
                             if (occupier is Rook && occupier.MoveCount == 0) {
-                                if (king.CanMoveTo(king.GetBoardPosition() + new BoardCoord(i, 0))
+                                if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i, 0)) == false
                                     && IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i * 2, 0)) == false
                                     && IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i * 3, 0)) == false) {
-                                    king.AddToAvailableMoves(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * 3, 0)));
+                                    castleMoves.Add(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * 3, 0)));
                                 }
                             }
                             break;
@@ -107,7 +109,9 @@ namespace ChessGameModes {
                         coord = new BoardCoord(x, y);
                     }
                 }
+                return castleMoves.ToArray();
             }
+            return new BoardCoord[0];
         }
 
     }

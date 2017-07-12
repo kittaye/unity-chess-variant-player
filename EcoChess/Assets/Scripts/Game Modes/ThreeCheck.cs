@@ -25,8 +25,7 @@ namespace ChessGameModes {
             bool hasAnyMoves = false;
             foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
                 if (piece.IsAlive) {
-                    CalculateAvailableMoves(piece);
-                    if (piece.GetAvailableMoves().Length > 0) {
+                    if (CalculateAvailableMoves(piece).Count > 0) {
                         hasAnyMoves = true;
                         break;
                     }

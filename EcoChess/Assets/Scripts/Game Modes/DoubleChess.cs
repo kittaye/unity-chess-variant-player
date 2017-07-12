@@ -79,8 +79,7 @@ namespace ChessGameModes {
         public override bool CheckWinState() {
             foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
                 if (piece.IsAlive) {
-                    CalculateAvailableMoves(piece);
-                    if (piece.GetAvailableMoves().Length > 0) return false;
+                    if (CalculateAvailableMoves(piece).Count > 0) return false;
                 }
             }
 
@@ -108,28 +107,30 @@ namespace ChessGameModes {
             return false;
         }
 
-        public override void CalculateAvailableMoves(ChessPiece mover) {
-            mover.ClearAvailableMoves();
-            mover.ClearTemplateMoves();
+        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
+            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
+            List<BoardCoord> availableMoves = new List<BoardCoord>(2);
 
-            mover.CalculateTemplateMoves();
-            BoardCoord[] templateMoves = mover.GetTemplateMoves();
             for (int i = 0; i < templateMoves.Length; i++) {
                 if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false
                     && IsPieceInCheckAfterThisMove(secondCurrentKing, mover, templateMoves[i]) == false) {
-                    mover.AddToAvailableMoves(templateMoves[i]);
+                    availableMoves.Add(templateMoves[i]);
                 }
             }
 
             if (mover is King) {
                 if (mover == currentRoyalPiece) {
-                    AddAvailableCastleMoves((King)mover, true, false);
+                    availableMoves.AddRange(TryAddAvailableCastleMoves((King)mover, true, false));
                 } else if (mover == secondCurrentKing) {
-                    AddAvailableCastleMoves((King)mover, false, true);
+                    availableMoves.AddRange(TryAddAvailableCastleMoves((King)mover, false, true));
                 }
             } else if (mover is Pawn) {
-                AddAvailableEnPassantMoves(mover);
+                BoardCoord enPassantMove = TryAddAvailableEnPassantMove(mover);
+                if (enPassantMove != BoardCoord.NULL) {
+                    availableMoves.Add(enPassantMove);
+                }
             }
+            return availableMoves;
         }
     }
 }

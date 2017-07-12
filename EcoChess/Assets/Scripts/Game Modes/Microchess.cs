@@ -64,25 +64,24 @@ namespace ChessGameModes {
             return false;
         }
 
-        public override void CalculateAvailableMoves(ChessPiece mover) {
-            mover.ClearAvailableMoves();
-            mover.ClearTemplateMoves();
+        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
+            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
+            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
 
-            mover.CalculateTemplateMoves();
-            BoardCoord[] templateMoves = mover.GetTemplateMoves();
             for (int i = 0; i < templateMoves.Length; i++) {
                 if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    mover.AddToAvailableMoves(templateMoves[i]);
+                    availableMoves.Add(templateMoves[i]);
                 }
             }
 
             if (mover is King) {
                 if (mover.GetTeam() == Team.WHITE) {
-                    AddAvailableCastleMoves(mover, true, false);
+                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, true, false));
                 } else {
-                    AddAvailableCastleMoves(mover, false, true);
+                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, false, true));
                 }
             }
+            return availableMoves;
         }
     }
 }

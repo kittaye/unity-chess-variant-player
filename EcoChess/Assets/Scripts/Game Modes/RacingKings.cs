@@ -55,8 +55,8 @@ namespace ChessGameModes {
                 BoardCoord stalemateSquare2 = new BoardCoord(currentRoyalPiece.GetBoardPosition().x + 1, BOARD_HEIGHT - 1);
                 BoardCoord stalemateSquare3 = new BoardCoord(currentRoyalPiece.GetBoardPosition().x - 1, BOARD_HEIGHT - 1);
 
-                CalculateAvailableMoves(currentRoyalPiece);
-                if (currentRoyalPiece.CanMoveTo(stalemateSquare1) || currentRoyalPiece.CanMoveTo(stalemateSquare2) || currentRoyalPiece.CanMoveTo(stalemateSquare3)) {
+                List<BoardCoord> kingMoves = CalculateAvailableMoves(currentRoyalPiece);
+                if (kingMoves.Contains(stalemateSquare1) || kingMoves.Contains(stalemateSquare2) || kingMoves.Contains(stalemateSquare3)) {
                     Debug.Log("Stalemate after team " + GetOpposingTeamTurn().ToString() + "'s move! (Team " + GetCurrentTeamTurn().ToString()
                         + " is able to reach the eighth rank on this turn)  -- Draw!");
                     return true;
@@ -74,8 +74,7 @@ namespace ChessGameModes {
 
             foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
                 if (piece.IsAlive) {
-                    CalculateAvailableMoves(piece);
-                    if (piece.GetAvailableMoves().Length > 0) return false;
+                    if (CalculateAvailableMoves(piece).Count > 0) return false;
                 }
             }
 
@@ -87,18 +86,16 @@ namespace ChessGameModes {
             return MakeMove(mover, destination);
         }
 
-        public override void CalculateAvailableMoves(ChessPiece mover) {
-            mover.ClearAvailableMoves();
-            mover.ClearTemplateMoves();
-
-            mover.CalculateTemplateMoves();
-            BoardCoord[] templateMoves = mover.GetTemplateMoves();
+        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
+            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
+            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
 
             for (int i = 0; i < templateMoves.Length; i++) {
                if (IsAKingInCheckAfterThisMove(mover, templateMoves[i]) == false) {
-                    mover.AddToAvailableMoves(templateMoves[i]);
+                    availableMoves.Add(templateMoves[i]);
                }
             }
+            return availableMoves;
         }
 
         private bool IsAKingInCheckAfterThisMove(ChessPiece mover, BoardCoord dest) {

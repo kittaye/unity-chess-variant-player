@@ -78,8 +78,7 @@ namespace ChessGameModes {
 
             foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
                 if (piece.IsAlive) {
-                    CalculateAvailableMoves(piece);
-                    if (piece.GetAvailableMoves().Length > 0) return false;
+                    if (CalculateAvailableMoves(piece).Count > 0) return false;
                 }
             }
 
@@ -117,23 +116,26 @@ namespace ChessGameModes {
             }
         }
 
-        public override void CalculateAvailableMoves(ChessPiece mover) {
-            mover.ClearAvailableMoves();
-            mover.ClearTemplateMoves();
+        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
+            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
+            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
 
-            mover.CalculateTemplateMoves();
-            BoardCoord[] templateMoves = mover.GetTemplateMoves();
             for (int i = 0; i < templateMoves.Length; i++) {
                 if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    mover.AddToAvailableMoves(templateMoves[i]);
+                    availableMoves.Add(templateMoves[i]);
                 }
             }
 
             if(mover is King) {
-                AddAvailableCastleMoves(mover);
+                availableMoves.AddRange(TryAddAvailableCastleMoves(mover));
             } else if (mover is Pawn) {
-                AddAvailableEnPassantMoves(mover);
+                BoardCoord enPassantMove = TryAddAvailableEnPassantMove(mover);
+                if(enPassantMove != BoardCoord.NULL) {
+                    availableMoves.Add(enPassantMove);
+                }
             }
+
+            return availableMoves;
         }
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
@@ -212,19 +214,19 @@ namespace ChessGameModes {
                 BoardCoord oldPos = mover.GetBoardPosition();
                 SimulateMove(mover, dest, originalOccupier, out originalLastMover);
 
-                //ChessPiece occupier = null;
-                //if (mover is Pawn) {
-                //    occupier = CheckPawnEnPassantCapture((Pawn)mover);
-                //}
+                ChessPiece occupier = null;
+                if (mover is Pawn) {
+                    occupier = CheckPawnEnPassantCapture((Pawn)mover);
+                }
 
                 // Check whether the piece is in check after this temporary move
                 bool isInCheck = IsPieceInCheck(pieceToCheck);
 
-                //if(occupier != null) {
-                //    board.GetCoordInfo(occupier.GetBoardPosition()).occupier = occupier;
-                //    occupier.IsAlive = true;
-                //    occupier.gameObject.SetActive(true);
-                //}
+                if (occupier != null) {
+                    board.GetCoordInfo(occupier.GetBoardPosition()).occupier = occupier;
+                    occupier.IsAlive = true;
+                    occupier.gameObject.SetActive(true);
+                }
 
                 // Revert the temporary move back to normal
                 RevertSimulatedMove(mover, dest, originalOccupier, originalLastMover, oldPos);
@@ -241,10 +243,11 @@ namespace ChessGameModes {
 
             checkingForCheck = true;
             foreach (ChessPiece piece in opposingTeamCheckThreats) {
-                CalculateAvailableMoves(piece);
-                if (piece.CanMoveTo(pieceToCheck.GetBoardPosition())) {
-                    checkingForCheck = false;
-                    return true;
+                if (piece.IsAlive) {
+                    if (CalculateAvailableMoves(piece).Contains(pieceToCheck.GetBoardPosition())) {
+                        checkingForCheck = false;
+                        return true;
+                    }
                 }
             }
             checkingForCheck = false;
@@ -268,13 +271,13 @@ namespace ChessGameModes {
                 }
             }
 
-            foreach (Knight knight in GetPieces<Knight>(opposingTeamTurn)) {
+            foreach (Knight knight in GetPieces<Knight>(pieceToCheck.GetOpposingTeam())) {
                 possibleCheckThreats.Add(knight);
             }
             return possibleCheckThreats;
         }
 
-        protected virtual void AddAvailableEnPassantMoves(ChessPiece mover) {
+        protected virtual BoardCoord TryAddAvailableEnPassantMove(ChessPiece mover) {
             const int LEFT = -1;
             const int RIGHT = 1;
 
@@ -286,19 +289,22 @@ namespace ChessGameModes {
                         if (piece is Pawn && piece == lastMovedPiece && ((Pawn)piece).validEnPassant) {
                             ((Pawn)mover).enPassantTargets.Add((Pawn)piece);
                             if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
-                                mover.AddToAvailableMoves(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1)));
+                                return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1));
                             }
                         }
                     }
                 }
             }
+            return BoardCoord.NULL;
         }
 
-        protected virtual void AddAvailableCastleMoves(ChessPiece king, bool canCastleLeftward = true, bool canCastleRightward = true) {
+        protected virtual BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, bool canCastleLeftward = true, bool canCastleRightward = true) {
             const int LEFT = -1;
             const int RIGHT = 1;
 
-            if (IsPieceInCheck(king) == false && king.MoveCount == 0) {
+            if (IsPieceInCheck(king) == false) {
+                List<BoardCoord> castleMoves = new List<BoardCoord>(2);
+
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     if (!canCastleLeftward && i == LEFT) continue;
                     if (!canCastleRightward && i == RIGHT) break;
@@ -311,9 +317,9 @@ namespace ChessGameModes {
                         ChessPiece occupier = board.GetCoordInfo(coord).occupier;
                         if (occupier != null) {
                             if (occupier is Rook && occupier.MoveCount == 0) {
-                                if (king.CanMoveTo(king.GetBoardPosition() + new BoardCoord(i, 0))
+                                if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i, 0)) == false
                                     && IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i * 2, 0)) == false) {
-                                    king.AddToAvailableMoves(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * 2, 0)));
+                                    castleMoves.Add(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * 2, 0)));
                                 }
                             }
                             break;
@@ -322,7 +328,9 @@ namespace ChessGameModes {
                         coord = new BoardCoord(x, y);
                     }
                 }
+                return castleMoves.ToArray();
             }
+            return new BoardCoord[0];
         }
     }
 }
