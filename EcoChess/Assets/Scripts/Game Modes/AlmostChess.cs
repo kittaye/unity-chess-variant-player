@@ -45,9 +45,7 @@ namespace ChessGameModes {
         protected override List<ChessPiece> GetAllPossibleCheckThreats(ChessPiece pieceToCheck) {
             List<ChessPiece> possibleCheckThreats = base.GetAllPossibleCheckThreats(pieceToCheck);
 
-            foreach (Empress empress in GetPieces<Empress>(opposingTeamTurn)) {
-                possibleCheckThreats.Add(empress);
-            }
+            GetPiecesOfType<Empress>(pieceToCheck.GetOpposingTeam()).ForEach(x => { possibleCheckThreats.Add(x); });
 
             return possibleCheckThreats;
         }
