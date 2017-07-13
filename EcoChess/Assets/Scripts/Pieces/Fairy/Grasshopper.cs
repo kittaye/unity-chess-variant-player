@@ -19,7 +19,10 @@ public class Grasshopper : ChessPiece {
 
             while (chessGame.board.ContainsCoord(coord)) {
                 if(chessGame.board.GetCoordInfo(coord).occupier != null) {
-                    moves.Add(chessGame.TryGetSpecificMove(this, coord + new BoardCoord(xModifier, yModifier)));
+                    BoardCoord grasshopperMove = chessGame.TryGetSpecificMove(this, coord + new BoardCoord(xModifier, yModifier));
+                    if(grasshopperMove != BoardCoord.NULL) {
+                        moves.Add(grasshopperMove);
+                    }
                     break;
                 }
                 coord.x += xModifier;
