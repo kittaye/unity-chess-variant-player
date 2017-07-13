@@ -40,19 +40,19 @@ public abstract class Chess {
         return opposingTeamTurn;
     }
 
-    public List<T> GetPieces<T>(Team team) where T : ChessPiece {
+    public List<T> GetPiecesOfType<T>(Team team, bool aliveOnly = true) where T : ChessPiece {
         List<T> selectionOfPieces = new List<T>();
         switch (team) {
             case Team.WHITE:
                 foreach (ChessPiece piece in whitePieces) {
-                    if (piece is T) {
+                    if (piece is T && piece.IsAlive) {
                         selectionOfPieces.Add((T)piece);
                     }
                 }
                 break;
             case Team.BLACK:
                 foreach (ChessPiece piece in blackPieces) {
-                    if (piece is T) {
+                    if (piece is T && piece.IsAlive) {
                         selectionOfPieces.Add((T)piece);
                     }
                 }
@@ -61,33 +61,48 @@ public abstract class Chess {
         return selectionOfPieces;
     }
 
-    public List<T> GetPieces<T>() where T : ChessPiece {
+    public List<T> GetPiecesOfType<T>(bool aliveOnly = true) where T : ChessPiece {
         List<T> selectionOfPieces = new List<T>();
         foreach (ChessPiece piece in whitePieces) {
-            if(piece is T) {
+            if(piece is T && piece.IsAlive) {
                 selectionOfPieces.Add((T)piece);
             }
         }
         foreach (ChessPiece piece in blackPieces) {
-            if (piece is T) {
+            if (piece is T && piece.IsAlive) {
                 selectionOfPieces.Add((T)piece);
             }
         }
         return selectionOfPieces;
     }
 
-    public List<ChessPiece> GetPieces() {
-        List<ChessPiece> pieces = new List<ChessPiece>();
-        pieces.AddRange(whitePieces);
-        pieces.AddRange(blackPieces);
+    public List<ChessPiece> GetPieces(bool aliveOnly = true) {
+        List<ChessPiece> pieces = new List<ChessPiece>(whitePieces.Count + blackPieces.Count);
+        if (aliveOnly) {
+            whitePieces.ForEach(x => { if (x.IsAlive) pieces.Add(x); });
+            blackPieces.ForEach(x => { if (x.IsAlive) pieces.Add(x); });
+        } else {
+            pieces.AddRange(whitePieces);
+            pieces.AddRange(blackPieces);
+        }
         return pieces;
     }
 
-    public List<ChessPiece> GetPieces(Team team) {
-        if(team == Team.WHITE) {
-            return new List<ChessPiece>(whitePieces);
+    public List<ChessPiece> GetPieces(Team team, bool aliveOnly = true) {
+        List<ChessPiece> pieces = new List<ChessPiece>();
+        if (aliveOnly) {
+            if (team == Team.WHITE) {
+                whitePieces.ForEach(x => { if (x.IsAlive) pieces.Add(x); });
+            } else {
+                blackPieces.ForEach(x => { if (x.IsAlive) pieces.Add(x); });
+            }
+            return pieces;
+        } else {
+            if (team == Team.WHITE) {
+                return new List<ChessPiece>(whitePieces);
+            }
+            return new List<ChessPiece>(blackPieces);
         }
-        return new List<ChessPiece>(blackPieces);
     }
 
     public bool IsAlly(ChessPiece mover, BoardCoord coord) {
