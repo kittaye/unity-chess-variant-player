@@ -107,6 +107,7 @@
     <Compile Include="Assets\Scripts\Game Modes\LosingChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Microchess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\PawnEndgame.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\DummyVariant.cs" />
     <Compile Include="Assets\Scripts\Game Modes\PeasantsRevolt.cs" />
     <Compile Include="Assets\Scripts\Game Modes\RacingKings.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Silverman4x5.cs" />
