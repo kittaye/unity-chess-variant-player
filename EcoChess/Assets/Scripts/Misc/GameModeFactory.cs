@@ -25,7 +25,7 @@ namespace ChessGameModes {
                 case GameMode.FIDE:
                     return new FIDERuleset();
                 case GameMode.GrandChess:
-                    return new FIDERuleset();
+                    return new GrandChess();
                 case GameMode.Horde:
                     return new Horde();
                 case GameMode.KingoftheHill:
