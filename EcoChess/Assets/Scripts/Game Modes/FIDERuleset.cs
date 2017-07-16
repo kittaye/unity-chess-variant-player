@@ -149,7 +149,10 @@ namespace ChessGameModes {
                 } else if (mover is Pawn) {
                     ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -2) == oldPos);
                     CheckPawnEnPassantCapture((Pawn)mover);
-                    CheckPawnPromotion((Pawn)mover);
+                    ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
+                    if(promotedPiece != null) {
+                        mover = promotedPiece;
+                    }
                 }
                 return true;
             }
@@ -176,6 +179,7 @@ namespace ChessGameModes {
             if (board.ContainsCoord(mover.GetRelativeBoardCoord(0, -1)) && IsThreat(mover, mover.GetRelativeBoardCoord(0, -1))) {
                 ChessPiece occupier = board.GetCoordInfo(mover.GetRelativeBoardCoord(0, -1)).occupier;
                 if (occupier != null && occupier is Pawn && ((Pawn)occupier).validEnPassant) {
+                    mover.CaptureCount++;
                     RemovePieceFromBoard(occupier);
                     return (Pawn)occupier;
                 }
@@ -183,12 +187,13 @@ namespace ChessGameModes {
             return null;
         }
 
-        protected virtual void CheckPawnPromotion(Pawn mover) {
+        protected virtual ChessPiece CheckPawnPromotion(Pawn mover) {
             if (mover.GetRelativeBoardCoord(0, 1).y < WHITE_BACKROW || mover.GetRelativeBoardCoord(0, 1).y > BLACK_BACKROW) {
                 RemovePieceFromBoard(mover);
                 RemovePieceFromTeam(mover);
-                AddPieceToBoard(ChessPieceFactory.Create(Piece.Queen, mover.GetTeam(), mover.GetBoardPosition()));
+                return AddPieceToBoard(ChessPieceFactory.Create(Piece.Queen, mover.GetTeam(), mover.GetBoardPosition()));
             }
+            return null;
         }
 
         protected Rook PerformCastle(Rook castlingRook, BoardCoord castlingRookNewPos) {
