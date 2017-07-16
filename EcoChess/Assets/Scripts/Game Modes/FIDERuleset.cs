@@ -147,7 +147,7 @@ namespace ChessGameModes {
                 if (mover is King && mover.MoveCount == 1) {
                     TryPerformCastlingRookMoves(mover);
                 } else if (mover is Pawn) {
-                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -2) == oldPos);
+                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
                     CheckPawnEnPassantCapture((Pawn)mover);
                     ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
                     if(promotedPiece != null) {
@@ -248,11 +248,9 @@ namespace ChessGameModes {
 
             checkingForCheck = true;
             foreach (ChessPiece piece in opposingTeamCheckThreats) {
-                if (piece.IsAlive) {
-                    if (CalculateAvailableMoves(piece).Contains(pieceToCheck.GetBoardPosition())) {
-                        checkingForCheck = false;
-                        return true;
-                    }
+                if (CalculateAvailableMoves(piece).Contains(pieceToCheck.GetBoardPosition())) {
+                    checkingForCheck = false;
+                    return true;
                 }
             }
             checkingForCheck = false;
