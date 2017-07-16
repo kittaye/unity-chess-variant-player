@@ -89,6 +89,26 @@ public class Board {
         return coordinates.ContainsKey(coord);
     }
 
+    public bool RemoveBoardCoordinates(string coordKey) {
+        BoardCoord coord;
+        if (TryGetCoordWithKey(coordKey, out coord)) {
+            GetCoordInfo(coord).boardChunk.SetActive(false);
+            coordinates.Remove(coord);
+            return true;
+        }
+        return false;
+    }
+
+    public void RemoveBoardCoordinates(string[] coordKeys) {
+        for (int i = 0; i < coordKeys.Length; i++) {
+            BoardCoord coord;
+            if (TryGetCoordWithKey(coordKeys[i], out coord)) {
+                GetCoordInfo(coord).boardChunk.SetActive(false);
+                coordinates.Remove(coord);
+            }
+        }
+    }
+
     public bool RemoveBoardCoordinates(BoardCoord coord) {
         if (ContainsCoord(coord)) {
             GetCoordInfo(coord).boardChunk.SetActive(false);
