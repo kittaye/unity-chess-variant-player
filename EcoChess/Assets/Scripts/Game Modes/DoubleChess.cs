@@ -98,7 +98,7 @@ namespace ChessGameModes {
                 if (mover is King && mover.MoveCount == 1) {
                     TryPerformCastlingRookMoves((King)mover, 2, 14, 3, 13);
                 } else if (mover is Pawn) {
-                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -2) == oldPos);
+                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
                     CheckPawnEnPassantCapture((Pawn)mover);
                     CheckPawnPromotion((Pawn)mover);
                 }
@@ -131,6 +131,58 @@ namespace ChessGameModes {
                 }
             }
             return availableMoves;
+        }
+
+        protected override BoardCoord TryAddAvailableEnPassantMove(ChessPiece mover) {
+            const int LEFT = -1;
+            const int RIGHT = 1;
+
+            if (mover is Pawn && ((Pawn)mover).canEnPassantCapture) {
+                for (int i = LEFT; i <= RIGHT; i += 2) {
+                    int y = 0;
+                    while(board.ContainsCoord(mover.GetRelativeBoardCoord(i, y))) {
+                        BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, y));
+                        if (board.ContainsCoord(coord)) {
+                            ChessPiece piece = board.GetCoordInfo(coord).occupier;
+                            if (piece != null) {
+                                if (piece is Pawn && piece == lastMovedPiece && ((Pawn)piece).validEnPassant) {
+                                    ((Pawn)mover).enPassantTargets.Add((Pawn)piece);
+                                    if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
+                                        return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1));
+                                    }
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
+                        y--;
+                    }
+                }
+            }
+            return BoardCoord.NULL;
+        }
+
+        protected override Pawn CheckPawnEnPassantCapture(Pawn mover) {
+            int y = -1;
+            while(board.ContainsCoord(mover.GetRelativeBoardCoord(0, y))) {
+                ChessPiece occupier = board.GetCoordInfo(mover.GetRelativeBoardCoord(0, y)).occupier;
+
+                if(occupier != null) {
+                    if (IsThreat(mover, occupier.GetBoardPosition())) {
+                        if (occupier is Pawn && ((Pawn)occupier).validEnPassant) {
+                            mover.CaptureCount++;
+                            RemovePieceFromBoard(occupier);
+                            return (Pawn)occupier;
+                        } else {
+                            return null;
+                        }
+                    } else {
+                        return null;
+                    }
+                }
+                y--;
+            }
+            return null;
         }
     }
 }
