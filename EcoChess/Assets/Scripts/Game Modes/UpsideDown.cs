@@ -27,6 +27,9 @@ namespace ChessGameModes {
             currentRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(4, WHITE_BACKROW)));
             opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(4, BLACK_BACKROW)));
 
+            AddPieceToBoard(new Queen(Team.BLACK, new BoardCoord(3, WHITE_BACKROW)));
+            AddPieceToBoard(new Queen(Team.WHITE, new BoardCoord(3, BLACK_BACKROW)));
+
             aSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(0, WHITE_BACKROW)));
             aSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(0, BLACK_BACKROW)));
             hSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(7, WHITE_BACKROW)));
@@ -42,9 +45,6 @@ namespace ChessGameModes {
                 } else if (x == 2 || x == BOARD_WIDTH - 3) {
                     AddPieceToBoard(new Bishop(Team.BLACK, new BoardCoord(x, WHITE_BACKROW)));
                     AddPieceToBoard(new Bishop(Team.WHITE, new BoardCoord(x, BLACK_BACKROW)));
-                } else if (x == 3) {
-                    AddPieceToBoard(new Queen(Team.BLACK, new BoardCoord(x, WHITE_BACKROW)));
-                    AddPieceToBoard(new Queen(Team.WHITE, new BoardCoord(x, BLACK_BACKROW)));
                 }
             }
         }
