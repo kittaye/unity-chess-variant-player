@@ -5,8 +5,10 @@ public abstract class ChessPiece {
     private Team m_Team;
     private BoardCoord m_BoardPosition;
 
+    protected Piece m_pieceType;
     public GameObject gameObject;
-    public int MoveCount { get; set; }
+    public int MoveCount { get; private set; }
+    public int CaptureCount { get; set; }
     public bool IsAlive { get; set; }
 
     protected Chess chessGame;
@@ -27,6 +29,10 @@ public abstract class ChessPiece {
 
     public void SetBoardPosition(BoardCoord pos) {
         m_BoardPosition = pos;
+    }
+
+    public Piece GetPieceType() {
+        return m_pieceType;
     }
 
     public bool MakeMoveTo(BoardCoord destination) {

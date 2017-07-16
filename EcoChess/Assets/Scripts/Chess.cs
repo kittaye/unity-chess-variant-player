@@ -153,6 +153,7 @@ public abstract class Chess {
         bool wasThreat = IsThreat(mover, destination);
 
         if (mover.MakeMoveTo(destination)) {
+            if (wasThreat) mover.CaptureCount++;
             numConsecutiveCapturelessMoves = (wasThreat == false && (mover is Pawn) == false) ? numConsecutiveCapturelessMoves + 1 : 0;
             UpdateSquareOccupiers(previousPosition, mover.GetBoardPosition());
             lastMovedPiece = mover;
