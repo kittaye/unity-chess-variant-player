@@ -109,7 +109,7 @@ namespace ChessGameModes {
 
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
             BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(2);
+            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
 
             for (int i = 0; i < templateMoves.Length; i++) {
                 if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false
