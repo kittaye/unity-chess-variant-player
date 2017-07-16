@@ -92,6 +92,7 @@
     <Compile Include="Assets\Scripts\Controllers\MouseController.cs" />
     <Compile Include="Assets\Scripts\Data Structures\BoardCoord.cs" />
     <Compile Include="Assets\Scripts\Data Structures\CoordInfo.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Monster.cs" />
     <Compile Include="Assets\Scripts\Game Modes\ChecklessChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Andernach.cs" />
     <Compile Include="Assets\Scripts\Game Modes\SovereignChess.cs" />
@@ -114,6 +115,7 @@
     <Compile Include="Assets\Scripts\Game Modes\RacingKings.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Silverman4x5.cs" />
     <Compile Include="Assets\Scripts\Game Modes\ThreeCheck.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Balbo.cs" />
     <Compile Include="Assets\Scripts\Game Modes\UpsideDown.cs" />
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\Scripts\Managers\UIManager.cs" />
