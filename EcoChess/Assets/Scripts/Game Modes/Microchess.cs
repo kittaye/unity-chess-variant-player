@@ -55,7 +55,7 @@ namespace ChessGameModes {
                         hSideBlackRook = PerformCastle(hSideBlackRook, new BoardCoord(1, BLACK_BACKROW));
                     }
                 } else if (mover is Pawn) {
-                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -2) == oldPos);
+                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
                     CheckPawnEnPassantCapture((Pawn)mover);
                     CheckPawnPromotion((Pawn)mover);
                 }
