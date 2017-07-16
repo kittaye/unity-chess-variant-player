@@ -4,7 +4,7 @@ namespace ChessGameModes {
     public enum GameMode {
         Atomic, ChargeOfTheLightBrigade, Chess960, DoubleChess, FIDE, Horde, KingoftheHill, Knightmate, LosingChess
             , Microchess, PawnEndgame, PeasantsRevolt, RacingKings, Silverman4x5, ThreeCheck, UpsideDown
-            , AlmostChess, CapablancaChess, GrandChess
+            , AlmostChess, CapablancaChess, GrandChess, MonsterChess, BalboChess, AndernachChess,
     }
 
     public static class GameModeFactory {
@@ -14,6 +14,10 @@ namespace ChessGameModes {
                     return new Atomic();
                 case GameMode.AlmostChess:
                     return new AlmostChess();
+                case GameMode.AndernachChess:
+                    return new Andernach();
+                case GameMode.BalboChess:
+                    return new Balbo();
                 case GameMode.CapablancaChess:
                     return new Capablanca();
                 case GameMode.ChargeOfTheLightBrigade:
@@ -36,6 +40,8 @@ namespace ChessGameModes {
                     return new LosingChess();
                 case GameMode.Microchess:
                     return new Microchess();
+                case GameMode.MonsterChess:
+                    return new Monster();
                 case GameMode.PawnEndgame:
                     return new PawnEndgame();
                 case GameMode.PeasantsRevolt:
