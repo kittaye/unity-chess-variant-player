@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class Rook : ChessPiece {
     public Rook(Team team, BoardCoord position) : base(team, position) {
-
+        m_pieceType = Piece.Rook;
     }
 
     public override string ToString() {

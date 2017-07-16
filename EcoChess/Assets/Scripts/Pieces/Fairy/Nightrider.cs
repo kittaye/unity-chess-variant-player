@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public class Nightrider : ChessPiece {
     public Nightrider(Team team, BoardCoord position) : base(team, position) {
+        m_pieceType = Piece.Nightrider;
     }
 
     public override string ToString() {

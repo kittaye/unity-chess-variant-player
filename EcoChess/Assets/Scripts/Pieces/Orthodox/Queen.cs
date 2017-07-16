@@ -2,7 +2,7 @@
 
 public class Queen : ChessPiece {
     public Queen(Team team, BoardCoord position) : base(team, position) {
-
+        m_pieceType = Piece.Queen;
     }
 
     public override string ToString() {

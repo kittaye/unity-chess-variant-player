@@ -9,6 +9,7 @@ public class Pawn : ChessPiece {
 
     public Pawn(Team team, BoardCoord position, bool canEnPassantCapture = true, uint initialMoveLimit = 2) 
         : base(team, position) {
+        m_pieceType = Piece.Pawn;
         this.enPassantTargets = new List<Pawn>(2);
         this.validEnPassant = false;
         this.canEnPassantCapture = canEnPassantCapture;

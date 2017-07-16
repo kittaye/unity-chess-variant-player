@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public class Grasshopper : ChessPiece {
     public Grasshopper(Team team, BoardCoord position) : base(team, position) {
+        m_pieceType = Piece.Grasshopper;
     }
 
     public override string ToString() {

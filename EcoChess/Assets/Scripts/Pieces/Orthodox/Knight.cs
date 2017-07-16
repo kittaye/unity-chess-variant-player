@@ -2,7 +2,7 @@
 
 public class Knight : ChessPiece {
     public Knight(Team team, BoardCoord position) : base(team, position) {
-
+        m_pieceType = Piece.Knight;
     }
 
     public override string ToString() {
