@@ -5,6 +5,9 @@ public class Nightrider : ChessPiece {
     public Nightrider(Team team, BoardCoord position) : base(team, position) {
         m_pieceType = Piece.Nightrider;
     }
+    public Nightrider(Team team, string algebraicKeyPosition) : base(team, algebraicKeyPosition) {
+        m_pieceType = Piece.Nightrider;
+    }
 
     public override string ToString() {
         return GetTeam() + "_Nightrider";

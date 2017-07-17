@@ -5,6 +5,9 @@ public class Grasshopper : ChessPiece {
     public Grasshopper(Team team, BoardCoord position) : base(team, position) {
         m_pieceType = Piece.Grasshopper;
     }
+    public Grasshopper(Team team, string algebraicKeyPosition) : base(team, algebraicKeyPosition) {
+        m_pieceType = Piece.Grasshopper;
+    }
 
     public override string ToString() {
         return GetTeam() + "_Grasshopper";

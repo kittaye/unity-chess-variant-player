@@ -5,6 +5,9 @@ public class Empress : ChessPiece {
     public Empress(Team team, BoardCoord position) : base(team, position) {
         m_pieceType = Piece.Empress;
     }
+    public Empress(Team team, string algebraicKeyPosition) : base(team, algebraicKeyPosition) {
+        m_pieceType = Piece.Empress;
+    }
 
     public override string ToString() {
         return GetTeam() + "_Empress";

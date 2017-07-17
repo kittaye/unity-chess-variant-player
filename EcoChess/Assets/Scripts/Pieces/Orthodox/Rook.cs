@@ -5,6 +5,9 @@ public class Rook : ChessPiece {
     public Rook(Team team, BoardCoord position) : base(team, position) {
         m_pieceType = Piece.Rook;
     }
+    public Rook(Team team, string algebraicKeyPosition) : base(team, algebraicKeyPosition) {
+        m_pieceType = Piece.Rook;
+    }
 
     public override string ToString() {
         return GetTeam() + "_Rook";

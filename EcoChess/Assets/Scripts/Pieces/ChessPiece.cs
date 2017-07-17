@@ -21,6 +21,17 @@ public abstract class ChessPiece {
         IsAlive = false;
     }
 
+    public ChessPiece(Team team, string algebraicKeyPosition) {
+        chessGame = GameManager.Instance.chessGame;
+        m_Team = team;
+        BoardCoord position = BoardCoord.NULL;
+        if(chessGame.board.TryGetCoordWithKey(algebraicKeyPosition, out position)) {
+            m_BoardPosition = position;
+        }
+        MoveCount = 0;
+        IsAlive = false;
+    }
+
     public abstract List<BoardCoord> CalculateTemplateMoves();
 
     public BoardCoord GetBoardPosition() {

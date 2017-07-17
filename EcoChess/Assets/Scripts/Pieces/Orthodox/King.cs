@@ -4,6 +4,9 @@ public class King : ChessPiece {
     public King(Team team, BoardCoord position) : base(team, position) {
         m_pieceType = Piece.King;
     }
+    public King(Team team, string algebraicKeyPosition) : base(team, algebraicKeyPosition) {
+        m_pieceType = Piece.King;
+    }
 
     public override string ToString() {
         return GetTeam() + "_King";
