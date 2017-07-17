@@ -92,6 +92,7 @@
     <Compile Include="Assets\Scripts\Controllers\MouseController.cs" />
     <Compile Include="Assets\Scripts\Data Structures\BoardCoord.cs" />
     <Compile Include="Assets\Scripts\Data Structures\CoordInfo.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\ShiftedChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Monster.cs" />
     <Compile Include="Assets\Scripts\Game Modes\ChecklessChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Andernach.cs" />
