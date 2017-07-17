@@ -103,25 +103,12 @@ namespace ChessGameModes {
             return availableMoves;
         }
 
-        public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            BoardCoord oldPos = mover.GetBoardPosition();
-
-            // Try make the move
-            if (MakeMove(mover, destination)) {
-                // Check castling moves
-                if (mover is King && mover.MoveCount == 1) {
-                    TryPerformCastlingRookMoves(mover, 1, 7, 2, 6);
-                } else if (mover is Pawn) {
-                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
-                    CheckPawnEnPassantCapture((Pawn)mover);
-                    ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
-                    if (promotedPiece != null) {
-                        mover = promotedPiece;
-                    }
-                }
-                return true;
+        protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
+            if (mover.GetBoardPosition().x == 1) {
+                aSideBlackRook = PerformCastle(aSideBlackRook, new BoardCoord(2, mover.GetBoardPosition().y));
+            } else if (mover.GetBoardPosition().x == 7) {
+                hSideWhiteRook = PerformCastle(hSideWhiteRook, new BoardCoord(6, mover.GetBoardPosition().y));
             }
-            return false;
         }
     }
 }

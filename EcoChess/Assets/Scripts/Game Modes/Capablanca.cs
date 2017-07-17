@@ -60,22 +60,20 @@ namespace ChessGameModes {
             }
         }
 
-        public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            BoardCoord oldPos = mover.GetBoardPosition();
-
-            // Try make the move
-            if (MakeMove(mover, destination)) {
-                // Check castling moves
-                if (mover is King && mover.MoveCount == 1) {
-                    TryPerformCastlingRookMoves(mover, castlerRightx: 8, rookRightx: 7);
-                } else if (mover is Pawn) {
-                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
-                    CheckPawnEnPassantCapture((Pawn)mover);
-                    CheckPawnPromotion((Pawn)mover);
+        protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
+            if (mover.GetBoardPosition().x == 2) {
+                if (mover.GetTeam() == Team.WHITE) {
+                    aSideWhiteRook = PerformCastle(aSideWhiteRook, new BoardCoord(3, mover.GetBoardPosition().y));
+                } else {
+                    aSideBlackRook = PerformCastle(aSideBlackRook, new BoardCoord(3, mover.GetBoardPosition().y));
                 }
-                return true;
+            } else if (mover.GetBoardPosition().x == 8) {
+                if (mover.GetTeam() == Team.WHITE) {
+                    hSideWhiteRook = PerformCastle(hSideWhiteRook, new BoardCoord(7, mover.GetBoardPosition().y));
+                } else {
+                    hSideBlackRook = PerformCastle(hSideBlackRook, new BoardCoord(7, mover.GetBoardPosition().y));
+                }
             }
-            return false;
         }
 
         protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, bool canCastleLeftward = true, bool canCastleRightward = true) {

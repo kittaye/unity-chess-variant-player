@@ -91,20 +91,20 @@ namespace ChessGameModes {
             return true;
         }
 
-        public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            BoardCoord oldPos = mover.GetBoardPosition();
-
-            if (MakeMove(mover, destination)) {
-                if (mover is King && mover.MoveCount == 1) {
-                    TryPerformCastlingRookMoves((King)mover, 2, 14, 3, 13);
-                } else if (mover is Pawn) {
-                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
-                    CheckPawnEnPassantCapture((Pawn)mover);
-                    CheckPawnPromotion((Pawn)mover);
+        protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
+            if (mover.GetBoardPosition().x == 2) {
+                if (mover.GetTeam() == Team.WHITE) {
+                    aSideWhiteRook = PerformCastle(aSideWhiteRook, new BoardCoord(3, mover.GetBoardPosition().y));
+                } else {
+                    aSideBlackRook = PerformCastle(aSideBlackRook, new BoardCoord(3, mover.GetBoardPosition().y));
                 }
-                return true;
+            } else if (mover.GetBoardPosition().x == 14) {
+                if (mover.GetTeam() == Team.WHITE) {
+                    hSideWhiteRook = PerformCastle(hSideWhiteRook, new BoardCoord(13, mover.GetBoardPosition().y));
+                } else {
+                    hSideBlackRook = PerformCastle(hSideBlackRook, new BoardCoord(13, mover.GetBoardPosition().y));
+                }
             }
-            return false;
         }
 
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {

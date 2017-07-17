@@ -159,18 +159,18 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected void TryPerformCastlingRookMoves(ChessPiece mover, int castlerLeftx = 2, int castlerRightx = 6, int rookLeftx = 3, int rookRightx = 5) {
-            if (mover.GetBoardPosition().x == castlerLeftx) {
+        protected virtual void TryPerformCastlingRookMoves(ChessPiece mover) {
+            if (mover.GetBoardPosition().x == 2) {
                 if (mover.GetTeam() == Team.WHITE) {
-                    aSideWhiteRook = PerformCastle(aSideWhiteRook, new BoardCoord(rookLeftx, mover.GetBoardPosition().y));
+                    aSideWhiteRook = PerformCastle(aSideWhiteRook, new BoardCoord(3, mover.GetBoardPosition().y));
                 } else {
-                    aSideBlackRook = PerformCastle(aSideBlackRook, new BoardCoord(rookLeftx, mover.GetBoardPosition().y));
+                    aSideBlackRook = PerformCastle(aSideBlackRook, new BoardCoord(3, mover.GetBoardPosition().y));
                 }
-            } else if (mover.GetBoardPosition().x == castlerRightx) {
+            } else if (mover.GetBoardPosition().x == 6) {
                 if (mover.GetTeam() == Team.WHITE) {
-                    hSideWhiteRook = PerformCastle(hSideWhiteRook, new BoardCoord(rookRightx, mover.GetBoardPosition().y));
+                    hSideWhiteRook = PerformCastle(hSideWhiteRook, new BoardCoord(5, mover.GetBoardPosition().y));
                 } else {
-                    hSideBlackRook = PerformCastle(hSideBlackRook, new BoardCoord(rookRightx, mover.GetBoardPosition().y));
+                    hSideBlackRook = PerformCastle(hSideBlackRook, new BoardCoord(5, mover.GetBoardPosition().y));
                 }
             }
         }
