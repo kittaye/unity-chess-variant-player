@@ -24,7 +24,7 @@ namespace ChessGameModes {
             if(base.MovePiece(mover, destination)) {
                 if (((mover is King) == false) && mover.CaptureCount != currentCaptures) {
                     RemovePieceFromBoard(mover);
-                    RemovePieceFromTeam(mover);
+                    RemovePieceFromActiveTeam(mover);
                     if(mover is Pawn) {
                         AddPieceToBoard(new Pawn(mover.GetOpposingTeam(), destination, initialMoveLimit: 1));
                     } else {

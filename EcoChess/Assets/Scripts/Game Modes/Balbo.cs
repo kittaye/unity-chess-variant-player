@@ -6,7 +6,7 @@ namespace ChessGameModes {
     /// 
     /// Winstate: Checkmate.
     /// Piece types: Orthodox.
-    /// Piece rules: pawn
+    /// Piece rules: Pawns promote differently on different files.
     /// Board layout:
     ///             q b k    
     ///           r n b n r     
@@ -40,7 +40,7 @@ namespace ChessGameModes {
         }
 
         public override string ToString() {
-            return "Balbo's chess";
+            return "Balbo's Chess";
         }
 
         public override void PopulateBoard() {
