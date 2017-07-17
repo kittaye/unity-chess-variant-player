@@ -162,15 +162,15 @@ namespace ChessGameModes {
         protected void TryPerformCastlingRookMoves(ChessPiece mover, int castlerLeftx = 2, int castlerRightx = 6, int rookLeftx = 3, int rookRightx = 5) {
             if (mover.GetBoardPosition().x == castlerLeftx) {
                 if (mover.GetTeam() == Team.WHITE) {
-                    aSideWhiteRook = PerformCastle(aSideWhiteRook, new BoardCoord(rookLeftx, WHITE_BACKROW));
+                    aSideWhiteRook = PerformCastle(aSideWhiteRook, new BoardCoord(rookLeftx, mover.GetBoardPosition().y));
                 } else {
-                    aSideBlackRook = PerformCastle(aSideBlackRook, new BoardCoord(rookLeftx, BLACK_BACKROW));
+                    aSideBlackRook = PerformCastle(aSideBlackRook, new BoardCoord(rookLeftx, mover.GetBoardPosition().y));
                 }
             } else if (mover.GetBoardPosition().x == castlerRightx) {
                 if (mover.GetTeam() == Team.WHITE) {
-                    hSideWhiteRook = PerformCastle(hSideWhiteRook, new BoardCoord(rookRightx, WHITE_BACKROW));
+                    hSideWhiteRook = PerformCastle(hSideWhiteRook, new BoardCoord(rookRightx, mover.GetBoardPosition().y));
                 } else {
-                    hSideBlackRook = PerformCastle(hSideBlackRook, new BoardCoord(rookRightx, BLACK_BACKROW));
+                    hSideBlackRook = PerformCastle(hSideBlackRook, new BoardCoord(rookRightx, mover.GetBoardPosition().y));
                 }
             }
         }
@@ -190,7 +190,7 @@ namespace ChessGameModes {
         protected virtual ChessPiece CheckPawnPromotion(Pawn mover) {
             if (mover.GetRelativeBoardCoord(0, 1).y < WHITE_BACKROW || mover.GetRelativeBoardCoord(0, 1).y > BLACK_BACKROW) {
                 RemovePieceFromBoard(mover);
-                RemovePieceFromTeam(mover);
+                RemovePieceFromActiveTeam(mover);
                 return AddPieceToBoard(ChessPieceFactory.Create(Piece.Queen, mover.GetTeam(), mover.GetBoardPosition()));
             }
             return null;
@@ -200,7 +200,7 @@ namespace ChessGameModes {
             if (AssertContainsCoord(castlingRookNewPos)) {
                 if (castlingRook != null) {
                     RemovePieceFromBoard(castlingRook);
-                    RemovePieceFromTeam(castlingRook);
+                    RemovePieceFromActiveTeam(castlingRook);
                     return (Rook)AddPieceToBoard(new Rook((castlingRook.GetTeam()), castlingRookNewPos));
                 } else {
                     Debug.LogError("Reference to the castling rook should not be null! Ensure rook references were made.");
