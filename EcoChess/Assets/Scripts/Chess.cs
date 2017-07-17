@@ -177,7 +177,7 @@ public abstract class Chess {
         return false;
     }
 
-    protected bool RemovePieceFromTeam(ChessPiece piece) {
+    protected bool RemovePieceFromActiveTeam(ChessPiece piece) {
         if (piece.GetTeam() == Team.WHITE) {
             return whitePieces.Remove(piece);
         } else {
@@ -185,15 +185,25 @@ public abstract class Chess {
         }
     }
 
-    protected ChessPiece AddPieceToBoard(ChessPiece piece) {
+    protected void AddPieceToActiveTeam(ChessPiece piece) {
+        if (piece.GetTeam() == Team.WHITE) {
+            whitePieces.Add(piece);
+        } else {
+            blackPieces.Add(piece);
+        }
+    }
+
+    protected ChessPiece AddPieceToBoard(ChessPiece piece, bool addToActiveTeam = true) {
         if (CheckValidPlacement(piece)) {
             board.GetCoordInfo(piece.GetBoardPosition()).occupier = piece;
             piece.IsAlive = true;
             ChessObjectSpawner.InstantiateChessPiece(this, ChessObjectSpawner.Instance.piecePrefab, piece);
-            if (piece.GetTeam() == Team.WHITE) {
-                whitePieces.Add(piece);
-            } else {
-                blackPieces.Add(piece);
+            if (addToActiveTeam) {
+                if (piece.GetTeam() == Team.WHITE) {
+                    whitePieces.Add(piece);
+                } else {
+                    blackPieces.Add(piece);
+                }
             }
             return piece;
         }
