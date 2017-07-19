@@ -34,10 +34,10 @@ namespace ChessGameModes {
                 }
             }
 
-            if (mover is King) {
+            if (mover is King && mover.MoveCount == 0) {
                 availableMoves.AddRange(TryAddAvailableCastleMoves(mover));
             } else if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove(mover);
+                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
                 if (enPassantMove != BoardCoord.NULL) {
                     availableMoves.Add(enPassantMove);
                 }

@@ -181,7 +181,7 @@ namespace ChessGameModes {
             const int RIGHT = 1;
 
             // If king is not in check and hasn't moved, it can try castle moves.
-            if (king.MoveCount == 0 && IsPieceInCheck(king)) {
+            if (IsPieceInCheck(king)) {
                 List<BoardCoord> castleMoves = new List<BoardCoord>(2);
 
                 BoardCoord CASTLE_ROOKPOS;

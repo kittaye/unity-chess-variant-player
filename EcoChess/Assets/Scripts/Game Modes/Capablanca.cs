@@ -80,7 +80,7 @@ namespace ChessGameModes {
             const int LEFT = -1;
             const int RIGHT = 1;
 
-            if (IsPieceInCheck(king) == false && king.MoveCount == 0) {
+            if (IsPieceInCheck(king) == false) {
                 List<BoardCoord> castleMoves = new List<BoardCoord>(2);
 
                 for (int i = LEFT; i <= RIGHT; i += 2) {

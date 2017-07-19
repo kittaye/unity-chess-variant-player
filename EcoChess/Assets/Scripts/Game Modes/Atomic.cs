@@ -67,10 +67,10 @@ namespace ChessGameModes {
                 if (isValid) availableMoves.Add(templateMoves[i]);
             }
 
-            if (mover is King) {
+            if (mover is King && mover.MoveCount == 0) {
                 availableMoves.AddRange(TryAddAvailableCastleMoves((King)mover));
             } else if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove(mover);
+                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
                 if (enPassantMove != BoardCoord.NULL) {
                     availableMoves.Add(enPassantMove);
                 }
@@ -125,17 +125,16 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override BoardCoord TryAddAvailableEnPassantMove(ChessPiece mover) {
+        protected override BoardCoord TryAddAvailableEnPassantMove(Pawn mover) {
             const int LEFT = -1;
             const int RIGHT = 1;
 
-            if (mover is Pawn && ((Pawn)mover).canEnPassantCapture) {
+            if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
                     if (board.ContainsCoord(coord)) {
                         ChessPiece piece = board.GetCoordInfo(coord).occupier;
                         if (piece is Pawn && piece == lastMovedPiece && ((Pawn)piece).validEnPassant) {
-                            ((Pawn)mover).enPassantTargets.Add((Pawn)piece);
                             if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
                                 bool isValid = true;
                                 for (int x = -1; x <= 1 && isValid; x++) {

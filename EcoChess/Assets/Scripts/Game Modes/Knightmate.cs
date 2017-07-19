@@ -40,7 +40,7 @@ namespace ChessGameModes {
             if (mover is Knight && mover.MoveCount == 0) {
                 availableMoves.AddRange(TryAddAvailableCastleMoves(mover));
             } else if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove(mover);
+                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
                 if (enPassantMove != BoardCoord.NULL) {
                     availableMoves.Add(enPassantMove);
                 }
@@ -116,7 +116,7 @@ namespace ChessGameModes {
             const int LEFT = -1;
             const int RIGHT = 1;
 
-            if (knight.MoveCount == 0 && IsPieceInCheck(knight) == false) {
+            if (IsPieceInCheck(knight) == false) {
                 List<BoardCoord> castleMoves = new List<BoardCoord>(2);
 
                 for (int i = LEFT; i <= RIGHT; i += 2) {

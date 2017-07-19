@@ -94,7 +94,7 @@ namespace ChessGameModes {
                     availableMoves.AddRange(TryAddAvailableCastleMoves(mover, true, false));
                 }
             } else if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove(mover);
+                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
                 if (enPassantMove != BoardCoord.NULL) {
                     availableMoves.Add(enPassantMove);
                 }

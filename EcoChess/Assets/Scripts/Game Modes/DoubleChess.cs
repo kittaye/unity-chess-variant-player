@@ -118,14 +118,14 @@ namespace ChessGameModes {
                 }
             }
 
-            if (mover is King) {
+            if (mover is King && mover.MoveCount == 0) {
                 if (mover == currentRoyalPiece) {
                     availableMoves.AddRange(TryAddAvailableCastleMoves((King)mover, true, false));
                 } else if (mover == secondCurrentKing) {
                     availableMoves.AddRange(TryAddAvailableCastleMoves((King)mover, false, true));
                 }
             } else if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove(mover);
+                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
                 if (enPassantMove != BoardCoord.NULL) {
                     availableMoves.Add(enPassantMove);
                 }
@@ -133,11 +133,11 @@ namespace ChessGameModes {
             return availableMoves;
         }
 
-        protected override BoardCoord TryAddAvailableEnPassantMove(ChessPiece mover) {
+        protected override BoardCoord TryAddAvailableEnPassantMove(Pawn mover) {
             const int LEFT = -1;
             const int RIGHT = 1;
 
-            if (mover is Pawn && ((Pawn)mover).canEnPassantCapture) {
+            if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     int y = 0;
                     while(board.ContainsCoord(mover.GetRelativeBoardCoord(i, y))) {
@@ -146,7 +146,6 @@ namespace ChessGameModes {
                             ChessPiece piece = board.GetCoordInfo(coord).occupier;
                             if (piece != null) {
                                 if (piece is Pawn && piece == lastMovedPiece && ((Pawn)piece).validEnPassant) {
-                                    ((Pawn)mover).enPassantTargets.Add((Pawn)piece);
                                     if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
                                         return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1));
                                     }
