@@ -92,6 +92,7 @@
     <Compile Include="Assets\Scripts\Controllers\MouseController.cs" />
     <Compile Include="Assets\Scripts\Data Structures\BoardCoord.cs" />
     <Compile Include="Assets\Scripts\Data Structures\CoordInfo.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Berolina.cs" />
     <Compile Include="Assets\Scripts\Game Modes\ShiftedChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Monster.cs" />
     <Compile Include="Assets\Scripts\Game Modes\ChecklessChess.cs" />
@@ -124,6 +125,7 @@
     <Compile Include="Assets\Scripts\Misc\ChessPieceFactory.cs" />
     <Compile Include="Assets\Scripts\Misc\GameModeFactory.cs" />
     <Compile Include="Assets\Scripts\Pieces\ChessPiece.cs" />
+    <Compile Include="Assets\Scripts\Pieces\Fairy\BerolinaPawn.cs" />
     <Compile Include="Assets\Scripts\Pieces\Fairy\Nightrider.cs" />
     <Compile Include="Assets\Scripts\Pieces\Fairy\Grasshopper.cs" />
     <Compile Include="Assets\Scripts\Pieces\Fairy\Empress.cs" />
