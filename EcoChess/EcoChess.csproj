@@ -93,6 +93,9 @@
     <Compile Include="Assets\Scripts\Data Structures\BoardCoord.cs" />
     <Compile Include="Assets\Scripts\Data Structures\CoordInfo.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Berolina.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Chigorin.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Embassy.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Janus.cs" />
     <Compile Include="Assets\Scripts\Game Modes\ShiftedChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Monster.cs" />
     <Compile Include="Assets\Scripts\Game Modes\ChecklessChess.cs" />
