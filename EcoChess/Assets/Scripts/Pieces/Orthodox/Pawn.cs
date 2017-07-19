@@ -2,21 +2,18 @@
 using UnityEngine;
 
 public class Pawn : ChessPiece {
-    public readonly List<Pawn> enPassantTargets;
     public readonly uint initialMoveLimit;
     public readonly bool canEnPassantCapture;
     public bool validEnPassant;
 
     public Pawn(Team team, BoardCoord position, bool canEnPassantCapture = true, uint initialMoveLimit = 2) : base(team, position) {
         m_pieceType = Piece.Pawn;
-        this.enPassantTargets = new List<Pawn>(2);
         this.validEnPassant = false;
         this.canEnPassantCapture = canEnPassantCapture;
         this.initialMoveLimit = initialMoveLimit;
     }
     public Pawn(Team team, string algebraicKeyPosition, bool canEnPassantCapture = true, uint initialMoveLimit = 2) : base(team, algebraicKeyPosition) {
         m_pieceType = Piece.Pawn;
-        this.enPassantTargets = new List<Pawn>(2);
         this.validEnPassant = false;
         this.canEnPassantCapture = canEnPassantCapture;
         this.initialMoveLimit = initialMoveLimit;
