@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Piece { King, Queen, Knight, Bishop, Rook, Pawn, Empress, Princess, Grasshopper, Nightrider }
+public enum Piece { King, Queen, Knight, Bishop, Rook, Pawn, Empress, Princess, Grasshopper, Nightrider, BerolinaPawn }
 
 public static class ChessPieceFactory {
 	public static ChessPiece Create(Piece piece, Team team, BoardCoord position) {
@@ -28,6 +28,8 @@ public static class ChessPieceFactory {
                 return new Grasshopper(team, position);
             case Piece.Nightrider:
                 return new Nightrider(team, position);
+            case Piece.BerolinaPawn:
+                return new BerolinaPawn(team, position);
             default:
                 Debug.LogError("Piece type: " + piece.ToString() + ", has not been implemented!");
                 return null;
