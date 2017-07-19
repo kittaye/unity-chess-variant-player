@@ -3,16 +3,16 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// ChecklessChess.cs is a chess variant that prohibits checks against the king except checkmate.
+    /// Checkless.cs is a chess variant that prohibits checks against the king except checkmate.
     /// 
     /// Winstate: Checkmate.
     /// Piece types: Orthodox.
     /// Board layout: FIDE standard.
     /// </summary>
-    public class ChecklessChess : FIDERuleset {
+    public class Checkless : FIDERuleset {
         private bool checkingForCheckmate;
 
-        public ChecklessChess() : base() {
+        public Checkless() : base() {
             checkingForCheckmate = false;
         }
 
