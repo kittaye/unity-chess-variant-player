@@ -7,6 +7,7 @@ namespace ChessGameModes {
     /// 
     /// Winstate: Checkmate.
     /// Piece types: Orthodox + Empresses, Princesses.
+    /// Piece rules: King moves 3 squares when castling.
     /// Board layout: 
     ///     r n b $ q k ^ b n r
     ///     p p p p p p p p p p
