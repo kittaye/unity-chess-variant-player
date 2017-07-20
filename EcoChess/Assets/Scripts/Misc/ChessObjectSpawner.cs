@@ -5,8 +5,8 @@ public class ChessObjectSpawner : MonoBehaviour {
     public GameObject piecePrefab;
 
     public GameObject boardChunkPrefab;
-    public Color primaryBoardColour;
-    public Color secondaryBoardColour;
+    //public Color primaryBoardColour;
+    //public Color secondaryBoardColour;
 
     private const int MAX_DIM = 26;
 
@@ -40,7 +40,7 @@ public class ChessObjectSpawner : MonoBehaviour {
 
                 //Alternate piece colour with each instantiation.
                 Material mat = go.GetComponent<Renderer>().material;
-                mat.color = ((y + x) % 2 != 0) ? primaryBoardColour : secondaryBoardColour;
+                mat.color = ((y + x) % 2 != 0) ? board.primaryBoardColour : board.secondaryBoardColour;
             }
         }
         return gameBoardObj;

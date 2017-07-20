@@ -6,18 +6,23 @@ using System.Text;
 public class Board {
     public GameObject gameBoardObj { get; private set; }
 
-    private uint boardWidth;
-    private uint boardHeight;
-    private Dictionary<BoardCoord, CoordInfo> coordinates;
+    private readonly uint boardWidth;
+    private readonly uint boardHeight;
+    private readonly Dictionary<BoardCoord, CoordInfo> coordinates;
     private List<BoardCoord> highlightedCoords;
     private char[] boardLetters;
     private string[] boardNumbers;
+    public readonly Color primaryBoardColour;
+    public readonly Color secondaryBoardColour;
 
-    public Board(uint width, uint height) {
+    public Board(uint width, uint height, Color primaryBoardColour, Color secondaryBoardColour) {
         highlightedCoords = new List<BoardCoord>();
         coordinates = new Dictionary<BoardCoord, CoordInfo>();
         boardWidth = width;
         boardHeight = height;
+        this.primaryBoardColour = primaryBoardColour;
+        this.secondaryBoardColour = secondaryBoardColour;
+
         GenerateBoardCoordinateValues();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {

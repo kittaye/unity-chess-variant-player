@@ -15,7 +15,17 @@ public abstract class Chess {
     protected uint numConsecutiveCapturelessMoves { get; private set; }
 
     public Chess(uint width, uint height) {
-        board = new Board(width, height);
+        board = new Board(width, height, new Color(0.9f, 0.9f, 0.9f), new Color(0.1f, 0.1f, 0.1f));
+        whitePieces = new List<ChessPiece>();
+        blackPieces = new List<ChessPiece>();
+        lastMovedPiece = null;
+        currentTeamTurn = Team.WHITE;
+        opposingTeamTurn = Team.BLACK;
+        numConsecutiveCapturelessMoves = 0;
+    }
+
+    public Chess(uint width, uint height, Color primaryBoardColour, Color secondaryBoardColour) {
+        board = new Board(width, height, primaryBoardColour, secondaryBoardColour);
         whitePieces = new List<ChessPiece>();
         blackPieces = new List<ChessPiece>();
         lastMovedPiece = null;

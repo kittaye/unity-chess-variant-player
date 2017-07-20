@@ -48,7 +48,31 @@ namespace ChessGameModes {
             checkingForCheck = false;
         }
 
+        public FIDERuleset(uint boardWidth, uint boardHeight, Color primaryBoardColour, Color secondaryBoardColour) 
+            : base(boardWidth, boardHeight, primaryBoardColour, secondaryBoardColour) {
+
+            BLACK_BACKROW = board.GetHeight() - 1;
+            BLACK_PAWNROW = board.GetHeight() - 2;
+            currentRoyalPiece = opposingRoyalPiece = null;
+            aSideWhiteRook = hSideWhiteRook = null;
+            aSideBlackRook = hSideWhiteRook = null;
+            opposingTeamCheckThreats = null;
+            checkingForCheck = false;
+        }
+
         public FIDERuleset() : base(BOARD_WIDTH, BOARD_HEIGHT) {
+            BLACK_BACKROW = board.GetHeight() - 1;
+            BLACK_PAWNROW = board.GetHeight() - 2;
+            currentRoyalPiece = opposingRoyalPiece = null;
+            aSideWhiteRook = hSideWhiteRook = null;
+            aSideBlackRook = hSideWhiteRook = null;
+            opposingTeamCheckThreats = null;
+            checkingForCheck = false;
+        }
+
+        public FIDERuleset(Color primaryBoardColour, Color secondaryBoardColour) 
+            : base(BOARD_WIDTH, BOARD_HEIGHT, primaryBoardColour, secondaryBoardColour) {
+
             BLACK_BACKROW = board.GetHeight() - 1;
             BLACK_PAWNROW = board.GetHeight() - 2;
             currentRoyalPiece = opposingRoyalPiece = null;
