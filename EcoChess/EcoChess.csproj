@@ -128,6 +128,7 @@
     <Compile Include="Assets\Scripts\Misc\ChessPieceFactory.cs" />
     <Compile Include="Assets\Scripts\Misc\GameModeFactory.cs" />
     <Compile Include="Assets\Scripts\Pieces\ChessPiece.cs" />
+    <Compile Include="Assets\Scripts\Pieces\Fairy\SovereignPawn.cs" />
     <Compile Include="Assets\Scripts\Pieces\Fairy\BerolinaPawn.cs" />
     <Compile Include="Assets\Scripts\Pieces\Fairy\Nightrider.cs" />
     <Compile Include="Assets\Scripts\Pieces\Fairy\Grasshopper.cs" />
