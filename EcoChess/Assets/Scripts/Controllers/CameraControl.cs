@@ -6,6 +6,6 @@ public class CameraControl : MonoBehaviour {
 	
 	// Update is called once per frame
 	void LateUpdate () {
-        transform.position += new Vector3(Input.GetAxis("Horizontal") * speed * Time.deltaTime, Input.GetAxis("Vertical") * speed * Time.deltaTime);
+        //transform.position += new Vector3(Input.GetAxis("Horizontal") * speed * Time.deltaTime, Input.GetAxis("Vertical") * speed * Time.deltaTime);
     }
 }
