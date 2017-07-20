@@ -18,7 +18,7 @@ namespace ChessGameModes {
         }
 
         public override string ToString() {
-            return "Three-Check";
+            return "Three-Check Chess";
         }
 
         public override bool CheckWinState() {

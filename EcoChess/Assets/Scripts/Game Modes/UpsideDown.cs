@@ -20,7 +20,7 @@ namespace ChessGameModes {
         public UpsideDown() : base() { }
 
         public override string ToString() {
-            return "Upside-down";
+            return "Upside-Down Chess";
         }
 
         public override void PopulateBoard() {

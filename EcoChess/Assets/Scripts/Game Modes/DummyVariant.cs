@@ -4,7 +4,10 @@ using UnityEngine;
 
 namespace ChessGameModes {
     public class DummyVariant : FIDERuleset {
-        public DummyVariant() : base() { }
+        private new const int BOARD_WIDTH = 8;
+        private new const int BOARD_HEIGHT = 8;
+
+        public DummyVariant() : base(BOARD_WIDTH, BOARD_HEIGHT) { }
 
         public override string ToString() {
             return "Dummy Variant";
