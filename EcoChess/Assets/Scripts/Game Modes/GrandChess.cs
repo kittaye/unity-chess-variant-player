@@ -26,6 +26,7 @@ namespace ChessGameModes {
         private new const int WHITE_PAWNROW = 2;
 
         public GrandChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {
+            pawnPromotionOptions = new Piece[6] { Piece.Queen, Piece.Empress, Piece.Princess, Piece.Rook, Piece.Bishop, Piece.Knight };
             BLACK_PAWNROW = board.GetHeight() - 3;
         }
 
@@ -79,6 +80,9 @@ namespace ChessGameModes {
                 BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
                 if (enPassantMove != BoardCoord.NULL) {
                     availableMoves.Add(enPassantMove);
+                }
+                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
+                    OnDisplayPromotionUI(true);
                 }
             }
             return availableMoves;

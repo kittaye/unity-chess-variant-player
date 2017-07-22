@@ -23,6 +23,7 @@ namespace ChessGameModes {
         private new const int BOARD_HEIGHT = 8;
 
         public Embassy() : base(BOARD_WIDTH, BOARD_HEIGHT) {
+            pawnPromotionOptions = new Piece[6] { Piece.Queen, Piece.Empress, Piece.Princess, Piece.Rook, Piece.Bishop, Piece.Knight };
         }
 
         public override string ToString() {

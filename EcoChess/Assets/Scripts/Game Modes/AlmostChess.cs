@@ -10,7 +10,10 @@ namespace ChessGameModes {
     /// Board layout: FIDE standard but queens are empresses.
     /// </summary>
     public class AlmostChess : FIDERuleset {
-        public AlmostChess() : base() { }
+        public AlmostChess() : base() {
+            selectedPawnPromotion = Piece.Empress;
+            pawnPromotionOptions = new Piece[4] { Piece.Empress, Piece.Rook, Piece.Bishop, Piece.Knight };
+        }
 
         public override string ToString() {
             return "Almost Chess";

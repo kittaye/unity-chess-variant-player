@@ -74,6 +74,9 @@ namespace ChessGameModes {
                 if (enPassantMove != BoardCoord.NULL) {
                     availableMoves.Add(enPassantMove);
                 }
+                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
+                    OnDisplayPromotionUI(true);
+                }
             }
             return availableMoves;
         }

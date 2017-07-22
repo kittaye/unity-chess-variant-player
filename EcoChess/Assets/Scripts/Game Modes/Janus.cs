@@ -23,6 +23,7 @@ namespace ChessGameModes {
         private new const int BOARD_HEIGHT = 8;
 
         public Janus() : base(BOARD_WIDTH, BOARD_HEIGHT) {
+            pawnPromotionOptions = new Piece[5] { Piece.Queen, Piece.Princess, Piece.Rook, Piece.Bishop, Piece.Knight };
         }
 
         public override string ToString() {

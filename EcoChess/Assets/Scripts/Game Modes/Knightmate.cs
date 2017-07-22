@@ -21,6 +21,7 @@ namespace ChessGameModes {
     /// </summary>
     public class Knightmate : FIDERuleset {
         public Knightmate() : base(BOARD_WIDTH, BOARD_HEIGHT) {
+            pawnPromotionOptions = new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.King };
         }
 
         public override string ToString() {
@@ -43,6 +44,9 @@ namespace ChessGameModes {
                 BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
                 if (enPassantMove != BoardCoord.NULL) {
                     availableMoves.Add(enPassantMove);
+                }
+                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
+                    OnDisplayPromotionUI(true);
                 }
             }
             return availableMoves;
