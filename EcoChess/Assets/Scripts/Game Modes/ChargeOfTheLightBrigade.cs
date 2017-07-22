@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace ChessGameModes {
@@ -18,10 +18,21 @@ namespace ChessGameModes {
     ///     . Q . Q K Q . .
     /// </summary>
     public class ChargeOfTheLightBrigade : FIDERuleset {
-        public ChargeOfTheLightBrigade() : base() { }
+        public ChargeOfTheLightBrigade() : base() {
+            pawnPromotionOptions = new Piece[0];
+        }
 
         public override string ToString() {
             return "Charge of the Light Brigade";
+        }
+
+        public override void OnTurnComplete() {
+            base.OnTurnComplete();
+            if(currentTeamTurn == Team.WHITE) {
+                selectedPawnPromotion = Piece.Queen;
+            } else {
+                selectedPawnPromotion = Piece.Knight;
+            }
         }
 
         public override void PopulateBoard() {
@@ -40,6 +51,26 @@ namespace ChessGameModes {
                     AddPieceToBoard(new Queen(Team.WHITE, new BoardCoord(x, WHITE_BACKROW)));
                 }
             }
+        }
+
+        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
+            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
+            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
+
+            for (int i = 0; i < templateMoves.Length; i++) {
+                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
+                    availableMoves.Add(templateMoves[i]);
+                }
+            }
+
+            if (mover is Pawn) {
+                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
+                if (enPassantMove != BoardCoord.NULL) {
+                    availableMoves.Add(enPassantMove);
+                }
+            }
+
+            return availableMoves;
         }
     }
 }
