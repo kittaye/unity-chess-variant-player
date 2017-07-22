@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour {
     public static int modeIndex = 0;
     public Chess chessGame { get; private set; }
 
-    private const int NUM_OF_VARIANTS = 29;
+    private const int NUM_OF_VARIANTS = 28;
     private bool gameFinished;
     private UIManager ui;
 

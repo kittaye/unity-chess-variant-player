@@ -5,7 +5,7 @@ namespace ChessGameModes {
         AlmostChess, AndernachChess, AtomicChess, BalboChess, BerolinaChess, CapablancaChess, ChargeOfTheLightBrigadeChess,
         ChecklessChess, Chess960, ChigorinChess, DoubleChess, EmbassyChess, FIDE, GrandChess, Horde, JanusChess,
         KingOfTheHill, Knightmate, LosingChess, Microchess, MonsterChess, PawnEndgameChess, PeasantsRevolt,
-        RacingKings, ShiftedChess, Silverman4x5, SovereignChess, ThreeCheck, UpsidedownChess
+        RacingKings, ShiftedChess, Silverman4x5, ThreeCheck, UpsidedownChess
     }
 
     public static class GameModeFactory {
