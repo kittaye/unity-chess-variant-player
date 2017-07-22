@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour {
     public static int modeIndex = 0;
     public Chess chessGame { get; private set; }
 
-    private const int NUM_OF_VARIANTS = 28;
+    private const int NUM_OF_VARIANTS = 29;
     private bool gameFinished;
     private UIManager ui;
 
@@ -22,9 +22,10 @@ public class GameManager : MonoBehaviour {
         }
 
         chessGame = GameModeFactory.Create((GameMode)modeIndex);
-        //chessGame = new ChessGameModes.SovereignChess();
+        //chessGame = new ChessGameModes.FIDERuleset();
         chessGame.PopulateBoard();
         CenterCameraToBoard(chessGame.board);
+        ui.CreatePawnPromotionOptions(((FIDERuleset)chessGame).pawnPromotionOptions);
     }
 
     private void Update() {
