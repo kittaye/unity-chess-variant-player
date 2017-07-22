@@ -34,14 +34,14 @@ namespace ChessGameModes {
         private new const int BOARD_WIDTH = 16;
         private new const int BOARD_HEIGHT = 16;
 
-        private static Color primaryBoardColour = new Color(1, 219f / 255f, 153f / 255f);
-        private static Color secondaryBoardColour = new Color(1, 237f / 255f, 204f / 255f);
+        private readonly static Color primaryBoardColour = new Color(1, 219f / 255f, 153f / 255f);
+        private readonly static Color secondaryBoardColour = new Color(1, 237f / 255f, 204f / 255f);
 
-        private static Color Color_orange = new Color(0.9f, 0.58f, 0);
-        private static Color Color_lightblue = new Color(0.447f, 0.77f, 0.98f);
-        private static Color Color_silver = new Color(0.85f, 0.85f, 0.85f);
-        private static Color Color_pink = new Color(1, 0.45f, 0.71f);
-        private static Color Color_purple = new Color(0.6f, 0, 0.6f);
+        private readonly static Color Color_orange = new Color(0.9f, 0.58f, 0);
+        private readonly static Color Color_lightblue = new Color(0.447f, 0.77f, 0.98f);
+        private readonly static Color Color_silver = new Color(0.85f, 0.85f, 0.85f);
+        private readonly static Color Color_pink = new Color(1, 0.45f, 0.71f);
+        private readonly static Color Color_purple = new Color(0.6f, 0, 0.6f);
 
         private Dictionary<BoardCoord, Color> ColourControlSquares = new Dictionary<BoardCoord, Color>(24);
 
@@ -117,6 +117,16 @@ namespace ChessGameModes {
             }
         }
 
+        private void AddSovereignPawn(string algebraicKey, Color color, SovereignPawn.Quadrant quadrant) {
+            BoardCoord coord;
+            if (board.TryGetCoordWithKey(algebraicKey, out coord)) {
+                ChessPiece sovereignPawn = AddPieceToBoard(new SovereignPawn(Team.WHITE, coord, quadrant), false);
+                if (sovereignPawn != null) {
+                    sovereignPawn.gameObject.GetComponent<SpriteRenderer>().material.color = color;
+                }
+            }
+        }
+
         public override void PopulateBoard() {
 #region WHITE+BLACK Teams
             currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(8, WHITE_BACKROW)));
@@ -146,22 +156,47 @@ namespace ChessGameModes {
             }
             #endregion
 
-            AddSovereignChessPiece(Piece.SovereignPawn, "c2", Color_pink);
-            AddSovereignChessPiece(Piece.SovereignPawn, "d2", Color_pink);
-            AddSovereignChessPiece(Piece.SovereignPawn, "b3", Color.red);
-            AddSovereignChessPiece(Piece.SovereignPawn, "b4", Color.red);
-            AddSovereignChessPiece(Piece.SovereignPawn, "b5", Color_orange);
-            AddSovereignChessPiece(Piece.SovereignPawn, "b6", Color_orange);
-            AddSovereignChessPiece(Piece.SovereignPawn, "b7", Color.yellow);
-            AddSovereignChessPiece(Piece.SovereignPawn, "b8", Color.yellow);
-            AddSovereignChessPiece(Piece.SovereignPawn, "b9", Color.green);
-            AddSovereignChessPiece(Piece.SovereignPawn, "b10", Color.green);
-            AddSovereignChessPiece(Piece.SovereignPawn, "b11", Color_lightblue);
-            AddSovereignChessPiece(Piece.SovereignPawn, "b12", Color_lightblue);
-            AddSovereignChessPiece(Piece.SovereignPawn, "b13", Color.blue);
-            AddSovereignChessPiece(Piece.SovereignPawn, "b14", Color.blue);
-            AddSovereignChessPiece(Piece.SovereignPawn, "c15", Color_purple);
-            AddSovereignChessPiece(Piece.SovereignPawn, "d15", Color_purple);
+            SovereignPawn.Quadrant currentQuadrant = SovereignPawn.Quadrant.BottomLeft;
+            AddSovereignPawn("c2", Color_pink, currentQuadrant);
+            AddSovereignPawn("d2", Color_pink, currentQuadrant);
+            AddSovereignPawn("b3", Color.red, currentQuadrant);
+            AddSovereignPawn("b4", Color.red, currentQuadrant);
+            AddSovereignPawn("b5", Color_orange, currentQuadrant);
+            AddSovereignPawn("b6", Color_orange, currentQuadrant);
+            AddSovereignPawn("b7", Color.yellow, currentQuadrant);
+            AddSovereignPawn("b8", Color.yellow, currentQuadrant);
+
+            currentQuadrant = SovereignPawn.Quadrant.UpLeft;
+            AddSovereignPawn("b9", Color.green, currentQuadrant);
+            AddSovereignPawn("b10", Color.green, currentQuadrant);
+            AddSovereignPawn("b11", Color_lightblue, currentQuadrant);
+            AddSovereignPawn("b12", Color_lightblue, currentQuadrant);
+            AddSovereignPawn("b13", Color.blue, currentQuadrant);
+            AddSovereignPawn("b14", Color.blue, currentQuadrant);
+            AddSovereignPawn("c15", Color_purple, currentQuadrant);
+            AddSovereignPawn("d15", Color_purple, currentQuadrant);
+
+            currentQuadrant = SovereignPawn.Quadrant.BottomRight;
+            AddSovereignPawn("m2", Color.green, currentQuadrant);
+            AddSovereignPawn("n2", Color.green, currentQuadrant);
+            AddSovereignPawn("o3", Color_lightblue, currentQuadrant);
+            AddSovereignPawn("o4", Color_lightblue, currentQuadrant);
+            AddSovereignPawn("o5", Color.blue, currentQuadrant);
+            AddSovereignPawn("o6", Color.blue, currentQuadrant);
+            AddSovereignPawn("o7", Color_purple, currentQuadrant);
+            AddSovereignPawn("o8", Color_purple, currentQuadrant);
+
+            currentQuadrant = SovereignPawn.Quadrant.UpRight;
+            AddSovereignPawn("o9", Color_pink, currentQuadrant);
+            AddSovereignPawn("o10", Color_pink, currentQuadrant);
+            AddSovereignPawn("o11", Color.red, currentQuadrant);
+            AddSovereignPawn("o12", Color.red, currentQuadrant);
+            AddSovereignPawn("o13", Color_orange, currentQuadrant);
+            AddSovereignPawn("o14", Color_orange, currentQuadrant);
+            AddSovereignPawn("m15", Color.yellow, currentQuadrant);
+            AddSovereignPawn("n15", Color.yellow, currentQuadrant);
+
+            //-------------------------------
 
             AddSovereignChessPiece(Piece.Queen, "a1", Color.grey);
             AddSovereignChessPiece(Piece.Rook, "a2", Color.grey);
@@ -191,23 +226,6 @@ namespace ChessGameModes {
             AddSovereignChessPiece(Piece.Knight, "d16", Color_purple);
 
             //--------------------------
-
-            AddSovereignChessPiece(Piece.SovereignPawn, "m2", Color.green);
-            AddSovereignChessPiece(Piece.SovereignPawn, "n2", Color.green);
-            AddSovereignChessPiece(Piece.SovereignPawn, "o3", Color_lightblue);
-            AddSovereignChessPiece(Piece.SovereignPawn, "o4", Color_lightblue);
-            AddSovereignChessPiece(Piece.SovereignPawn, "o5", Color.blue);
-            AddSovereignChessPiece(Piece.SovereignPawn, "o6", Color.blue);
-            AddSovereignChessPiece(Piece.SovereignPawn, "o7", Color_purple);
-            AddSovereignChessPiece(Piece.SovereignPawn, "o8", Color_purple);
-            AddSovereignChessPiece(Piece.SovereignPawn, "o9", Color_pink);
-            AddSovereignChessPiece(Piece.SovereignPawn, "o10", Color_pink);
-            AddSovereignChessPiece(Piece.SovereignPawn, "o11", Color.red);
-            AddSovereignChessPiece(Piece.SovereignPawn, "o12", Color.red);
-            AddSovereignChessPiece(Piece.SovereignPawn, "o13", Color_orange);
-            AddSovereignChessPiece(Piece.SovereignPawn, "o14", Color_orange);
-            AddSovereignChessPiece(Piece.SovereignPawn, "m15", Color.yellow);
-            AddSovereignChessPiece(Piece.SovereignPawn, "n15", Color.yellow);
 
             AddSovereignChessPiece(Piece.Queen, "p1", Color_silver);
             AddSovereignChessPiece(Piece.Rook, "p2", Color_silver);
