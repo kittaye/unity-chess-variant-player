@@ -2,10 +2,10 @@
 
 namespace ChessGameModes {
     public enum GameMode {
-        AtomicChess, ChargeOfTheLightBrigade, Chess960, DoubleChess, FIDE, Horde, KingoftheHill, Knightmate, LosingChess
-            , Microchess, PawnEndgame, PeasantsRevolt, RacingKings, Silverman4x5, ThreeCheck, UpsideDown, AlmostChess
-            , CapablancaChess, GrandChess, MonsterChess, BalboChess, AndernachChess, BerolinaChess, JanusChess, ChigorinChess
-            , EmbassyChess, ChecklessChess, SovereignChess
+        AlmostChess, AndernachChess, AtomicChess, BalboChess, BerolinaChess, CapablancaChess, ChargeOfTheLightBrigadeChess,
+        ChecklessChess, Chess960, ChigorinChess, DoubleChess, EmbassyChess, FIDE, GrandChess, Horde, JanusChess,
+        KingOfTheHill, Knightmate, LosingChess, Microchess, MonsterChess, PawnEndgameChess, PeasantsRevolt,
+        RacingKings, ShiftedChess, Silverman4x5, SovereignChess, ThreeCheck, UpsidedownChess
     }
 
     public static class GameModeFactory {
@@ -23,7 +23,7 @@ namespace ChessGameModes {
                     return new Berolina();
                 case GameMode.CapablancaChess:
                     return new Capablanca();
-                case GameMode.ChargeOfTheLightBrigade:
+                case GameMode.ChargeOfTheLightBrigadeChess:
                     return new ChargeOfTheLightBrigade();
                 case GameMode.ChecklessChess:
                     return new Checkless();
@@ -43,7 +43,7 @@ namespace ChessGameModes {
                     return new Horde();
                 case GameMode.JanusChess:
                     return new Janus();
-                case GameMode.KingoftheHill:
+                case GameMode.KingOfTheHill:
                     return new KingOfTheHill();
                 case GameMode.Knightmate:
                     return new Knightmate();
@@ -53,19 +53,21 @@ namespace ChessGameModes {
                     return new Microchess();
                 case GameMode.MonsterChess:
                     return new Monster();
-                case GameMode.PawnEndgame:
+                case GameMode.PawnEndgameChess:
                     return new PawnEndgame();
                 case GameMode.PeasantsRevolt:
                     return new PeasantsRevolt();
                 case GameMode.RacingKings:
                     return new RacingKings();
+                case GameMode.ShiftedChess:
+                    return new ShiftedChess();
                 case GameMode.Silverman4x5:
                     return new Silverman4x5();
                 case GameMode.SovereignChess:
                     return new SovereignChess();
                 case GameMode.ThreeCheck:
                     return new ThreeCheck();
-                case GameMode.UpsideDown:
+                case GameMode.UpsidedownChess:
                     return new UpsideDown();
                 default:
                     Debug.LogError("Game mode: " + mode.ToString() + ", is not supported!");
