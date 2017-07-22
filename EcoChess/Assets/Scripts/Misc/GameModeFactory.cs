@@ -63,8 +63,8 @@ namespace ChessGameModes {
                     return new ShiftedChess();
                 case GameMode.Silverman4x5:
                     return new Silverman4x5();
-                case GameMode.SovereignChess:
-                    return new SovereignChess();
+                //case GameMode.SovereignChess:
+                //    return new SovereignChess();
                 case GameMode.ThreeCheck:
                     return new ThreeCheck();
                 case GameMode.UpsidedownChess:
