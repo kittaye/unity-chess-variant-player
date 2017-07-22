@@ -15,13 +15,11 @@ public class BerolinaPawn : Pawn {
 
     public override List<BoardCoord> CalculateTemplateMoves() {
         List<BoardCoord> moves = new List<BoardCoord>();
-        if (MoveCount == 0) {
-            moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight, cap: initialMoveLimit, threatAttackLimit: 0));
-            moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, cap: initialMoveLimit, threatAttackLimit: 0));
-        } else {
-            moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight, cap: 1, threatAttackLimit: 0));
-            moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, cap: 1, threatAttackLimit: 0));
-        }
+
+        uint moveCap = (MoveCount == 0) ? initialMoveLimit : 1;
+
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight, cap: moveCap, threatAttackLimit: 0));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, cap: moveCap, threatAttackLimit: 0));
 
         moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up, cap: 1, threatsOnly: true));
 
