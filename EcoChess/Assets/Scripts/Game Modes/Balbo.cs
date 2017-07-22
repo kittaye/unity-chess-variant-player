@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
@@ -23,8 +24,25 @@ namespace ChessGameModes {
         private new const int BOARD_WIDTH = 11;
         private new const int BOARD_HEIGHT = 10;
         private new const int WHITE_PAWNROW = 2;
+        private List<BoardCoord> promotionSquares;
 
         public Balbo() : base(BOARD_WIDTH, BOARD_HEIGHT) {
+            promotionSquares = new List<BoardCoord>(14);
+            AddPromotionSquare("c3");
+            AddPromotionSquare("c8");
+            AddPromotionSquare("d2");
+            AddPromotionSquare("d9");
+            AddPromotionSquare("e1");
+            AddPromotionSquare("e10");
+            AddPromotionSquare("f1");
+            AddPromotionSquare("f10");
+            AddPromotionSquare("g1");
+            AddPromotionSquare("g10");
+            AddPromotionSquare("h2");
+            AddPromotionSquare("h9");
+            AddPromotionSquare("i3");
+            AddPromotionSquare("i8");
+
             BLACK_PAWNROW = board.GetHeight() - 3;
 
             board.RemoveBoardCoordinates(new string[]
@@ -41,6 +59,66 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Balbo's Chess";
+        }
+
+        private void AddPromotionSquare(string algebraicKeyPosition) {
+            BoardCoord coord;
+            if (board.TryGetCoordWithKey(algebraicKeyPosition, out coord)) {
+                promotionSquares.Add(coord);
+            }
+        }
+
+        protected override bool CanPromote(Pawn mover, BoardCoord[] availableMoves) {
+            for (int i = 0; i < availableMoves.Length; i++) {
+                if (promotionSquares.Contains(availableMoves[i])) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        protected override ChessPiece CheckPawnPromotion(Pawn mover) {
+            if (promotionSquares.Contains(mover.GetBoardPosition())) {
+                RemovePieceFromBoard(mover);
+                RemovePieceFromActiveTeam(mover);
+                return AddPieceToBoard(ChessPieceFactory.Create(selectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
+            }
+            return null;
+        }
+
+        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
+            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
+            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
+
+            for (int i = 0; i < templateMoves.Length; i++) {
+                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
+                    availableMoves.Add(templateMoves[i]);
+                }
+            }
+
+            if (mover is King && mover.MoveCount == 0) {
+                availableMoves.AddRange(TryAddAvailableCastleMoves(mover));
+            } else if (mover is Pawn) {
+                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
+                if (enPassantMove != BoardCoord.NULL) {
+                    availableMoves.Add(enPassantMove);
+                }
+                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
+                    selectedPawnPromotion = Piece.Queen;
+                    SetPawnPromotionOptions(new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Queen });
+                    for (int i = 0; i < availableMoves.Count; i++) {
+                        if (availableMoves[i] == new BoardCoord(2, 2) || availableMoves[i] == new BoardCoord(2, 7)
+                            || availableMoves[i] == new BoardCoord(8, 2) || availableMoves[i] == new BoardCoord(8, 7)) {
+                            selectedPawnPromotion = Piece.Bishop;
+                            SetPawnPromotionOptions(new Piece[2] { Piece.Bishop, Piece.Knight });
+                            break;
+                        }
+                    }
+                    OnDisplayPromotionUI(true);
+                }
+            }
+
+            return availableMoves;
         }
 
         public override void PopulateBoard() {
