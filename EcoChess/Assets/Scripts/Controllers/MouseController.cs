@@ -29,7 +29,6 @@ public class MouseController : MonoBehaviour {
 
                 if (hasSelection && lastOccupierAvailableMoves.Contains(GetHoveredBoardCoord())) {
                     if (chessGame.MovePiece(chessGame.board.GetCoordInfo(lastSelectedCoord).occupier, GetHoveredBoardCoord())) {
-                        lastOccupierAvailableMoves.Clear();
                         GameManager.Instance.OnTurnComplete();
                     }
                     DeSelect();
@@ -37,6 +36,7 @@ public class MouseController : MonoBehaviour {
                 }
 
                 if (selectedCoord.occupier != null && selectedCoord.occupier.GetTeam() == chessGame.GetCurrentTeamTurn()) {
+                    UIManager.Instance.OnDisplayPromotionOptions(false);
                     hasSelection = true;
                     lastSelectedCoord = GetHoveredBoardCoord();
                     lastOccupierAvailableMoves = chessGame.CalculateAvailableMoves(selectedCoord.occupier);
@@ -44,8 +44,6 @@ public class MouseController : MonoBehaviour {
                     return;
                 }
             }
-            DeSelect();
-
         } else if (Input.GetMouseButtonDown(1)) {
             if (hasSelection) {
                 DeSelect();
@@ -75,6 +73,8 @@ public class MouseController : MonoBehaviour {
     private void DeSelect() {
         hasSelection = false;
         lastSelectedCoord = BoardCoord.NULL;
+        lastOccupierAvailableMoves.Clear();
+        UIManager.Instance.OnDisplayPromotionOptions(false);
         chessGame.board.RemoveHighlightedCoordinates();
     }
 
