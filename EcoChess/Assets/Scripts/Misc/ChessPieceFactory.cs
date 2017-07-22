@@ -30,8 +30,6 @@ public static class ChessPieceFactory {
                 return new Nightrider(team, position);
             case Piece.BerolinaPawn:
                 return new BerolinaPawn(team, position);
-            case Piece.SovereignPawn:
-                return new SovereignPawn(team, position);
             default:
                 Debug.LogError("Piece type: " + piece.ToString() + ", has not been implemented!");
                 return null;
