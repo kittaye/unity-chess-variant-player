@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,14 +20,17 @@ namespace ChessGameModes {
     ///     R N B Q K B N R
     /// </summary>
     public class FIDERuleset : Chess {
+        public static event Action<bool> _DisplayPromotionUI;
+        public static event Action<Piece[]> _OnPawnPromotionsChanged;
+        public Piece[] pawnPromotionOptions { get; protected set; }
+        public Piece selectedPawnPromotion { get; protected set; }
+
         protected const int BOARD_WIDTH = 8;
         protected const int BOARD_HEIGHT = 8;
         protected const int WHITE_BACKROW = 0;
         protected const int WHITE_PAWNROW = 1;
         protected int BLACK_BACKROW;
         protected int BLACK_PAWNROW;
-
-        protected bool checkingForCheck;
 
         protected ChessPiece currentRoyalPiece;
         protected ChessPiece opposingRoyalPiece;
@@ -36,6 +40,7 @@ namespace ChessGameModes {
         protected Rook aSideBlackRook;
         protected Rook hSideBlackRook;
 
+        protected bool checkingForCheck;
         protected List<ChessPiece> opposingTeamCheckThreats;
 
         public FIDERuleset(uint boardWidth, uint boardHeight) : base(boardWidth, boardHeight) {
@@ -46,6 +51,8 @@ namespace ChessGameModes {
             aSideBlackRook = hSideWhiteRook = null;
             opposingTeamCheckThreats = null;
             checkingForCheck = false;
+            pawnPromotionOptions = new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight };
+            selectedPawnPromotion = Piece.Queen;
         }
 
         public FIDERuleset(uint boardWidth, uint boardHeight, Color primaryBoardColour, Color secondaryBoardColour) 
@@ -58,6 +65,8 @@ namespace ChessGameModes {
             aSideBlackRook = hSideWhiteRook = null;
             opposingTeamCheckThreats = null;
             checkingForCheck = false;
+            pawnPromotionOptions = new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight };
+            selectedPawnPromotion = Piece.Queen;
         }
 
         public FIDERuleset() : base(BOARD_WIDTH, BOARD_HEIGHT) {
@@ -68,6 +77,8 @@ namespace ChessGameModes {
             aSideBlackRook = hSideWhiteRook = null;
             opposingTeamCheckThreats = null;
             checkingForCheck = false;
+            pawnPromotionOptions = new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight };
+            selectedPawnPromotion = Piece.Queen;
         }
 
         public FIDERuleset(Color primaryBoardColour, Color secondaryBoardColour) 
@@ -80,6 +91,8 @@ namespace ChessGameModes {
             aSideBlackRook = hSideWhiteRook = null;
             opposingTeamCheckThreats = null;
             checkingForCheck = false;
+            pawnPromotionOptions = new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight };
+            selectedPawnPromotion = Piece.Queen;
         }
 
         public override string ToString() {
@@ -157,6 +170,9 @@ namespace ChessGameModes {
                 if(enPassantMove != BoardCoord.NULL) {
                     availableMoves.Add(enPassantMove);
                 }
+                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
+                    OnDisplayPromotionUI(true);
+                }
             }
 
             return availableMoves;
@@ -211,13 +227,35 @@ namespace ChessGameModes {
             return null;
         }
 
+        protected virtual bool CanPromote(Pawn mover, BoardCoord[] availableMoves) {
+            for (int i = 0; i < availableMoves.Length; i++) {
+                if (availableMoves[i].y == WHITE_BACKROW || availableMoves[i].y == BLACK_BACKROW) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         protected virtual ChessPiece CheckPawnPromotion(Pawn mover) {
             if (mover.GetRelativeBoardCoord(0, 1).y < WHITE_BACKROW || mover.GetRelativeBoardCoord(0, 1).y > BLACK_BACKROW) {
                 RemovePieceFromBoard(mover);
                 RemovePieceFromActiveTeam(mover);
-                return AddPieceToBoard(ChessPieceFactory.Create(Piece.Queen, mover.GetTeam(), mover.GetBoardPosition()));
+                return AddPieceToBoard(ChessPieceFactory.Create(selectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
             }
             return null;
+        }
+
+        protected void SetPawnPromotionOptions(Piece[] pieces) {
+            pawnPromotionOptions = pieces;
+            if (_OnPawnPromotionsChanged != null) _OnPawnPromotionsChanged.Invoke(pawnPromotionOptions);
+        }
+
+        protected void OnDisplayPromotionUI(bool value) {
+            if (_DisplayPromotionUI != null) _DisplayPromotionUI.Invoke(true);
+        }
+
+        public void SetPawnPromotionTo(Piece piece) {
+            this.selectedPawnPromotion = piece;
         }
 
         protected Rook PerformCastle(Rook castlingRook, BoardCoord castlingRookNewPos) {
@@ -252,6 +290,7 @@ namespace ChessGameModes {
                 bool isInCheck = IsPieceInCheck(pieceToCheck);
 
                 if (occupier != null) {
+                    mover.CaptureCount--;
                     board.GetCoordInfo(occupier.GetBoardPosition()).occupier = occupier;
                     occupier.IsAlive = true;
                     occupier.gameObject.SetActive(true);
