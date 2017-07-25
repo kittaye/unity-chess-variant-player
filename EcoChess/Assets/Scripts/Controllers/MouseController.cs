@@ -6,6 +6,7 @@ public class MouseController : MonoBehaviour {
     public LayerMask boardLayer;
 
     private bool hasSelection;
+    private bool gameFinished = false;
     private Collider hoveredObj = null;
     private List<BoardCoord> lastOccupierAvailableMoves = new List<BoardCoord>();
     private BoardCoord lastSelectedCoord;
@@ -14,16 +15,27 @@ public class MouseController : MonoBehaviour {
     private readonly Color highlightColor = new Color(0.1f, 0.1f, 0.1f);
     private Chess chessGame;
 
+    private void Awake() {
+        GameManager._OnGameFinished += OnGameFinished;
+    }
+
     private void Start() {
         chessGame = GameManager.Instance.chessGame;
     }
 
+    private void OnDestroy() {
+        GameManager._OnGameFinished -= OnGameFinished;
+    }
+
+    private void OnGameFinished() {
+        gameFinished = true;
+    }
+
     void Update () {
         UpdateHoveredObj();
+        if (gameFinished) return;
 
         if (Input.GetMouseButtonDown(0)) {
-            if (GameManager.Instance.isGameFinished()) return;
-
             if (hoveredObj != null) {
                 CoordInfo selectedCoord = chessGame.board.GetCoordInfo(GetHoveredBoardCoord());
 

@@ -12,6 +12,7 @@ public class UIManager : MonoBehaviour {
     private Text teamTurnLbl;
     private Text gameModeLbl;
     private Text promoteToLbl;
+    private Text gameLogLbl;
     private List<GameObject> promotionOptions;
 
     // Use this for initialization
@@ -23,6 +24,7 @@ public class UIManager : MonoBehaviour {
         }
 
         promotionOptions = new List<GameObject>();
+        GameManager._OnGameFinished += OnGameFinished;
         ChessGameModes.FIDERuleset._DisplayPromotionUI += OnDisplayPromotionOptions;
         ChessGameModes.FIDERuleset._OnPawnPromotionsChanged += OnPawnPromotionOptionsChanged;
 
@@ -36,14 +38,31 @@ public class UIManager : MonoBehaviour {
             if (aText.name.Equals("PromoteTo_lbl")) {
                 promoteToLbl = aText;
             }
+            if (aText.name.Equals("GameLog_lbl")) {
+                gameLogLbl = aText;
+            }
         }
 
         OnDisplayPromotionOptions(false);
     }
 
+    void Start() {
+        UpdateGameModeText();
+    }
+
     void OnDestroy() {
+        GameManager._OnGameFinished -= OnGameFinished;
         ChessGameModes.FIDERuleset._DisplayPromotionUI -= OnDisplayPromotionOptions;
         ChessGameModes.FIDERuleset._OnPawnPromotionsChanged -= OnPawnPromotionOptionsChanged;
+    }
+
+    private void OnGameFinished() {
+        teamTurnLbl.text = "Finished";
+        teamTurnLbl.color = Color.yellow;
+    }
+
+    public void Log(string message) {
+        gameLogLbl.text = message;
     }
 
     public void CreatePawnPromotionOptions(Piece[] pieces) {
@@ -76,10 +95,6 @@ public class UIManager : MonoBehaviour {
     public void SelectPawnPromotion(Piece value) {
         promoteToLbl.text = "<color=white>Promote to:\n</color><b>" + value.ToString() + "</b>";
         ((ChessGameModes.FIDERuleset)GameManager.Instance.chessGame).SetPawnPromotionTo(value);
-    }
-
-    void Start() {
-        UpdateGameModeText();
     }
 
     public void UpdateGameModeText() {
