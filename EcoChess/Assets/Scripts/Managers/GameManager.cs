@@ -4,10 +4,12 @@ using ChessGameModes;
 
 public class GameManager : MonoBehaviour {
     public static GameManager Instance;
-    public static int modeIndex = 0;
     public Chess chessGame { get; private set; }
+    public GameObject piecePrefab;
+    public GameObject boardChunkPrefab;
 
     private const int NUM_OF_VARIANTS = 28;
+    private static int modeIndex = 0;
     private bool gameFinished;
     private UIManager ui;
 
@@ -21,8 +23,8 @@ public class GameManager : MonoBehaviour {
             Instance = this;
         }
 
-        chessGame = GameModeFactory.Create((GameMode)modeIndex);
-        //chessGame = new ChessGameModes.FIDERuleset();
+        //chessGame = GameModeFactory.Create((GameMode)modeIndex);
+        chessGame = new ChessGameModes.Monster();
         chessGame.PopulateBoard();
         CenterCameraToBoard(chessGame.board);
         ui.CreatePawnPromotionOptions(((FIDERuleset)chessGame).pawnPromotionOptions);
@@ -55,5 +57,13 @@ public class GameManager : MonoBehaviour {
         GameObject camera = FindObjectOfType<Camera>().gameObject;
         camera.GetComponent<Camera>().orthographicSize = tallestDim / camera.GetComponent<Camera>().aspect;
         camera.transform.position = new Vector3(board.GetWidth() / 2f - 0.5f, board.GetHeight() / 2f - 0.5f, camera.gameObject.transform.position.z);
+    }
+
+    public void InstantiateChessPiece(ChessPiece piece) {
+        piece.gameObject = Instantiate(piecePrefab, piece.GetBoardPosition(), piecePrefab.transform.rotation);
+        piece.gameObject.SetActive(true);
+        piece.gameObject.name = piece.ToString();
+        piece.gameObject.transform.SetParent(chessGame.board.gameBoardObj.transform);
+        piece.gameObject.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>(piece.ToString());
     }
 }

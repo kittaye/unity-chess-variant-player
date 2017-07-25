@@ -207,7 +207,7 @@ public abstract class Chess {
         if (CheckValidPlacement(piece)) {
             board.GetCoordInfo(piece.GetBoardPosition()).occupier = piece;
             piece.IsAlive = true;
-            ChessObjectSpawner.InstantiateChessPiece(this, ChessObjectSpawner.Instance.piecePrefab, piece);
+            GameManager.Instance.InstantiateChessPiece(piece);
             if (addToActiveTeam) {
                 if (piece.GetTeam() == Team.WHITE) {
                     whitePieces.Add(piece);
