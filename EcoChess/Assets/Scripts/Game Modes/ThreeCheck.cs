@@ -40,18 +40,18 @@ namespace ChessGameModes {
                 }
 
                 if (numOfChecksWHITE == 3 || numOfChecksBLACK == 3) {
-                    Debug.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checked 3 times -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                    UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checked 3 times -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
                     return true;
                 }
 
                 if (hasAnyMoves == false) {
-                    Debug.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                    UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
                     return true;
                 }
             }
 
             if (numConsecutiveCapturelessMoves == 100) {
-                Debug.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
                 return true;
             }
             return false;

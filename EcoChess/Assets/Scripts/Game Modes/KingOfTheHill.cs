@@ -32,11 +32,11 @@ namespace ChessGameModes {
         public override bool CheckWinState() {
             if (opposingRoyalPiece.GetBoardPosition() == CENTER_SQUARE_1 || opposingRoyalPiece.GetBoardPosition() == CENTER_SQUARE_2
                 || opposingRoyalPiece.GetBoardPosition() == CENTER_SQUARE_3 || opposingRoyalPiece.GetBoardPosition() == CENTER_SQUARE_4) {
-                Debug.Log("Team " + GetOpposingTeamTurn().ToString() + " has reached the center! -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                UIManager.Instance.Log("Team " + GetOpposingTeamTurn().ToString() + " has reached the center! -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
             }
 
             if (numConsecutiveCapturelessMoves == 100) {
-                Debug.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
                 return true;
             }
 
@@ -47,9 +47,9 @@ namespace ChessGameModes {
             }
 
             if (IsPieceInCheck(currentRoyalPiece)) {
-                Debug.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
             } else {
-                Debug.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
             }
             return true;
         }

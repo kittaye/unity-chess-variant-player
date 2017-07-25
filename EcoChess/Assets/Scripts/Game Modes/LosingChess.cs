@@ -24,12 +24,12 @@ namespace ChessGameModes {
 
         public override bool CheckWinState() {
             if (numConsecutiveCapturelessMoves == 100) {
-                Debug.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
                 return true;
             }
 
             if(GetPieces(GetCurrentTeamTurn()).TrueForAll(x => x.IsAlive == false)) {
-                Debug.Log("Team " + GetCurrentTeamTurn().ToString() + " has lost all pieces -- Team " + GetCurrentTeamTurn().ToString() + " wins!");
+                UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has lost all pieces -- Team " + GetCurrentTeamTurn().ToString() + " wins!");
                 return true;
             }
 
@@ -47,7 +47,7 @@ namespace ChessGameModes {
                 }
             }
 
-            Debug.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move -- Team " + GetCurrentTeamTurn().ToString() + " wins!");
+            UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move -- Team " + GetCurrentTeamTurn().ToString() + " wins!");
             return true;
         }
 
