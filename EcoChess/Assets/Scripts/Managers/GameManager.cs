@@ -10,8 +10,9 @@ public class GameManager : MonoBehaviour {
 
     private const int NUM_OF_VARIANTS = 28;
     private static int modeIndex = 0;
-    private bool gameFinished;
     private UIManager ui;
+
+    public static event System.Action _OnGameFinished;
 
     // Use this for initialization
     void Awake () {
@@ -44,12 +45,8 @@ public class GameManager : MonoBehaviour {
         chessGame.OnTurnComplete();
         ui.OnTurnComplete();
         if (chessGame.CheckWinState()) {
-            gameFinished = true;
+            if (_OnGameFinished != null) _OnGameFinished.Invoke();
         }
-    }
-
-    public bool isGameFinished() {
-        return gameFinished;
     }
 
     private void CenterCameraToBoard(Board board) {
