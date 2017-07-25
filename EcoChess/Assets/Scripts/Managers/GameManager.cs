@@ -24,8 +24,8 @@ public class GameManager : MonoBehaviour {
             Instance = this;
         }
 
-        //chessGame = GameModeFactory.Create((GameMode)modeIndex);
-        chessGame = new ChessGameModes.Monster();
+        chessGame = GameModeFactory.Create((GameMode)modeIndex);
+        //chessGame = new ChessGameModes.Monster();
         chessGame.PopulateBoard();
         CenterCameraToBoard(chessGame.board);
         ui.CreatePawnPromotionOptions(((FIDERuleset)chessGame).pawnPromotionOptions);
