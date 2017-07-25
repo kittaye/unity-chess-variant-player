@@ -64,68 +64,56 @@ namespace ChessGameModes {
             }
         }
 
+        public override bool CheckWinState() {
+            if (numConsecutiveCapturelessMoves == 100) {
+                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                return true;
+            }
+
+            if(isWhiteSecondMove) {
+                if (IsPieceInCheck(opposingRoyalPiece)) {
+                    UIManager.Instance.Log("Team " + GetOpposingTeamTurn().ToString() + " has been checkmated -- Team " + GetCurrentTeamTurn().ToString() + " wins!");
+                    return true;
+                }
+            }
+
+            if(isWhiteSecondMove || GetCurrentTeamTurn() == Team.BLACK) {
+                foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
+                    if (piece.IsAlive) {
+                        if (CalculateAvailableMoves(piece).Count > 0) return false;
+                    }
+                }
+
+                if (IsPieceInCheck(currentRoyalPiece)) {
+                    UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                } else {
+                    UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                }
+                return true;
+            }
+
+            return false;
+        }
+
         protected override bool IsPieceInCheck(ChessPiece pieceToCheck) {
             if (checkingForCheck) return false;
 
             checkingForCheck = true;
             if (pieceToCheck.GetTeam() == Team.BLACK) {
                 foreach (ChessPiece piece in GetPieces(Team.WHITE)) {
-                    BoardCoord[] immediateMoves = CalculateAvailableMoves(piece).ToArray();
-                    for (int i = 0; i < immediateMoves.Length; i++) {
-                        // Temporarily simulate the move actually happening
-                        ChessPiece originalOccupier = board.GetCoordInfo(immediateMoves[i]).occupier;
-                        ChessPiece originalLastMover;
-                        BoardCoord oldPos = piece.GetBoardPosition();
-                        SimulateMove(piece, immediateMoves[i], originalOccupier, out originalLastMover);
-
-                        ChessPiece occupier = null;
-                        if (piece is Pawn) {
-                            occupier = CheckPawnEnPassantCapture((Pawn)piece);
-                        }
-
-                        if (piece.CalculateTemplateMoves().Contains(pieceToCheck.GetBoardPosition())) {
-                            checkingForCheck = false;
-                            // Revert the temporary move back to normal
-                            if (occupier != null) {
-                                piece.CaptureCount--;
-                                board.GetCoordInfo(occupier.GetBoardPosition()).occupier = occupier;
-                                occupier.IsAlive = true;
-                                occupier.gameObject.SetActive(true);
-                            }
-                            RevertSimulatedMove(piece, immediateMoves[i], originalOccupier, originalLastMover, oldPos);
-                            return true;
-                        }
-
-                        // Revert the temporary move back to normal
-                        if (occupier != null) {
-                            piece.CaptureCount--;
-                            board.GetCoordInfo(occupier.GetBoardPosition()).occupier = occupier;
-                            occupier.IsAlive = true;
-                            occupier.gameObject.SetActive(true);
-                        }
-                        RevertSimulatedMove(piece, immediateMoves[i], originalOccupier, originalLastMover, oldPos);
+                    if (CalculateAvailableMoves(piece).Contains(pieceToCheck.GetBoardPosition())) {
+                        checkingForCheck = false;
+                        return true;
                     }
                 }
             } else {
-                opposingTeamCheckThreats = GetAllPossibleCheckThreats(pieceToCheck);
-                foreach (ChessPiece piece in opposingTeamCheckThreats) {
-                    if (CalculateAvailableMoves(piece).Contains(pieceToCheck.GetBoardPosition())) {
-                        if(isWhiteSecondMove == false) {
-                            BoardCoord[] secondaryTemplateMoves = pieceToCheck.CalculateTemplateMoves().ToArray();
-                            int validSquares = secondaryTemplateMoves.Length - 1;
-                            for (int i = 0; i < secondaryTemplateMoves.Length; i++) {
-                                foreach (ChessPiece piece2 in GetPieces(Team.BLACK)) {
-                                    if (piece2.CalculateTemplateMoves().Contains(secondaryTemplateMoves[i])) {
-                                        validSquares--;
-                                        break;
-                                    }
-                                }
-                            }
+                if (isWhiteSecondMove) {
+                    opposingTeamCheckThreats = GetAllPossibleCheckThreats(pieceToCheck);
+                    foreach (ChessPiece piece in opposingTeamCheckThreats) {
+                        if (CalculateAvailableMoves(piece).Contains(pieceToCheck.GetBoardPosition())) {
                             checkingForCheck = false;
-                            return (validSquares == 0);
+                            return true;
                         }
-                        checkingForCheck = false;
-                        return true;
                     }
                 }
             }
