@@ -9,11 +9,9 @@ public class SovereignPawn : Pawn {
     public Quadrant pieceQuadrant;
 
     public SovereignPawn(Team team, BoardCoord position, Quadrant quadrant) : base(team, position) {
-        m_pieceType = Piece.SovereignPawn;
         this.pieceQuadrant = quadrant;
     }
     public SovereignPawn(Team team, string algebraicKeyPosition, Quadrant quadrant) : base(team, algebraicKeyPosition) {
-        m_pieceType = Piece.SovereignPawn;
         this.pieceQuadrant = quadrant;
     }
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Piece { King, Queen, Knight, Bishop, Rook, Pawn, Empress, Princess, Grasshopper, Nightrider, BerolinaPawn, SovereignPawn }
+public enum Piece { King, Queen, Knight, Bishop, Rook, Pawn, Empress, Princess, Grasshopper, Nightrider, BerolinaPawn }
 
 public static class ChessPieceFactory {
 	public static ChessPiece Create(Piece piece, Team team, BoardCoord position) {
