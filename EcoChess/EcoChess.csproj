@@ -124,7 +124,6 @@
     <Compile Include="Assets\Scripts\Game Modes\UpsideDown.cs" />
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\Scripts\Managers\UIManager.cs" />
-    <Compile Include="Assets\Scripts\Misc\ChessObjectSpawner.cs" />
     <Compile Include="Assets\Scripts\Misc\ChessPieceFactory.cs" />
     <Compile Include="Assets\Scripts\Misc\GameModeFactory.cs" />
     <Compile Include="Assets\Scripts\Pieces\ChessPiece.cs" />
