@@ -12,6 +12,7 @@ public class Board {
     private List<BoardCoord> highlightedCoords;
     private char[] boardLetters;
     private string[] boardNumbers;
+    private const int MAX_DIM = 26;
     public readonly Color primaryBoardColour;
     public readonly Color secondaryBoardColour;
 
@@ -24,17 +25,39 @@ public class Board {
         this.secondaryBoardColour = secondaryBoardColour;
 
         GenerateBoardCoordinateValues();
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                coordinates.Add(new BoardCoord(x, y), new CoordInfo(boardLetters[x] + boardNumbers[y]));
+        gameBoardObj = InstantiateGameBoard();
+    }
+
+    private GameObject InstantiateGameBoard() {
+        if (this.GetWidth() > MAX_DIM || this.GetHeight() > MAX_DIM) {
+            Debug.LogWarning(string.Format("Board dimensions greater than {0} will not have naming support.", MAX_DIM));
+        }
+
+        GameObject gameBoardObj = new GameObject("Board");
+
+        //Create the board from the bottom up, row by row.
+        for (int y = 0; y < this.GetHeight(); y++) {
+            for (int x = 0; x < this.GetWidth(); x++) {
+                //Instantiate board piece at (x,y) and parent it to the board.
+                GameObject go = MonoBehaviour.Instantiate
+                    (GameManager.Instance.boardChunkPrefab, new Vector3(x, y), GameManager.Instance.boardChunkPrefab.transform.rotation);
+                go.transform.SetParent(gameBoardObj.transform);
+
+                //Rename piece to match the board coordinate its on.
+                coordinates.Add(new BoardCoord(x, y), new CoordInfo(boardLetters[x] + boardNumbers[y], go));
+                go.name = this.GetCoordInfo(new BoardCoord(x, y)).algebraicKey;
+
+                //Alternate piece colour with each instantiation.
+                Material mat = go.GetComponent<Renderer>().material;
+                mat.color = ((y + x) % 2 != 0) ? this.primaryBoardColour : this.secondaryBoardColour;
             }
         }
-        gameBoardObj = ChessObjectSpawner.Instance.InstantiateGameBoard(this);
+        return gameBoardObj;
     }
 
     private void GenerateBoardCoordinateValues() {
-        StringBuilder letters = new StringBuilder((int)boardWidth);
-        StringBuilder numbers = new StringBuilder((int)boardWidth);
+        StringBuilder letters = new StringBuilder(MAX_DIM);
+        StringBuilder numbers = new StringBuilder(MAX_DIM);
 
         int nextLetter = 'a';
         for (int i = 0; i < letters.Capacity; i++) {
