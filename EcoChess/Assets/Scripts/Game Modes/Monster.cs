@@ -72,10 +72,38 @@ namespace ChessGameModes {
                 foreach (ChessPiece piece in GetPieces(Team.WHITE)) {
                     BoardCoord[] immediateMoves = CalculateAvailableMoves(piece).ToArray();
                     for (int i = 0; i < immediateMoves.Length; i++) {
-                        if(IsPieceInCheckAfterThisMove(pieceToCheck, piece, immediateMoves[i])) {
+                        // Temporarily simulate the move actually happening
+                        ChessPiece originalOccupier = board.GetCoordInfo(immediateMoves[i]).occupier;
+                        ChessPiece originalLastMover;
+                        BoardCoord oldPos = piece.GetBoardPosition();
+                        SimulateMove(piece, immediateMoves[i], originalOccupier, out originalLastMover);
+
+                        ChessPiece occupier = null;
+                        if (piece is Pawn) {
+                            occupier = CheckPawnEnPassantCapture((Pawn)piece);
+                        }
+
+                        if (piece.CalculateTemplateMoves().Contains(pieceToCheck.GetBoardPosition())) {
                             checkingForCheck = false;
+                            // Revert the temporary move back to normal
+                            if (occupier != null) {
+                                piece.CaptureCount--;
+                                board.GetCoordInfo(occupier.GetBoardPosition()).occupier = occupier;
+                                occupier.IsAlive = true;
+                                occupier.gameObject.SetActive(true);
+                            }
+                            RevertSimulatedMove(piece, immediateMoves[i], originalOccupier, originalLastMover, oldPos);
                             return true;
                         }
+
+                        // Revert the temporary move back to normal
+                        if (occupier != null) {
+                            piece.CaptureCount--;
+                            board.GetCoordInfo(occupier.GetBoardPosition()).occupier = occupier;
+                            occupier.IsAlive = true;
+                            occupier.gameObject.SetActive(true);
+                        }
+                        RevertSimulatedMove(piece, immediateMoves[i], originalOccupier, originalLastMover, oldPos);
                     }
                 }
             } else {
