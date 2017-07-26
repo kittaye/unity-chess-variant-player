@@ -127,6 +127,34 @@ namespace ChessGameModes {
             }
         }
 
+        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
+            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
+            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
+
+            for (int i = 0; i < templateMoves.Length; i++) {
+                if(Mathf.Abs(mover.GetBoardPosition().x - templateMoves[i].x) > 8 || Mathf.Abs(mover.GetBoardPosition().y - templateMoves[i].y) > 8) {
+                    continue;
+                }
+                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
+                    availableMoves.Add(templateMoves[i]);
+                }
+            }
+
+            if (mover is King && mover.MoveCount == 0) {
+                availableMoves.AddRange(TryAddAvailableCastleMoves(mover));
+            } else if (mover is Pawn) {
+                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
+                if (enPassantMove != BoardCoord.NULL) {
+                    availableMoves.Add(enPassantMove);
+                }
+                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
+                    OnDisplayPromotionUI(true);
+                }
+            }
+
+            return availableMoves;
+        }
+
         public override void PopulateBoard() {
 #region WHITE+BLACK Teams
             currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(8, WHITE_BACKROW)));
