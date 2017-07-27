@@ -9,7 +9,13 @@ namespace ChessGameModes {
     /// Winstate: Checkmate.
     /// Piece types: Orthodox.
     /// Piece rules: All sliding pieces may only move up to 8 squares at a time. 
+    ///              Pawn enpassant is not allowed.
     ///              Pawns must move and capture towards the center, either horizontally or vertically.
+    ///              Owned pawns may promote to a king, which removes the previous king from the board.
+    ///              Pieces may not move to or over a square controlled by the opposing team unless to capture and gain control.
+    ///              Pieces may not move to a square of its own colour.
+    ///              Pieces may capture pieces to steal control from the opposing team.
+    ///              Kings may switch teams to a controlled colour.
     /// Board layout:
     ///     Q B R N ? ? ? ? ? ? ? ? N R N Q
     ///     R P P P ? ? ? ? ? ? ? ? P P P R
@@ -43,68 +49,60 @@ namespace ChessGameModes {
         private readonly static Color Color_pink = new Color(1, 0.45f, 0.71f);
         private readonly static Color Color_purple = new Color(0.6f, 0, 0.6f);
 
-        private Dictionary<BoardCoord, Color> ColourControlSquares = new Dictionary<BoardCoord, Color>(24);
+        private Dictionary<Color, BoardCoord[]> ColourControlSquares = new Dictionary<Color, BoardCoord[]>(24);
 
         public SovereignChess() : base(BOARD_WIDTH, BOARD_HEIGHT, primaryBoardColour, secondaryBoardColour) {
             //Red
-            AddColourControlSquare("e12", Color.red);
-            AddColourControlSquare("l5", Color.red);
+            AddColourControlSquares("e12", "l5", Color.red);
 
             //Blue
-            AddColourControlSquare("e5", Color.blue);
-            AddColourControlSquare("l12", Color.blue);
+            AddColourControlSquares("e5", "l12", Color.blue);
 
             //Yellow
-            AddColourControlSquare("f11", Color.yellow);
-            AddColourControlSquare("k6", Color.yellow);
+            AddColourControlSquares("f11","k6", Color.yellow);
 
             //Green
-            AddColourControlSquare("f6", Color.green);
-            AddColourControlSquare("k11", Color.green);
+            AddColourControlSquares("f6", "k11", Color.green);
 
             //Pink
-            AddColourControlSquare("h11", Color_pink);
-            AddColourControlSquare("i6", Color_pink);
+            AddColourControlSquares("h11", "i6", Color_pink);
 
             //Purple
-            AddColourControlSquare("i11", Color_purple);
-            AddColourControlSquare("h6", Color_purple);
+            AddColourControlSquares("i11", "h6", Color_purple);
 
             //Grey
-            AddColourControlSquare("g10", Color.grey);
-            AddColourControlSquare("j7", Color.grey);
-
+            AddColourControlSquares("g10", "j7", Color.grey);
+            
             //Silver
-            AddColourControlSquare("g7", Color_silver);
-            AddColourControlSquare("j10", Color_silver);
+            AddColourControlSquares("g7", "j10", Color_silver);
 
             //Orange
-            AddColourControlSquare("f9", Color_orange);
-            AddColourControlSquare("k8", Color_orange);
+            AddColourControlSquares("f9", "k8", Color_orange);
 
             //Light blue
-            AddColourControlSquare("f8", Color_lightblue);
-            AddColourControlSquare("k9", Color_lightblue);
+            AddColourControlSquares("f8", "k9", Color_lightblue);
 
             //White
-            AddColourControlSquare("h9", Color.white);
-            AddColourControlSquare("i8", Color.white);
+            AddColourControlSquares("h9", "i8", Color.white);
 
             //Black
-            AddColourControlSquare("i9", Color.black);
-            AddColourControlSquare("h8", Color.black);
+            AddColourControlSquares("i9", "h8", Color.black);
         }
 
         public override string ToString() {
             return "Sovereign Chess";
         }
 
-        private void AddColourControlSquare(string algebraicKey, Color color) {
-            BoardCoord coord;
-            if (board.TryGetCoordWithKey(algebraicKey, out coord)) {
-                board.GetCoordInfo(coord).boardChunk.GetComponent<MeshRenderer>().material.color = color;
-                ColourControlSquares.Add(coord, color);
+        private void AddColourControlSquares(string algebraicKey, string algebraicKey2, Color color) {
+            BoardCoord coord1;
+            if (board.TryGetCoordWithKey(algebraicKey, out coord1)) {
+                board.GetCoordInfo(coord1).boardChunk.GetComponent<MeshRenderer>().material.color = color;
             }
+            BoardCoord coord2;
+            if (board.TryGetCoordWithKey(algebraicKey2, out coord2)) {
+                board.GetCoordInfo(coord2).boardChunk.GetComponent<MeshRenderer>().material.color = color;
+            }
+            ColourControlSquares.Add(color, new BoardCoord[2] { coord1, coord2 });
         }
 
         private void AddSovereignChessPiece(Piece piece, string algebraicKey, Color color) {
@@ -131,28 +129,66 @@ namespace ChessGameModes {
             BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
             List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
 
+            bool cancelDirectionalSlide = false;
             for (int i = 0; i < templateMoves.Length; i++) {
                 if(Mathf.Abs(mover.GetBoardPosition().x - templateMoves[i].x) > 8 || Mathf.Abs(mover.GetBoardPosition().y - templateMoves[i].y) > 8) {
                     continue;
                 }
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
+
+                if (i > 0 && (Mathf.Abs(templateMoves[i].x - templateMoves[i - 1].x) > 1 || Mathf.Abs(templateMoves[i].y - templateMoves[i - 1].y) > 1)) {
+                    cancelDirectionalSlide = false;
+                }
+
+                if (cancelDirectionalSlide == false) {
+                    if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
+                        BoardCoord move = TryGetValidMove(mover, templateMoves[i], out cancelDirectionalSlide);
+                        if (move != BoardCoord.NULL) {
+                            availableMoves.Add(move);
+                        } else if ((mover is Queen || mover is Rook || mover is Bishop) == false) {
+                            cancelDirectionalSlide = false;
+                        }
+                    }
                 }
             }
 
             if (mover is King && mover.MoveCount == 0) {
                 availableMoves.AddRange(TryAddAvailableCastleMoves(mover));
             } else if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
                 if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
                     OnDisplayPromotionUI(true);
                 }
             }
 
             return availableMoves;
+        }
+
+        private BoardCoord TryGetValidMove(ChessPiece mover, BoardCoord templateMove, out bool cancelDirectionalSlide) {
+            BoardCoord[] positions = new BoardCoord[2];
+            Color movedToColour = board.GetCoordInfo(templateMove).boardChunk.GetComponent<MeshRenderer>().material.color;
+            if (ColourControlSquares.TryGetValue(movedToColour, out positions)) {
+                bool controlledByMover = false;
+                bool controlledByAlly = false;
+                bool controlNeutral = false;
+                ChessPiece firstOccupier = board.GetCoordInfo(positions[0]).occupier;
+                ChessPiece secondOccupier = board.GetCoordInfo(positions[1]).occupier;
+                if (firstOccupier == null && secondOccupier == null) {
+                    controlNeutral = true;
+                } else if (mover.GetBoardPosition() == positions[0] || mover.GetBoardPosition() == positions[1]) {
+                    controlledByMover = true;
+                } else if (IsAlly(mover, positions[0]) || IsAlly(mover, positions[1])) {
+                    controlledByAlly = true;
+                }
+
+                if (controlledByMover || IsThreat(mover, templateMove) || controlNeutral) {
+                    cancelDirectionalSlide = false;
+                    return templateMove;
+                } else {
+                    cancelDirectionalSlide = (controlledByAlly) ? false : true;
+                    return BoardCoord.NULL;
+                }
+            }
+            cancelDirectionalSlide = false;
+            return templateMove;
         }
 
         public override void PopulateBoard() {
