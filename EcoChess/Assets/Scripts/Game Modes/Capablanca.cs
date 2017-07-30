@@ -113,6 +113,5 @@ namespace ChessGameModes {
             }
             return new BoardCoord[0];
         }
-
     }
 }
