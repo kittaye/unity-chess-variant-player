@@ -202,15 +202,15 @@ namespace ChessGameModes {
         protected virtual void TryPerformCastlingRookMoves(ChessPiece mover) {
             if (mover.GetBoardPosition().x == 2) {
                 if (mover.GetTeam() == Team.WHITE) {
-                    aSideWhiteRook = PerformCastle(aSideWhiteRook, new BoardCoord(3, mover.GetBoardPosition().y));
+                    aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(3, mover.GetBoardPosition().y));
                 } else {
-                    aSideBlackRook = PerformCastle(aSideBlackRook, new BoardCoord(3, mover.GetBoardPosition().y));
+                    aSideBlackRook = (Rook)PerformCastle(aSideBlackRook, new BoardCoord(3, mover.GetBoardPosition().y));
                 }
             } else if (mover.GetBoardPosition().x == 6) {
                 if (mover.GetTeam() == Team.WHITE) {
-                    hSideWhiteRook = PerformCastle(hSideWhiteRook, new BoardCoord(5, mover.GetBoardPosition().y));
+                    hSideWhiteRook = (Rook)PerformCastle(hSideWhiteRook, new BoardCoord(5, mover.GetBoardPosition().y));
                 } else {
-                    hSideBlackRook = PerformCastle(hSideBlackRook, new BoardCoord(5, mover.GetBoardPosition().y));
+                    hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(5, mover.GetBoardPosition().y));
                 }
             }
         }
@@ -258,14 +258,14 @@ namespace ChessGameModes {
             this.selectedPawnPromotion = piece;
         }
 
-        protected Rook PerformCastle(Rook castlingRook, BoardCoord castlingRookNewPos) {
-            if (AssertContainsCoord(castlingRookNewPos)) {
-                if (castlingRook != null) {
-                    RemovePieceFromBoard(castlingRook);
-                    RemovePieceFromActiveTeam(castlingRook);
-                    return (Rook)AddPieceToBoard(new Rook((castlingRook.GetTeam()), castlingRookNewPos));
+        protected ChessPiece PerformCastle(ChessPiece castlingPiece, BoardCoord castlingPieceNewPos) {
+            if (AssertContainsCoord(castlingPieceNewPos)) {
+                if (castlingPiece != null) {
+                    RemovePieceFromBoard(castlingPiece);
+                    RemovePieceFromActiveTeam(castlingPiece);
+                    return AddPieceToBoard(ChessPieceFactory.Create(castlingPiece.GetPieceType(), castlingPiece.GetTeam(), castlingPieceNewPos));
                 } else {
-                    Debug.LogError("Reference to the castling rook should not be null! Ensure rook references were made.");
+                    Debug.LogError("Reference to the castling piece should not be null! Ensure references were made when the piece was first created.");
                 }
             }
             return null;
