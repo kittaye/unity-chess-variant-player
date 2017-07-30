@@ -3,10 +3,10 @@
 namespace ChessGameModes {
     public enum GameMode {
         ActiveChess, AlmostChess, AmazonChess, AndernachChess, AtomicChess, BalboChess, BerolinaChess, CapablancaChess,
-        ChargeOfTheLightBrigadeChess, ChecklessChess, Chess960, ChigorinChess, DoubleChess, EmbassyChess, FIDE, GrandChess,
-        GrasshopperChess, HalfChess, Horde, JanusChess, KingOfTheHill, Knightmate, LosAlamosChess, LosingChess, Microchess,
-        MongredienChess, MonsterChess, NightriderChess, OmegaChess, PawnEndgameChess, PeasantsRevolt, PerfectChess, RacingKings,
-        ReversedRoyals, ShiftedChess, Silverman4x5, ThreeCheck, UpsidedownChess, Weak
+        ChargeOfTheLightBrigadeChess, ChecklessChess, Chess960, ChigorinChess, DoubleChess, EmbassyChess, FIDE, GothicChess,
+        GrandChess, GrasshopperChess, HalfChess, Horde, JanusChess, KingOfTheHill, Knightmate, LosAlamosChess, LosingChess,
+        Microchess, MongredienChess, MonsterChess, NightriderChess, OmegaChess, PawnEndgameChess, PeasantsRevolt, PerfectChess,
+        RacingKings, ReversedRoyals, ShiftedChess, Silverman4x5, ThreeCheck, UpsidedownChess, Weak
     }
 
     public static class GameModeFactory {
@@ -42,6 +42,8 @@ namespace ChessGameModes {
                     return new Embassy();
                 case GameMode.FIDE:
                     return new FIDERuleset();
+                case GameMode.GothicChess:
+                    return new GothicChess();
                 case GameMode.GrandChess:
                     return new GrandChess();
                 case GameMode.GrasshopperChess:

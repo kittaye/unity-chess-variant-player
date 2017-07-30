@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour {
     public GameObject piecePrefab;
     public GameObject boardChunkPrefab;
 
-    private const int NUM_OF_VARIANTS = 39;
+    private const int NUM_OF_VARIANTS = 40;
     private static int modeIndex = 0;
     private UIManager ui;
 
