@@ -2,7 +2,7 @@
 
 namespace ChessGameModes {
     public enum GameMode {
-        AlmostChess, AndernachChess, AtomicChess, BalboChess, BerolinaChess, CapablancaChess, ChargeOfTheLightBrigadeChess,
+        ActiveChess, AlmostChess, AndernachChess, AtomicChess, BalboChess, BerolinaChess, CapablancaChess, ChargeOfTheLightBrigadeChess,
         ChecklessChess, Chess960, ChigorinChess, DoubleChess, EmbassyChess, FIDE, GrandChess, GrasshopperChess, HalfChess,
         Horde, JanusChess, KingOfTheHill, Knightmate, LosAlamosChess, LosingChess, Microchess, MongredienChess, MonsterChess,
         NightriderChess, OmegaChess, PawnEndgameChess, PeasantsRevolt, RacingKings, ReversedRoyals, ShiftedChess, Silverman4x5,
@@ -12,6 +12,8 @@ namespace ChessGameModes {
     public static class GameModeFactory {
         public static Chess Create(GameMode mode) {
             switch (mode) {
+                case GameMode.ActiveChess:
+                    return new ActiveChess();
                 case GameMode.AtomicChess:
                     return new Atomic();
                 case GameMode.AlmostChess:
