@@ -8,14 +8,14 @@ namespace ChessGameModes {
     /// Winstate: Checkmate.
     /// Piece types: Orthodox.
     /// Board layout:
-    ///     r b b k q n n r
+    ///     r n b k q b n r
     ///     p p p p p p p p
     ///     . . . . . . . .
     ///     . . . . . . . .
     ///     . . . . . . . .
     ///     . . . . . . . .
     ///     p p p p p p p p
-    ///     R B B Q K N N R
+    ///     R N B Q K B N R
     /// </summary>
     public class ReversedRoyals : FIDERuleset {
         public ReversedRoyals() : base() {
@@ -54,15 +54,15 @@ namespace ChessGameModes {
         protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
             if (mover.GetTeam() == Team.WHITE) {
                 if(mover.GetBoardPosition().x == 2) {
-                    aSideWhiteRook = PerformCastle(aSideWhiteRook, new BoardCoord(3, mover.GetBoardPosition().y));
+                    aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(3, mover.GetBoardPosition().y));
                 } else if(mover.GetBoardPosition().x == 6) {
-                    hSideWhiteRook = PerformCastle(hSideWhiteRook, new BoardCoord(5, mover.GetBoardPosition().y));
+                    hSideWhiteRook = (Rook)PerformCastle(hSideWhiteRook, new BoardCoord(5, mover.GetBoardPosition().y));
                 }
             } else {
                 if (mover.GetBoardPosition().x == 1) {
-                    aSideBlackRook = PerformCastle(aSideBlackRook, new BoardCoord(2, mover.GetBoardPosition().y));
+                    aSideBlackRook = (Rook)PerformCastle(aSideBlackRook, new BoardCoord(2, mover.GetBoardPosition().y));
                 } else if (mover.GetBoardPosition().x == 5) {
-                    hSideBlackRook = PerformCastle(hSideBlackRook, new BoardCoord(4, mover.GetBoardPosition().y));
+                    hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(4, mover.GetBoardPosition().y));
                 }
             }
         }

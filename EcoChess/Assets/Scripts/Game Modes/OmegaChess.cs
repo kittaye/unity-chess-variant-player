@@ -85,15 +85,15 @@ namespace ChessGameModes {
         protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
             if (mover.GetBoardPosition().x == 4) {
                 if (mover.GetTeam() == Team.WHITE) {
-                    aSideWhiteRook = PerformCastle(aSideWhiteRook, new BoardCoord(5, mover.GetBoardPosition().y));
+                    aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(5, mover.GetBoardPosition().y));
                 } else {
-                    aSideBlackRook = PerformCastle(aSideBlackRook, new BoardCoord(5, mover.GetBoardPosition().y));
+                    aSideBlackRook = (Rook)PerformCastle(aSideBlackRook, new BoardCoord(5, mover.GetBoardPosition().y));
                 }
             } else if (mover.GetBoardPosition().x == 8) {
                 if (mover.GetTeam() == Team.WHITE) {
-                    hSideWhiteRook = PerformCastle(hSideWhiteRook, new BoardCoord(7, mover.GetBoardPosition().y));
+                    hSideWhiteRook = (Rook)PerformCastle(hSideWhiteRook, new BoardCoord(7, mover.GetBoardPosition().y));
                 } else {
-                    hSideBlackRook = PerformCastle(hSideBlackRook, new BoardCoord(7, mover.GetBoardPosition().y));
+                    hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(7, mover.GetBoardPosition().y));
                 }
             }
         }

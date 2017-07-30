@@ -48,9 +48,9 @@ namespace ChessGameModes {
                 // Check castling moves
                 if (mover is King && mover.MoveCount == 1) {
                     if (mover.GetBoardPosition() == new BoardCoord(1, WHITE_BACKROW)) {
-                        aSideWhiteRook = PerformCastle(aSideWhiteRook, new BoardCoord(2, WHITE_BACKROW));
+                        aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(2, WHITE_BACKROW));
                     } else if (mover.GetBoardPosition() == new BoardCoord(2, BLACK_BACKROW)) {
-                        hSideBlackRook = PerformCastle(hSideBlackRook, new BoardCoord(1, BLACK_BACKROW));
+                        hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(1, BLACK_BACKROW));
                     }
                 } else if (mover is Pawn) {
                     ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
