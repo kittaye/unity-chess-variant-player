@@ -13,13 +13,11 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile>
-    </CompilerResponseFile>
+    <CompilerResponseFile></CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.6.1f1</UnityVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -92,47 +90,50 @@
     <Compile Include="Assets\Scripts\Controllers\MouseController.cs" />
     <Compile Include="Assets\Scripts\Data Structures\BoardCoord.cs" />
     <Compile Include="Assets\Scripts\Data Structures\CoordInfo.cs" />
-    <Compile Include="Assets\Scripts\Game Modes\Berolina.cs" />
-    <Compile Include="Assets\Scripts\Game Modes\Chigorin.cs" />
-    <Compile Include="Assets\Scripts\Game Modes\Embassy.cs" />
-    <Compile Include="Assets\Scripts\Game Modes\Janus.cs" />
-    <Compile Include="Assets\Scripts\Game Modes\ShiftedChess.cs" />
-    <Compile Include="Assets\Scripts\Game Modes\Monster.cs" />
-    <Compile Include="Assets\Scripts\Game Modes\Checkless.cs" />
-    <Compile Include="Assets\Scripts\Game Modes\Andernach.cs" />
-    <Compile Include="Assets\Scripts\Game Modes\SovereignChess.cs" />
-    <Compile Include="Assets\Scripts\Game Modes\GrandChess.cs" />
-    <Compile Include="Assets\Scripts\Game Modes\Capablanca.cs" />
     <Compile Include="Assets\Scripts\Game Modes\AlmostChess.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Andernach.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Atomic.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Balbo.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Berolina.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Capablanca.cs" />
     <Compile Include="Assets\Scripts\Game Modes\ChargeOfTheLightBrigade.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Checkless.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Chess960.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Chigorin.cs" />
     <Compile Include="Assets\Scripts\Game Modes\DoubleChess.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\DummyVariant.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Embassy.cs" />
     <Compile Include="Assets\Scripts\Game Modes\FIDERuleset.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\GrandChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Horde.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Janus.cs" />
     <Compile Include="Assets\Scripts\Game Modes\KingOfTheHill.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Knightmate.cs" />
     <Compile Include="Assets\Scripts\Game Modes\LosingChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Microchess.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Monster.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\OmegaChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\PawnEndgame.cs" />
-    <Compile Include="Assets\Scripts\Game Modes\DummyVariant.cs" />
     <Compile Include="Assets\Scripts\Game Modes\PeasantsRevolt.cs" />
     <Compile Include="Assets\Scripts\Game Modes\RacingKings.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\ShiftedChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Silverman4x5.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\SovereignChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\ThreeCheck.cs" />
-    <Compile Include="Assets\Scripts\Game Modes\Balbo.cs" />
     <Compile Include="Assets\Scripts\Game Modes\UpsideDown.cs" />
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\Scripts\Managers\UIManager.cs" />
     <Compile Include="Assets\Scripts\Misc\ChessPieceFactory.cs" />
     <Compile Include="Assets\Scripts\Misc\GameModeFactory.cs" />
     <Compile Include="Assets\Scripts\Pieces\ChessPiece.cs" />
-    <Compile Include="Assets\Scripts\Pieces\Fairy\SovereignPawn.cs" />
     <Compile Include="Assets\Scripts\Pieces\Fairy\BerolinaPawn.cs" />
-    <Compile Include="Assets\Scripts\Pieces\Fairy\Nightrider.cs" />
-    <Compile Include="Assets\Scripts\Pieces\Fairy\Grasshopper.cs" />
+    <Compile Include="Assets\Scripts\Pieces\Fairy\Champion.cs" />
     <Compile Include="Assets\Scripts\Pieces\Fairy\Empress.cs" />
+    <Compile Include="Assets\Scripts\Pieces\Fairy\Grasshopper.cs" />
+    <Compile Include="Assets\Scripts\Pieces\Fairy\Nightrider.cs" />
     <Compile Include="Assets\Scripts\Pieces\Fairy\Princess.cs" />
+    <Compile Include="Assets\Scripts\Pieces\Fairy\SovereignPawn.cs" />
+    <Compile Include="Assets\Scripts\Pieces\Fairy\Wizard.cs" />
     <Compile Include="Assets\Scripts\Pieces\Orthodox\Bishop.cs" />
     <Compile Include="Assets\Scripts\Pieces\Orthodox\King.cs" />
     <Compile Include="Assets\Scripts\Pieces\Orthodox\Knight.cs" />
