@@ -311,6 +311,8 @@ public abstract class Chess {
         List<BoardCoord> moves = new List<BoardCoord>();
         while (true) {
             iter++;
+            if (iter > cap) break;
+
             x += xModifier;
             y += yModifier;
             coord = new BoardCoord(x, y);
@@ -322,8 +324,6 @@ public abstract class Chess {
             }
             if (IsThreat(mover, coord) == false && threatsOnly) break;
             moves.Add(coord);
-
-            if (iter == cap) break;
         }
         return moves.ToArray();
     }
