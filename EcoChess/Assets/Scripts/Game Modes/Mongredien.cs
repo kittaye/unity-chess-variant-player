@@ -22,7 +22,7 @@ namespace ChessGameModes {
         }
 
         public override string ToString() {
-            return "Mongredien chess";
+            return "Mongredien Chess";
         }
 
         public override void PopulateBoard() {
