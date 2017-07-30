@@ -40,6 +40,8 @@ namespace ChessGameModes {
 
             BLACK_BACKROW = board.GetHeight() - 2;
             BLACK_PAWNROW = board.GetHeight() - 3;
+
+            pawnPromotionOptions = new Piece[6] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight, Piece.Wizard, Piece.Champion };
         }
 
         public override string ToString() {
