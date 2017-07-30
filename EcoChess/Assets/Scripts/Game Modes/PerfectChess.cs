@@ -8,7 +8,14 @@ namespace ChessGameModes {
     /// Winstate: Checkmate.
     /// Piece types: Orthodox + Amazons, Empresses, Princesses.
     /// Board layout:
-    /// 
+    ///     $ ^ q a k b n r
+    ///     p p p p p p p p
+    ///     . . . . . . . .
+    ///     . . . . . . . .     $ = Empress
+    ///     . . . . . . . .     ^ = Princess
+    ///     . . . . . . . .
+    ///     p p p p p p p p
+    ///     $ ^ Q A K B N R
     /// </summary>
     public class PerfectChess : FIDERuleset {
         private Empress aSideWhiteEmpress;
