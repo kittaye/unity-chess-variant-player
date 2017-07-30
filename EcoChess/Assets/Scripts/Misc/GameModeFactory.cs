@@ -2,11 +2,11 @@
 
 namespace ChessGameModes {
     public enum GameMode {
-        ActiveChess, AlmostChess, AndernachChess, AtomicChess, BalboChess, BerolinaChess, CapablancaChess, ChargeOfTheLightBrigadeChess,
-        ChecklessChess, Chess960, ChigorinChess, DoubleChess, EmbassyChess, FIDE, GrandChess, GrasshopperChess, HalfChess,
-        Horde, JanusChess, KingOfTheHill, Knightmate, LosAlamosChess, LosingChess, Microchess, MongredienChess, MonsterChess,
-        NightriderChess, OmegaChess, PawnEndgameChess, PeasantsRevolt, RacingKings, ReversedRoyals, ShiftedChess, Silverman4x5,
-        ThreeCheck, UpsidedownChess, Weak
+        ActiveChess, AlmostChess, AmazonChess, AndernachChess, AtomicChess, BalboChess, BerolinaChess, CapablancaChess,
+        ChargeOfTheLightBrigadeChess, ChecklessChess, Chess960, ChigorinChess, DoubleChess, EmbassyChess, FIDE, GrandChess,
+        GrasshopperChess, HalfChess, Horde, JanusChess, KingOfTheHill, Knightmate, LosAlamosChess, LosingChess, Microchess,
+        MongredienChess, MonsterChess, NightriderChess, OmegaChess, PawnEndgameChess, PeasantsRevolt, PerfectChess, RacingKings,
+        ReversedRoyals, ShiftedChess, Silverman4x5, ThreeCheck, UpsidedownChess, Weak
     }
 
     public static class GameModeFactory {
@@ -14,12 +14,14 @@ namespace ChessGameModes {
             switch (mode) {
                 case GameMode.ActiveChess:
                     return new ActiveChess();
-                case GameMode.AtomicChess:
-                    return new Atomic();
                 case GameMode.AlmostChess:
                     return new AlmostChess();
+                case GameMode.AmazonChess:
+                    return new AmazonChess();
                 case GameMode.AndernachChess:
                     return new Andernach();
+                case GameMode.AtomicChess:
+                    return new Atomic();
                 case GameMode.BalboChess:
                     return new Balbo();
                 case GameMode.BerolinaChess:
@@ -70,6 +72,8 @@ namespace ChessGameModes {
                     return new OmegaChess();
                 case GameMode.PawnEndgameChess:
                     return new PawnEndgame();
+                case GameMode.PerfectChess:
+                    return new PerfectChess();
                 case GameMode.PeasantsRevolt:
                     return new PeasantsRevolt();
                 case GameMode.RacingKings:

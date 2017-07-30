@@ -92,8 +92,10 @@
     <Compile Include="Assets\Scripts\Controllers\MouseController.cs" />
     <Compile Include="Assets\Scripts\Data Structures\BoardCoord.cs" />
     <Compile Include="Assets\Scripts\Data Structures\CoordInfo.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\PerfectChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\LosAlamos.cs" />
     <Compile Include="Assets\Scripts\Game Modes\ActiveChess.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\AmazonChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\ReversedRoyals.cs" />
     <Compile Include="Assets\Scripts\Game Modes\NightriderChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\HalfChess.cs" />
@@ -147,6 +149,7 @@
     <Compile Include="Assets\Scripts\Pieces\Orthodox\King.cs" />
     <Compile Include="Assets\Scripts\Pieces\Orthodox\Knight.cs" />
     <Compile Include="Assets\Scripts\Pieces\Orthodox\Pawn.cs" />
+    <Compile Include="Assets\Scripts\Pieces\Fairy\Amazon.cs" />
     <Compile Include="Assets\Scripts\Pieces\Orthodox\Queen.cs" />
     <Compile Include="Assets\Scripts\Pieces\Fairy\Champion.cs" />
     <Compile Include="Assets\Scripts\Pieces\Orthodox\Rook.cs" />
