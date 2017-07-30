@@ -300,7 +300,7 @@ public abstract class Chess {
         return moves.ToArray();
     }
 
-    public BoardCoord[] TryGetCustomDirectionalMoves(ChessPiece mover, int xVariance, int yVariance, uint cap = 0, bool threatsOnly = false, bool isLeaper = true) {
+    public BoardCoord[] TryGetCustomDirectionalMoves(ChessPiece mover, int xVariance, int yVariance, uint cap = 0, bool threatsOnly = false) {
         int x = mover.GetBoardPosition().x;
         int y = mover.GetBoardPosition().y;
         int xModifier = mover.TeamSensitiveMove(xVariance);
@@ -311,19 +311,16 @@ public abstract class Chess {
         List<BoardCoord> moves = new List<BoardCoord>();
         while (true) {
             iter++;
-            if (iter > cap) break;
-
             x += xModifier;
             y += yModifier;
             coord = new BoardCoord(x, y);
 
             if (board.ContainsCoord(coord) == false) break;
-            if (IsAlly(mover, coord)) {
-                if (isLeaper) continue;
-                else break;
-            }
+            if (IsAlly(mover, coord)) break;
             if (IsThreat(mover, coord) == false && threatsOnly) break;
             moves.Add(coord);
+
+            if (iter == cap) break;
         }
         return moves.ToArray();
     }
