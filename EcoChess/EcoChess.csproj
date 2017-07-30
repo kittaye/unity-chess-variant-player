@@ -93,6 +93,7 @@
     <Compile Include="Assets\Scripts\Data Structures\BoardCoord.cs" />
     <Compile Include="Assets\Scripts\Data Structures\CoordInfo.cs" />
     <Compile Include="Assets\Scripts\Game Modes\HalfChess.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\GrasshopperChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Weak.cs" />
     <Compile Include="Assets\Scripts\Game Modes\OmegaChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Berolina.cs" />
