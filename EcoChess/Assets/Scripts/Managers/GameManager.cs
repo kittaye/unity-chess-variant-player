@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour {
     public GameObject piecePrefab;
     public GameObject boardChunkPrefab;
 
-    private const int NUM_OF_VARIANTS = 28;
+    private const int NUM_OF_VARIANTS = 30;
     private static int modeIndex = 0;
     private UIManager ui;
 
@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour {
         }
 
         chessGame = GameModeFactory.Create((GameMode)modeIndex);
-        //chessGame = new ChessGameModes.Monster();
+        //chessGame = new ChessGameModes.Weak();
         chessGame.PopulateBoard();
         CenterCameraToBoard(chessGame.board);
         ui.CreatePawnPromotionOptions(((FIDERuleset)chessGame).pawnPromotionOptions);
