@@ -27,6 +27,19 @@ namespace ChessGameModes {
         private List<BoardCoord> promotionSquares;
 
         public Balbo() : base(BOARD_WIDTH, BOARD_HEIGHT) {
+            board.RemoveBoardCoordinates(new string[]
+            { "a1", "a2", "a3", "a4", "a7", "a8", "a9", "a10",
+              "b1", "b2", "b3", "b8", "b9", "b10",
+              "c1", "c2", "c9", "c10",
+              "d1", "d10",
+              "h1", "h10",
+              "i1", "i2", "i9", "i10",
+              "j1", "j2", "j3", "j8", "j9", "j10",
+              "k1", "k2", "k3", "k4", "k7", "k8", "k9", "k10",
+            });
+
+            BLACK_PAWNROW = board.GetHeight() - 3;
+
             promotionSquares = new List<BoardCoord>(14);
             AddPromotionSquare("c3");
             AddPromotionSquare("c8");
@@ -42,19 +55,6 @@ namespace ChessGameModes {
             AddPromotionSquare("h9");
             AddPromotionSquare("i3");
             AddPromotionSquare("i8");
-
-            BLACK_PAWNROW = board.GetHeight() - 3;
-
-            board.RemoveBoardCoordinates(new string[]
-            { "a1", "a2", "a3", "a4", "a7", "a8", "a9", "a10",
-              "b1", "b2", "b3", "b8", "b9", "b10",
-              "c1", "c2", "c9", "c10",
-              "d1", "d10",
-              "h1", "h10",
-              "i1", "i2", "i9", "i10",
-              "j1", "j2", "j3", "j8", "j9", "j10",
-              "k1", "k2", "k3", "k4", "k7", "k8", "k9", "k10",
-            });
         }
 
         public override string ToString() {
