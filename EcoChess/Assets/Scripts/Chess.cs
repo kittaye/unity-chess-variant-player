@@ -115,11 +115,11 @@ public abstract class Chess {
         }
     }
 
-    public bool IsAlly(ChessPiece mover, BoardCoord coord) {
+    protected virtual bool IsAlly(ChessPiece mover, BoardCoord coord) {
         if (AssertContainsCoord(coord)) {
-            CoordInfo coordInfo = board.GetCoordInfo(coord);
-            if (coordInfo.occupier != null) {
-                return coordInfo.occupier.GetTeam() == mover.GetTeam();
+            ChessPiece occupier = board.GetCoordInfo(coord).occupier;
+            if (occupier != null) {
+                return occupier.GetTeam() == mover.GetTeam();
             } else {
                 return false;
             }
@@ -127,11 +127,11 @@ public abstract class Chess {
         return false;
     }
 
-    public bool IsThreat(ChessPiece mover, BoardCoord coord) {
+    protected virtual bool IsThreat(ChessPiece mover, BoardCoord coord) {
         if (AssertContainsCoord(coord)) {
-            CoordInfo coordInfo = board.GetCoordInfo(coord);
-            if (coordInfo.occupier != null) {
-                return coordInfo.occupier.GetTeam() != mover.GetTeam();
+            ChessPiece occupier = board.GetCoordInfo(coord).occupier;
+            if (occupier != null) {
+                return occupier.GetTeam() != mover.GetTeam();
             } else {
                 return false;
             }
@@ -241,6 +241,10 @@ public abstract class Chess {
         return true;
     }
 
+    public virtual bool IsMoversTurn(ChessPiece mover) {
+        return mover.GetTeam() == currentTeamTurn;
+    }
+
     protected void SimulateMove(ChessPiece mover, BoardCoord dest, ChessPiece originalOccupier, out ChessPiece originalLastMover) {
         originalLastMover = null;
         if (AssertContainsCoord(dest)) {
@@ -267,12 +271,12 @@ public abstract class Chess {
         }
     }
 
-    public BoardCoord[] TryGetDirectionalMoves(ChessPiece mover, MoveDirection dir, uint cap = 0, uint threatAttackLimit = 1, bool threatsOnly = false) {
+    public BoardCoord[] TryGetDirectionalMoves(ChessPiece mover, MoveDirection dir, uint cap = 0, uint threatAttackLimit = 1, bool threatsOnly = false, bool teamSensitive = true) {
         int x = mover.GetBoardPosition().x;
         int y = mover.GetBoardPosition().y;
         int xModifier;
         int yModifier;
-        GetMoveDirectionModifiers(mover, dir, out xModifier, out yModifier);
+        GetMoveDirectionModifiers(mover, dir, out xModifier, out yModifier, teamSensitive);
 
         uint iter = 0;
         uint threats = 0;
@@ -336,39 +340,39 @@ public abstract class Chess {
         return BoardCoord.NULL;
     }
 
-    public void GetMoveDirectionModifiers(ChessPiece mover, MoveDirection dir, out int xModifier, out int yModifier) {
+    public void GetMoveDirectionModifiers(ChessPiece mover, MoveDirection dir, out int xModifier, out int yModifier, bool teamSensitive = true) {
         switch (dir) {
             case MoveDirection.Up:
                 xModifier = 0;
-                yModifier = mover.TeamSensitiveMove(1);
+                yModifier = (teamSensitive) ? mover.TeamSensitiveMove(1) : 1;
                 break;
             case MoveDirection.Down:
                 xModifier = 0;
-                yModifier = mover.TeamSensitiveMove(-1);
+                yModifier = (teamSensitive) ? mover.TeamSensitiveMove(-1) : -1;
                 break;
             case MoveDirection.Left:
-                xModifier = mover.TeamSensitiveMove(-1);
+                xModifier = (teamSensitive) ? mover.TeamSensitiveMove(-1) : -1;
                 yModifier = 0;
                 break;
             case MoveDirection.Right:
-                xModifier = mover.TeamSensitiveMove(1);
+                xModifier = (teamSensitive) ? mover.TeamSensitiveMove(1) : 1;
                 yModifier = 0;
                 break;
             case MoveDirection.UpLeft:
-                xModifier = mover.TeamSensitiveMove(-1);
-                yModifier = mover.TeamSensitiveMove(1);
+                xModifier = (teamSensitive) ? mover.TeamSensitiveMove(-1) : -1;
+                yModifier = (teamSensitive) ? mover.TeamSensitiveMove(1) : 1;
                 break;
             case MoveDirection.UpRight:
-                xModifier = mover.TeamSensitiveMove(1);
-                yModifier = mover.TeamSensitiveMove(1);
+                xModifier = (teamSensitive) ? mover.TeamSensitiveMove(1) : 1;
+                yModifier = (teamSensitive) ? mover.TeamSensitiveMove(1) : 1;
                 break;
             case MoveDirection.DownLeft:
-                xModifier = mover.TeamSensitiveMove(-1);
-                yModifier = mover.TeamSensitiveMove(-1);
+                xModifier = (teamSensitive) ? mover.TeamSensitiveMove(-1) : -1;
+                yModifier = (teamSensitive) ? mover.TeamSensitiveMove(-1) : -1;
                 break;
             case MoveDirection.DownRight:
-                xModifier = mover.TeamSensitiveMove(1);
-                yModifier = mover.TeamSensitiveMove(-1);
+                xModifier = (teamSensitive) ? mover.TeamSensitiveMove(1) : 1;
+                yModifier = (teamSensitive) ? mover.TeamSensitiveMove(-1) : -1;
                 break;
             default:
                 xModifier = 0;
