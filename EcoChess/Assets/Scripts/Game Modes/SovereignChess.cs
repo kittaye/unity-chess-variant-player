@@ -43,15 +43,24 @@ namespace ChessGameModes {
         private readonly static Color primaryBoardColour = new Color(1, 219f / 255f, 153f / 255f);
         private readonly static Color secondaryBoardColour = new Color(1, 237f / 255f, 204f / 255f);
 
-        private readonly static Color Color_orange = new Color(0.9f, 0.58f, 0);
-        private readonly static Color Color_lightblue = new Color(0.447f, 0.77f, 0.98f);
-        private readonly static Color Color_silver = new Color(0.85f, 0.85f, 0.85f);
-        private readonly static Color Color_pink = new Color(1, 0.45f, 0.71f);
-        private readonly static Color Color_purple = new Color(0.6f, 0, 0.6f);
+        private readonly Color Color_orange = new Color(0.9f, 0.58f, 0);
+        private readonly Color Color_lightblue = new Color(0.447f, 0.77f, 0.98f);
+        private readonly Color Color_silver = new Color(0.85f, 0.85f, 0.85f);
+        private readonly Color Color_pink = new Color(1, 0.45f, 0.71f);
+        private readonly Color Color_purple = new Color(0.6f, 0, 0.6f);
+
+        private Color whiteCurrentOwnedColour = Color.white;
+        private Color blackCurrentOwnedColour = Color.black;
+
+        private HashSet<Color> whiteControlledColours = new HashSet<Color>();
+        private HashSet<Color> blackControlledColours = new HashSet<Color>();
 
         private Dictionary<Color, BoardCoord[]> ColourControlSquares = new Dictionary<Color, BoardCoord[]>(24);
 
         public SovereignChess() : base(BOARD_WIDTH, BOARD_HEIGHT, primaryBoardColour, secondaryBoardColour) {
+            whiteControlledColours.Add(Color.white);
+            blackControlledColours.Add(Color.black);
+
             //Red
             AddColourControlSquares("e12", "l5", Color.red);
 
@@ -125,6 +134,14 @@ namespace ChessGameModes {
             }
         }
 
+        public override bool IsMoversTurn(ChessPiece mover) {
+            if(currentTeamTurn == Team.WHITE) {
+                return whiteControlledColours.Contains(GetChessPieceColour(mover));
+            } else {
+                return blackControlledColours.Contains(GetChessPieceColour(mover));
+            }
+        }
+
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
             BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
             List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
@@ -162,6 +179,84 @@ namespace ChessGameModes {
             return availableMoves;
         }
 
+        protected override bool IsThreat(ChessPiece mover, BoardCoord coord) {
+            if (AssertContainsCoord(coord)) {
+                ChessPiece occupier = board.GetCoordInfo(coord).occupier;
+                if (occupier != null) {
+                    if(whiteControlledColours.Contains(GetChessPieceColour(mover))) {
+                        return blackControlledColours.Contains(GetChessPieceColour(occupier));
+                    } else if (blackControlledColours.Contains(GetChessPieceColour(mover))) {
+                        return whiteControlledColours.Contains(GetChessPieceColour(occupier));
+                    }
+                } else {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        protected override bool IsAlly(ChessPiece mover, BoardCoord coord) {
+            if (AssertContainsCoord(coord)) {
+                ChessPiece occupier = board.GetCoordInfo(coord).occupier;
+                if (occupier != null) {
+                    if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
+                        return blackControlledColours.Contains(GetChessPieceColour(occupier)) == false;
+                    } else if (blackControlledColours.Contains(GetChessPieceColour(mover))) {
+                        return whiteControlledColours.Contains(GetChessPieceColour(occupier)) == false;
+                    } else {
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
+            BoardCoord[] positions = new BoardCoord[2];
+            ChessPiece threat = board.GetCoordInfo(destination).occupier;
+            Color movedFromColour = board.GetCoordInfo(mover.GetBoardPosition()).boardChunk.GetComponent<MeshRenderer>().material.color;
+            // Try make the move
+            if (MakeMove(mover, destination)) {
+                // Check castling moves
+                if (mover is King && mover.MoveCount == 1) {
+                    TryPerformCastlingRookMoves(mover);
+                } else if (mover is Pawn) {
+                    ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
+                    if (promotedPiece != null) {
+                        mover = promotedPiece;
+                    }
+                }
+
+                if (ColourControlSquares.TryGetValue(movedFromColour, out positions)) {
+                    if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
+                        whiteControlledColours.Remove(movedFromColour);
+                    } else {
+                        blackControlledColours.Remove(movedFromColour);
+                    }
+                }
+
+                Color destinationColour = board.GetCoordInfo(destination).boardChunk.GetComponent<MeshRenderer>().material.color;
+                if (ColourControlSquares.TryGetValue(destinationColour, out positions)) {
+                    if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
+                        blackControlledColours.Remove(destinationColour);
+                        whiteControlledColours.Add(destinationColour);
+                    } else {
+                        whiteControlledColours.Remove(destinationColour);
+                        blackControlledColours.Add(destinationColour);
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private Color GetChessPieceColour(ChessPiece piece) {
+            if (piece.GetTeam() == Team.BLACK) return Color.black;
+            return piece.gameObject.GetComponent<SpriteRenderer>().material.color;
+        }
+
         private BoardCoord TryGetValidMove(ChessPiece mover, BoardCoord templateMove, out bool cancelDirectionalSlide) {
             BoardCoord[] positions = new BoardCoord[2];
             Color movedToColour = board.GetCoordInfo(templateMove).boardChunk.GetComponent<MeshRenderer>().material.color;
@@ -179,16 +274,28 @@ namespace ChessGameModes {
                     controlledByAlly = true;
                 }
 
-                if (controlledByMover || IsThreat(mover, templateMove) || controlNeutral) {
+                if (controlledByMover || controlNeutral || IsThreat(mover, templateMove)) {
                     cancelDirectionalSlide = false;
                     return templateMove;
-                } else {
+                } else { 
                     cancelDirectionalSlide = (controlledByAlly) ? false : true;
                     return BoardCoord.NULL;
                 }
+            } else {
+                cancelDirectionalSlide = false;
+                if (IsThreat(mover, templateMove)) {
+                    ChessPiece threat = board.GetCoordInfo(templateMove).occupier;
+                    if (whiteControlledColours.Contains(GetChessPieceColour(mover)) && blackControlledColours.Contains(GetChessPieceColour(threat))) {
+                        return templateMove;
+                    } else if (blackControlledColours.Contains(GetChessPieceColour(mover)) && whiteControlledColours.Contains(GetChessPieceColour(threat))) {
+                        return templateMove;
+                    } else {
+                        cancelDirectionalSlide = true;
+                        return BoardCoord.NULL;
+                    }
+                }
+                return templateMove;
             }
-            cancelDirectionalSlide = false;
-            return templateMove;
         }
 
         public override void PopulateBoard() {
@@ -197,8 +304,8 @@ namespace ChessGameModes {
             opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(8, BLACK_BACKROW)));
 
             aSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(4, WHITE_BACKROW)));
-            aSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(4, BLACK_BACKROW)));
             hSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(11, WHITE_BACKROW)));
+            aSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(4, BLACK_BACKROW)));
             hSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(11, BLACK_BACKROW)));
 
             AddPieceToBoard(new Queen(Team.WHITE, new BoardCoord(7, WHITE_BACKROW)));
