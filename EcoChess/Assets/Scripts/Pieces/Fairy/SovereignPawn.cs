@@ -27,36 +27,36 @@ public class SovereignPawn : Pawn {
 
         switch (pieceQuadrant) {
             case Quadrant.BottomLeft:
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up, cap: moveCap, threatAttackLimit: 0));
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Right, cap: moveCap, threatAttackLimit: 0));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up, cap: moveCap, threatAttackLimit: 0, teamSensitive: false));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Right, cap: moveCap, threatAttackLimit: 0, teamSensitive: false));
 
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight, cap: 1, threatsOnly: true));
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, cap: 1, threatsOnly: true));
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownRight, cap: 1, threatsOnly: true));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight, cap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, cap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownRight, cap: 1, threatsOnly: true, teamSensitive: false));
                 break;
             case Quadrant.BottomRight:
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up, cap: moveCap, threatAttackLimit: 0));
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Left, cap: moveCap, threatAttackLimit: 0));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up, cap: moveCap, threatAttackLimit: 0, teamSensitive: false));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Left, cap: moveCap, threatAttackLimit: 0, teamSensitive: false));
 
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight, cap: 1, threatsOnly: true));
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, cap: 1, threatsOnly: true));
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownLeft, cap: 1, threatsOnly: true));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight, cap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, cap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownLeft, cap: 1, threatsOnly: true, teamSensitive: false));
                 break;
             case Quadrant.UpLeft:
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Down, cap: moveCap, threatAttackLimit: 0));
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Right, cap: moveCap, threatAttackLimit: 0));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Down, cap: moveCap, threatAttackLimit: 0, teamSensitive: false));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Right, cap: moveCap, threatAttackLimit: 0, teamSensitive: false));
 
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight, cap: 1, threatsOnly: true));
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownLeft, cap: 1, threatsOnly: true));
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownRight, cap: 1, threatsOnly: true));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight, cap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownLeft, cap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownRight, cap: 1, threatsOnly: true, teamSensitive: false));
                 break;
             case Quadrant.UpRight:
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Down, cap: moveCap, threatAttackLimit: 0));
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Left, cap: moveCap, threatAttackLimit: 0));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Down, cap: moveCap, threatAttackLimit: 0, teamSensitive: false));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Left, cap: moveCap, threatAttackLimit: 0, teamSensitive: false));
 
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, cap: 1, threatsOnly: true));
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownLeft, cap: 1, threatsOnly: true));
-                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownRight, cap: 1, threatsOnly: true));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, cap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownLeft, cap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownRight, cap: 1, threatsOnly: true, teamSensitive: false));
                 break;
             default:
                 break;
