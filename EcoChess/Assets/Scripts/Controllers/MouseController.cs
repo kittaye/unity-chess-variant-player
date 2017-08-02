@@ -47,7 +47,7 @@ public class MouseController : MonoBehaviour {
                     return;
                 }
 
-                if (selectedCoord.occupier != null && selectedCoord.occupier.GetTeam() == chessGame.GetCurrentTeamTurn()) {
+                if (selectedCoord.occupier != null && chessGame.IsMoversTurn(selectedCoord.occupier)) {
                     UIManager.Instance.OnDisplayPromotionOptions(false);
                     hasSelection = true;
                     lastSelectedCoord = GetHoveredBoardCoord();
