@@ -40,6 +40,8 @@ namespace ChessGameModes {
         private new const int BOARD_WIDTH = 16;
         private new const int BOARD_HEIGHT = 16;
 
+        private List<BoardCoord> promotionSquares;
+
         private readonly static Color primaryBoardColour = new Color(1, 219f / 255f, 153f / 255f);
         private readonly static Color secondaryBoardColour = new Color(1, 237f / 255f, 204f / 255f);
 
@@ -96,10 +98,54 @@ namespace ChessGameModes {
 
             //Black
             AddColourControlSquares("i9", "h8", Color.black);
+
+            //Promotion squares
+            promotionSquares = new List<BoardCoord>(16);
+            AddPromotionSquare("g7");
+            AddPromotionSquare("g8");
+            AddPromotionSquare("g9");
+            AddPromotionSquare("g10");
+            AddPromotionSquare("h7");
+            AddPromotionSquare("h8");
+            AddPromotionSquare("h9");
+            AddPromotionSquare("h10");
+            AddPromotionSquare("i7");
+            AddPromotionSquare("i8");
+            AddPromotionSquare("i9");
+            AddPromotionSquare("i10");
+            AddPromotionSquare("j7");
+            AddPromotionSquare("j8");
+            AddPromotionSquare("j9");
+            AddPromotionSquare("j10");
         }
 
         public override string ToString() {
             return "Sovereign Chess";
+        }
+
+        private void AddPromotionSquare(string algebraicKeyPosition) {
+            BoardCoord coord;
+            if (board.TryGetCoordWithKey(algebraicKeyPosition, out coord)) {
+                promotionSquares.Add(coord);
+            }
+        }
+
+        protected override bool CanPromote(Pawn mover, BoardCoord[] availableMoves) {
+            for (int i = 0; i < availableMoves.Length; i++) {
+                if (promotionSquares.Contains(availableMoves[i])) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        protected override ChessPiece CheckPawnPromotion(Pawn mover) {
+            if (promotionSquares.Contains(mover.GetBoardPosition())) {
+                RemovePieceFromBoard(mover);
+                RemovePieceFromActiveTeam(mover);
+                return AddPieceToBoard(ChessPieceFactory.Create(selectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
+            }
+            return null;
         }
 
         private void AddColourControlSquares(string algebraicKey, string algebraicKey2, Color color) {
@@ -260,40 +306,26 @@ namespace ChessGameModes {
         private BoardCoord TryGetValidMove(ChessPiece mover, BoardCoord templateMove, out bool cancelDirectionalSlide) {
             BoardCoord[] positions = new BoardCoord[2];
             Color movedToColour = board.GetCoordInfo(templateMove).boardChunk.GetComponent<MeshRenderer>().material.color;
+
             if (ColourControlSquares.TryGetValue(movedToColour, out positions)) {
-                bool controlledByMover = false;
                 bool controlledByAlly = false;
-                bool controlNeutral = false;
                 ChessPiece firstOccupier = board.GetCoordInfo(positions[0]).occupier;
                 ChessPiece secondOccupier = board.GetCoordInfo(positions[1]).occupier;
-                if (firstOccupier == null && secondOccupier == null) {
-                    controlNeutral = true;
+
+                if ((firstOccupier == null && secondOccupier == null) || IsThreat(mover, templateMove)) {
+                    cancelDirectionalSlide = false;
+                    return templateMove;
                 } else if (mover.GetBoardPosition() == positions[0] || mover.GetBoardPosition() == positions[1]) {
-                    controlledByMover = true;
+                    cancelDirectionalSlide = false;
+                    return templateMove;
                 } else if (IsAlly(mover, positions[0]) || IsAlly(mover, positions[1])) {
                     controlledByAlly = true;
                 }
 
-                if (controlledByMover || controlNeutral || IsThreat(mover, templateMove)) {
-                    cancelDirectionalSlide = false;
-                    return templateMove;
-                } else { 
-                    cancelDirectionalSlide = (controlledByAlly) ? false : true;
-                    return BoardCoord.NULL;
-                }
+                cancelDirectionalSlide = (controlledByAlly) ? false : true;
+                return BoardCoord.NULL;
             } else {
                 cancelDirectionalSlide = false;
-                if (IsThreat(mover, templateMove)) {
-                    ChessPiece threat = board.GetCoordInfo(templateMove).occupier;
-                    if (whiteControlledColours.Contains(GetChessPieceColour(mover)) && blackControlledColours.Contains(GetChessPieceColour(threat))) {
-                        return templateMove;
-                    } else if (blackControlledColours.Contains(GetChessPieceColour(mover)) && whiteControlledColours.Contains(GetChessPieceColour(threat))) {
-                        return templateMove;
-                    } else {
-                        cancelDirectionalSlide = true;
-                        return BoardCoord.NULL;
-                    }
-                }
                 return templateMove;
             }
         }
