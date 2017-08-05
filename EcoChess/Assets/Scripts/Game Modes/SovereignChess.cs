@@ -60,6 +60,8 @@ namespace ChessGameModes {
         private Dictionary<Color, BoardCoord[]> ColourControlSquares = new Dictionary<Color, BoardCoord[]>(24);
 
         public SovereignChess() : base(BOARD_WIDTH, BOARD_HEIGHT, primaryBoardColour, secondaryBoardColour) {
+            pawnPromotionOptions = new Piece[5] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight, Piece.King };
+
             whiteControlledColours.Add(Color.white);
             blackControlledColours.Add(Color.black);
 
@@ -124,6 +126,11 @@ namespace ChessGameModes {
                 return AddSovereignChessPiece(selectedPawnPromotion, mover.GetBoardPosition(), GetChessPieceColour(mover));
             }
             return null;
+        }
+
+        public override void SetPawnPromotionTo(Piece piece) {
+            base.SetPawnPromotionTo(piece);
+            MouseController.Instance.CalculateLastOccupierAvailableMoves();
         }
 
         private void AddColourControlSquares(string algebraicKey, string algebraicKey2, Color color) {
@@ -223,7 +230,10 @@ namespace ChessGameModes {
                 }
 
                 if (cancelDirectionalSlide == false) {
-                    if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
+                    if (selectedPawnPromotion == Piece.King && mover is SovereignPawn && promotionSquares.Contains(templateMoves[i]) 
+                        && IsInCheckAfterPromotion((SovereignPawn)mover, templateMoves[i])) {
+                        continue;
+                    } else if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
                         BoardCoord move = TryGetValidMove(mover, templateMoves[i], out cancelDirectionalSlide);
                         if (move != BoardCoord.NULL) {
                             availableMoves.Add(move);
@@ -243,6 +253,26 @@ namespace ChessGameModes {
             }
 
             return availableMoves;
+        }
+
+        private bool IsInCheckAfterPromotion(SovereignPawn mover, BoardCoord templateMove) {
+            if (AssertContainsCoord(templateMove)) {
+                if (checkingForCheck) return false;
+                // Temporarily simulate the move actually happening
+                ChessPiece originalOccupier = board.GetCoordInfo(templateMove).occupier;
+                ChessPiece originalLastMover;
+                BoardCoord oldPos = mover.GetBoardPosition();
+                SimulateMove(mover, templateMove, originalOccupier, out originalLastMover);
+
+                // Check whether the piece is in check after this temporary move
+                bool isInCheck = IsPieceInCheck(mover);
+
+                // Revert the temporary move back to normal
+                RevertSimulatedMove(mover, templateMove, originalOccupier, originalLastMover, oldPos);
+
+                return isInCheck;
+            }
+            return false;
         }
 
         protected override bool IsThreat(ChessPiece mover, BoardCoord coord) {
@@ -292,6 +322,17 @@ namespace ChessGameModes {
                     ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
                     if (promotedPiece != null) {
                         mover = promotedPiece;
+                        if(mover is King) {
+                            RemovePieceFromBoard(currentRoyalPiece);
+                            if (currentTeamTurn == Team.WHITE) {
+                                whiteControlledColours.Remove(GetChessPieceColour(currentRoyalPiece));
+                                whiteCurrentOwnedColour = GetChessPieceColour(mover);
+                            } else {
+                                blackControlledColours.Remove(GetChessPieceColour(currentRoyalPiece));
+                                blackCurrentOwnedColour = GetChessPieceColour(mover);
+                            }
+                            currentRoyalPiece = mover;
+                        }
                     }
                 }
 
