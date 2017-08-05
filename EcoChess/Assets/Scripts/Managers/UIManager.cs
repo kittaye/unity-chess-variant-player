@@ -81,10 +81,12 @@ public class UIManager : MonoBehaviour {
             go.GetComponent<Button>().onClick.AddListener(() => SelectPawnPromotion(pieces[j]));
             promotionOptions.Add(go);
         }
-        promoteToLbl.text = "<color=white>Promote to:\n</color><b>" + ((ChessGameModes.FIDERuleset)GameManager.Instance.chessGame).selectedPawnPromotion.ToString() + "</b>";
     }
 
     public void OnDisplayPromotionOptions(bool value) {
+        if (value) {
+            promoteToLbl.text = "<color=white>Promote to:\n</color><b>" + ((ChessGameModes.FIDERuleset)GameManager.Instance.chessGame).selectedPawnPromotion.ToString() + "</b>";
+        }
         promotionWindow.SetActive(value);
     }
 
