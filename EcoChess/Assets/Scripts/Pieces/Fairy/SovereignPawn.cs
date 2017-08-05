@@ -5,7 +5,7 @@ using System.Collections.Generic;
 /// Sovereign Pawns are specific only to the Sovereign Chess variant and should not be used elsewhere.
 /// </summary>
 public class SovereignPawn : Pawn {
-    public enum Quadrant { BottomLeft, BottomRight, UpLeft, UpRight}
+    public enum Quadrant { BottomLeft, BottomRight, TopLeft, TopRight}
     public Quadrant pieceQuadrant;
 
     public SovereignPawn(Team team, BoardCoord position, Quadrant quadrant) : base(team, position) {
@@ -17,6 +17,10 @@ public class SovereignPawn : Pawn {
 
     public override string ToString() {
         return GetTeam() + "_Pawn";
+    }
+
+    public void ChangePieceQuadrant(Quadrant quadrant) {
+        pieceQuadrant = quadrant;
     }
 
     public override List<BoardCoord> CalculateTemplateMoves() {
@@ -42,7 +46,7 @@ public class SovereignPawn : Pawn {
                 moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, cap: 1, threatsOnly: true, teamSensitive: false));
                 moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownLeft, cap: 1, threatsOnly: true, teamSensitive: false));
                 break;
-            case Quadrant.UpLeft:
+            case Quadrant.TopLeft:
                 moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Down, cap: moveCap, threatAttackLimit: 0, teamSensitive: false));
                 moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Right, cap: moveCap, threatAttackLimit: 0, teamSensitive: false));
 
@@ -50,7 +54,7 @@ public class SovereignPawn : Pawn {
                 moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownLeft, cap: 1, threatsOnly: true, teamSensitive: false));
                 moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownRight, cap: 1, threatsOnly: true, teamSensitive: false));
                 break;
-            case Quadrant.UpRight:
+            case Quadrant.TopRight:
                 moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Down, cap: moveCap, threatAttackLimit: 0, teamSensitive: false));
                 moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Left, cap: moveCap, threatAttackLimit: 0, teamSensitive: false));
 

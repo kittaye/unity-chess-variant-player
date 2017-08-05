@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// SovereignChess.cs is a chess variant involving multi-coloured armies to control.
+    /// SovereignChess.cs is a chess variant involving multi-coloured armies to control on a 16x16 board.
     /// 
     /// Winstate: Checkmate.
     /// Piece types: Orthodox.
@@ -63,40 +63,18 @@ namespace ChessGameModes {
             whiteControlledColours.Add(Color.white);
             blackControlledColours.Add(Color.black);
 
-            //Red
+            //Colour control squares
             AddColourControlSquares("e12", "l5", Color.red);
-
-            //Blue
             AddColourControlSquares("e5", "l12", Color.blue);
-
-            //Yellow
             AddColourControlSquares("f11","k6", Color.yellow);
-
-            //Green
             AddColourControlSquares("f6", "k11", Color.green);
-
-            //Pink
             AddColourControlSquares("h11", "i6", Color_pink);
-
-            //Purple
             AddColourControlSquares("i11", "h6", Color_purple);
-
-            //Grey
             AddColourControlSquares("g10", "j7", Color.grey);
-            
-            //Silver
             AddColourControlSquares("g7", "j10", Color_silver);
-
-            //Orange
             AddColourControlSquares("f9", "k8", Color_orange);
-
-            //Light blue
             AddColourControlSquares("f8", "k9", Color_lightblue);
-
-            //White
             AddColourControlSquares("h9", "i8", Color.white);
-
-            //Black
             AddColourControlSquares("i9", "h8", Color.black);
 
             //Promotion squares
@@ -198,6 +176,12 @@ namespace ChessGameModes {
                     continue;
                 }
 
+                if (mover is SovereignPawn && IsThreat(mover, templateMoves[i]) == false) {
+                    if (QuadrantBoundariesExceeded((SovereignPawn)mover, templateMoves[i])) {
+                        continue;
+                    }
+                }
+
                 if (i > 0 && (Mathf.Abs(templateMoves[i].x - templateMoves[i - 1].x) > 1 || Mathf.Abs(templateMoves[i].y - templateMoves[i - 1].y) > 1)) {
                     cancelDirectionalSlide = false;
                 }
@@ -261,7 +245,6 @@ namespace ChessGameModes {
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
             BoardCoord[] positions = new BoardCoord[2];
-            ChessPiece threat = board.GetCoordInfo(destination).occupier;
             Color movedFromColour = board.GetCoordInfo(mover.GetBoardPosition()).boardChunk.GetComponent<MeshRenderer>().material.color;
             // Try make the move
             if (MakeMove(mover, destination)) {
@@ -269,6 +252,7 @@ namespace ChessGameModes {
                 if (mover is King && mover.MoveCount == 1) {
                     TryPerformCastlingRookMoves(mover);
                 } else if (mover is Pawn) {
+                    if(mover is SovereignPawn) UpdatePawnQuadrant((SovereignPawn)mover);
                     ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
                     if (promotedPiece != null) {
                         mover = promotedPiece;
@@ -294,6 +278,59 @@ namespace ChessGameModes {
                     }
                 }
                 return true;
+            }
+            return false;
+        }
+
+        private void UpdatePawnQuadrant(SovereignPawn pawn) {
+            const int X_RIGHTSIDELIMIT = 8;
+            const int X_LEFTSIDELIMIT = 7;
+            const int Y_ABOVESIDELIMIT = 8;
+            const int Y_BOTTOMSIDELIMIT = 7;
+
+            switch (pawn.pieceQuadrant) {
+                case SovereignPawn.Quadrant.BottomLeft:
+                    if (pawn.GetBoardPosition().x > X_LEFTSIDELIMIT) pawn.ChangePieceQuadrant(SovereignPawn.Quadrant.BottomRight);
+                    else if (pawn.GetBoardPosition().y > Y_BOTTOMSIDELIMIT) pawn.ChangePieceQuadrant(SovereignPawn.Quadrant.TopLeft);
+                    break;
+                case SovereignPawn.Quadrant.BottomRight:
+                    if (pawn.GetBoardPosition().x < X_RIGHTSIDELIMIT) pawn.ChangePieceQuadrant(SovereignPawn.Quadrant.BottomLeft);
+                    else if (pawn.GetBoardPosition().y > Y_BOTTOMSIDELIMIT) pawn.ChangePieceQuadrant(SovereignPawn.Quadrant.TopRight);
+                    break;
+                case SovereignPawn.Quadrant.TopLeft:
+                    if (pawn.GetBoardPosition().x > X_LEFTSIDELIMIT) pawn.ChangePieceQuadrant(SovereignPawn.Quadrant.TopRight);
+                    else if (pawn.GetBoardPosition().y < Y_ABOVESIDELIMIT) pawn.ChangePieceQuadrant(SovereignPawn.Quadrant.BottomLeft);
+                    break;
+                case SovereignPawn.Quadrant.TopRight:
+                    if (pawn.GetBoardPosition().x < X_RIGHTSIDELIMIT) pawn.ChangePieceQuadrant(SovereignPawn.Quadrant.TopLeft);
+                    else if (pawn.GetBoardPosition().y < Y_ABOVESIDELIMIT) pawn.ChangePieceQuadrant(SovereignPawn.Quadrant.BottomRight);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private bool QuadrantBoundariesExceeded(SovereignPawn pawn, BoardCoord move) {
+            const int X_RIGHTSIDELIMIT = 8;
+            const int X_LEFTSIDELIMIT = 7;
+            const int Y_ABOVESIDELIMIT = 8;
+            const int Y_BOTTOMSIDELIMIT = 7;
+
+            switch (pawn.pieceQuadrant) {
+                case SovereignPawn.Quadrant.BottomLeft:
+                    if (move.x > X_LEFTSIDELIMIT || move.y > Y_BOTTOMSIDELIMIT) return true;
+                    break;
+                case SovereignPawn.Quadrant.BottomRight:
+                    if (move.x < X_RIGHTSIDELIMIT || move.y > Y_BOTTOMSIDELIMIT) return true;
+                    break;
+                case SovereignPawn.Quadrant.TopLeft:
+                    if (move.x > X_LEFTSIDELIMIT || move.y < Y_ABOVESIDELIMIT) return true;
+                    break;
+                case SovereignPawn.Quadrant.TopRight:
+                    if (move.x < X_RIGHTSIDELIMIT || move.y < Y_ABOVESIDELIMIT) return true;
+                    break;
+                default:
+                    break;
             }
             return false;
         }
@@ -332,23 +369,38 @@ namespace ChessGameModes {
 
         public override void PopulateBoard() {
 #region WHITE+BLACK Teams
-            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(8, WHITE_BACKROW)));
-            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(8, BLACK_BACKROW)));
+            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, "i1"));
+            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, "i16"));
 
-            aSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(4, WHITE_BACKROW)));
-            hSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(11, WHITE_BACKROW)));
-            aSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(4, BLACK_BACKROW)));
-            hSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(11, BLACK_BACKROW)));
+            aSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, "e1"));
+            hSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, "l1"));
+            aSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, "e16"));
+            hSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, "l16"));
 
-            AddPieceToBoard(new Queen(Team.WHITE, new BoardCoord(7, WHITE_BACKROW)));
-            AddPieceToBoard(new Queen(Team.BLACK, new BoardCoord(7, BLACK_BACKROW)));
+            AddPieceToBoard(new Queen(Team.WHITE, "h1"));
+            AddPieceToBoard(new Queen(Team.BLACK, "h16"));
+
+            AddPieceToBoard(new SovereignPawn(Team.WHITE, "e2", SovereignPawn.Quadrant.BottomLeft));
+            AddPieceToBoard(new SovereignPawn(Team.WHITE, "f2", SovereignPawn.Quadrant.BottomLeft));
+            AddPieceToBoard(new SovereignPawn(Team.WHITE, "g2", SovereignPawn.Quadrant.BottomLeft));
+            AddPieceToBoard(new SovereignPawn(Team.WHITE, "h2", SovereignPawn.Quadrant.BottomLeft));
+
+            AddPieceToBoard(new SovereignPawn(Team.WHITE, "i2", SovereignPawn.Quadrant.BottomRight));
+            AddPieceToBoard(new SovereignPawn(Team.WHITE, "j2", SovereignPawn.Quadrant.BottomRight));
+            AddPieceToBoard(new SovereignPawn(Team.WHITE, "k2", SovereignPawn.Quadrant.BottomRight));
+            AddPieceToBoard(new SovereignPawn(Team.WHITE, "l2", SovereignPawn.Quadrant.BottomRight));
+
+            AddPieceToBoard(new SovereignPawn(Team.BLACK, "e15", SovereignPawn.Quadrant.TopLeft));
+            AddPieceToBoard(new SovereignPawn(Team.BLACK, "f15", SovereignPawn.Quadrant.TopLeft));
+            AddPieceToBoard(new SovereignPawn(Team.BLACK, "g15", SovereignPawn.Quadrant.TopLeft));
+            AddPieceToBoard(new SovereignPawn(Team.BLACK, "h15", SovereignPawn.Quadrant.TopLeft));
+
+            AddPieceToBoard(new SovereignPawn(Team.BLACK, "i15", SovereignPawn.Quadrant.TopRight));
+            AddPieceToBoard(new SovereignPawn(Team.BLACK, "j15", SovereignPawn.Quadrant.TopRight));
+            AddPieceToBoard(new SovereignPawn(Team.BLACK, "k15", SovereignPawn.Quadrant.TopRight));
+            AddPieceToBoard(new SovereignPawn(Team.BLACK, "l15", SovereignPawn.Quadrant.TopRight));
 
             for (int x = 0; x < BOARD_WIDTH; x++) {
-                if (x > 3 && x < 12) {
-                    AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, WHITE_PAWNROW)));
-                    AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(x, BLACK_PAWNROW)));
-                }
-
                 if (x == 5 || x == 10) {
                     AddPieceToBoard(new Knight(Team.WHITE, new BoardCoord(x, WHITE_BACKROW)));
                     AddPieceToBoard(new Knight(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
@@ -369,7 +421,7 @@ namespace ChessGameModes {
             AddSovereignPawn("b7", Color.yellow, currentQuadrant);
             AddSovereignPawn("b8", Color.yellow, currentQuadrant);
 
-            currentQuadrant = SovereignPawn.Quadrant.UpLeft;
+            currentQuadrant = SovereignPawn.Quadrant.TopLeft;
             AddSovereignPawn("b9", Color.green, currentQuadrant);
             AddSovereignPawn("b10", Color.green, currentQuadrant);
             AddSovereignPawn("b11", Color_lightblue, currentQuadrant);
@@ -389,7 +441,7 @@ namespace ChessGameModes {
             AddSovereignPawn("o7", Color_purple, currentQuadrant);
             AddSovereignPawn("o8", Color_purple, currentQuadrant);
 
-            currentQuadrant = SovereignPawn.Quadrant.UpRight;
+            currentQuadrant = SovereignPawn.Quadrant.TopRight;
             AddSovereignPawn("o9", Color_pink, currentQuadrant);
             AddSovereignPawn("o10", Color_pink, currentQuadrant);
             AddSovereignPawn("o11", Color.red, currentQuadrant);
