@@ -141,7 +141,7 @@ namespace ChessGameModes {
         private void AddSovereignChessPiece(Piece piece, string algebraicKey, Color color) {
             BoardCoord coord;
             if (board.TryGetCoordWithKey(algebraicKey, out coord)) {
-                ChessPiece sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.WHITE, coord), false);
+                ChessPiece sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.WHITE, coord));
                 if (sovereignPiece != null) {
                     sovereignPiece.gameObject.GetComponent<SpriteRenderer>().material.color = color;
                 }
@@ -151,7 +151,7 @@ namespace ChessGameModes {
         private void AddSovereignPawn(string algebraicKey, Color color, SovereignPawn.Quadrant quadrant) {
             BoardCoord coord;
             if (board.TryGetCoordWithKey(algebraicKey, out coord)) {
-                ChessPiece sovereignPawn = AddPieceToBoard(new SovereignPawn(Team.WHITE, coord, quadrant), false);
+                ChessPiece sovereignPawn = AddPieceToBoard(new SovereignPawn(Team.WHITE, coord, quadrant));
                 if (sovereignPawn != null) {
                     sovereignPawn.gameObject.GetComponent<SpriteRenderer>().material.color = color;
                 }
@@ -259,22 +259,26 @@ namespace ChessGameModes {
                     }
                 }
 
-                if (ColourControlSquares.TryGetValue(movedFromColour, out positions)) {
-                    if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
-                        whiteControlledColours.Remove(movedFromColour);
-                    } else {
-                        blackControlledColours.Remove(movedFromColour);
+                if (movedFromColour != whiteCurrentOwnedColour && movedFromColour != blackCurrentOwnedColour) {
+                    if (ColourControlSquares.TryGetValue(movedFromColour, out positions)) {
+                        if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
+                            whiteControlledColours.Remove(movedFromColour);
+                        } else {
+                            blackControlledColours.Remove(movedFromColour);
+                        }
                     }
                 }
 
                 Color destinationColour = board.GetCoordInfo(destination).boardChunk.GetComponent<MeshRenderer>().material.color;
-                if (ColourControlSquares.TryGetValue(destinationColour, out positions)) {
-                    if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
-                        blackControlledColours.Remove(destinationColour);
-                        whiteControlledColours.Add(destinationColour);
-                    } else {
-                        whiteControlledColours.Remove(destinationColour);
-                        blackControlledColours.Add(destinationColour);
+                if (destinationColour != whiteCurrentOwnedColour && destinationColour != blackCurrentOwnedColour) {
+                    if (ColourControlSquares.TryGetValue(destinationColour, out positions)) {
+                        if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
+                            blackControlledColours.Remove(destinationColour);
+                            whiteControlledColours.Add(destinationColour);
+                        } else {
+                            whiteControlledColours.Remove(destinationColour);
+                            blackControlledColours.Add(destinationColour);
+                        }
                     }
                 }
                 return true;
