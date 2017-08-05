@@ -121,7 +121,7 @@ namespace ChessGameModes {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
                 RemovePieceFromBoard(mover);
                 RemovePieceFromActiveTeam(mover);
-                return AddPieceToBoard(ChessPieceFactory.Create(selectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
+                return AddSovereignChessPiece(selectedPawnPromotion, mover.GetBoardPosition(), GetChessPieceColour(mover));
             }
             return null;
         }
@@ -138,24 +138,60 @@ namespace ChessGameModes {
             ColourControlSquares.Add(color, new BoardCoord[2] { coord1, coord2 });
         }
 
-        private void AddSovereignChessPiece(Piece piece, string algebraicKey, Color color) {
+        private ChessPiece AddSovereignChessPiece(Piece piece, string algebraicKey, Color color) {
             BoardCoord coord;
             if (board.TryGetCoordWithKey(algebraicKey, out coord)) {
-                ChessPiece sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.WHITE, coord));
+                ChessPiece sovereignPiece;
+                if (color == Color.black) {
+                    sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.BLACK, coord));
+                } else {
+                    sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.WHITE, coord));
+                }
                 if (sovereignPiece != null) {
-                    sovereignPiece.gameObject.GetComponent<SpriteRenderer>().material.color = color;
+                    if (color != Color.black) {
+                        sovereignPiece.gameObject.GetComponent<SpriteRenderer>().material.color = color;
+                    }
+                    return sovereignPiece;
                 }
             }
+            return null;
         }
 
-        private void AddSovereignPawn(string algebraicKey, Color color, SovereignPawn.Quadrant quadrant) {
-            BoardCoord coord;
-            if (board.TryGetCoordWithKey(algebraicKey, out coord)) {
-                ChessPiece sovereignPawn = AddPieceToBoard(new SovereignPawn(Team.WHITE, coord, quadrant));
-                if (sovereignPawn != null) {
-                    sovereignPawn.gameObject.GetComponent<SpriteRenderer>().material.color = color;
+        private ChessPiece AddSovereignChessPiece(Piece piece, BoardCoord coord, Color color) {
+            if (board.ContainsCoord(coord)) {
+                ChessPiece sovereignPiece;
+                if (color == Color.black) {
+                    sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.BLACK, coord));
+                } else {
+                    sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.WHITE, coord));
+                }
+                if (sovereignPiece != null) {
+                    if(color != Color.black) {
+                        sovereignPiece.gameObject.GetComponent<SpriteRenderer>().material.color = color;
+                    }
+                    return sovereignPiece;
                 }
             }
+            return null;
+        }
+
+        private SovereignPawn AddSovereignPawn(string algebraicKey, Color color, SovereignPawn.Quadrant quadrant) {
+            BoardCoord coord;
+            if (board.TryGetCoordWithKey(algebraicKey, out coord)) {
+                SovereignPawn sovereignPawn;
+                if (color == Color.black) {
+                    sovereignPawn = (SovereignPawn)AddPieceToBoard(new SovereignPawn(Team.BLACK, coord, quadrant));
+                } else {
+                    sovereignPawn = (SovereignPawn)AddPieceToBoard(new SovereignPawn(Team.WHITE, coord, quadrant));
+                }
+                if (sovereignPawn != null) {
+                    if (color != Color.black) {
+                        sovereignPawn.gameObject.GetComponent<SpriteRenderer>().material.color = color;
+                    }
+                    return sovereignPawn;
+                }
+            }
+            return null;
         }
 
         public override bool IsMoversTurn(ChessPiece mover) {
@@ -373,44 +409,44 @@ namespace ChessGameModes {
 
         public override void PopulateBoard() {
 #region WHITE+BLACK Teams
-            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, "i1"));
-            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, "i16"));
+            currentRoyalPiece = (King)AddSovereignChessPiece(Piece.King, "i1", Color.white);
+            opposingRoyalPiece = (King)AddSovereignChessPiece(Piece.King, "i16", Color.black);
 
-            aSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, "e1"));
-            hSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, "l1"));
-            aSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, "e16"));
-            hSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, "l16"));
+            aSideWhiteRook = (Rook)AddSovereignChessPiece(Piece.Rook, "e1", Color.white);
+            hSideWhiteRook = (Rook)AddSovereignChessPiece(Piece.Rook, "l1", Color.white);
+            aSideBlackRook = (Rook)AddSovereignChessPiece(Piece.Rook, "e16", Color.black);
+            hSideBlackRook = (Rook)AddSovereignChessPiece(Piece.Rook, "l16", Color.black);
 
-            AddPieceToBoard(new Queen(Team.WHITE, "h1"));
-            AddPieceToBoard(new Queen(Team.BLACK, "h16"));
+            AddSovereignChessPiece(Piece.Queen, "h1", Color.white);
+            AddSovereignChessPiece(Piece.Queen, "h16", Color.black);
 
-            AddPieceToBoard(new SovereignPawn(Team.WHITE, "e2", SovereignPawn.Quadrant.BottomLeft));
-            AddPieceToBoard(new SovereignPawn(Team.WHITE, "f2", SovereignPawn.Quadrant.BottomLeft));
-            AddPieceToBoard(new SovereignPawn(Team.WHITE, "g2", SovereignPawn.Quadrant.BottomLeft));
-            AddPieceToBoard(new SovereignPawn(Team.WHITE, "h2", SovereignPawn.Quadrant.BottomLeft));
+            AddSovereignPawn("e2", Color.white, SovereignPawn.Quadrant.BottomLeft);
+            AddSovereignPawn("f2", Color.white, SovereignPawn.Quadrant.BottomLeft);
+            AddSovereignPawn("g2", Color.white, SovereignPawn.Quadrant.BottomLeft);
+            AddSovereignPawn("h2", Color.white, SovereignPawn.Quadrant.BottomLeft);
 
-            AddPieceToBoard(new SovereignPawn(Team.WHITE, "i2", SovereignPawn.Quadrant.BottomRight));
-            AddPieceToBoard(new SovereignPawn(Team.WHITE, "j2", SovereignPawn.Quadrant.BottomRight));
-            AddPieceToBoard(new SovereignPawn(Team.WHITE, "k2", SovereignPawn.Quadrant.BottomRight));
-            AddPieceToBoard(new SovereignPawn(Team.WHITE, "l2", SovereignPawn.Quadrant.BottomRight));
+            AddSovereignPawn("i2", Color.white, SovereignPawn.Quadrant.BottomRight);
+            AddSovereignPawn("j2", Color.white, SovereignPawn.Quadrant.BottomRight);
+            AddSovereignPawn("k2", Color.white, SovereignPawn.Quadrant.BottomRight);
+            AddSovereignPawn("l2", Color.white, SovereignPawn.Quadrant.BottomRight);
 
-            AddPieceToBoard(new SovereignPawn(Team.BLACK, "e15", SovereignPawn.Quadrant.TopLeft));
-            AddPieceToBoard(new SovereignPawn(Team.BLACK, "f15", SovereignPawn.Quadrant.TopLeft));
-            AddPieceToBoard(new SovereignPawn(Team.BLACK, "g15", SovereignPawn.Quadrant.TopLeft));
-            AddPieceToBoard(new SovereignPawn(Team.BLACK, "h15", SovereignPawn.Quadrant.TopLeft));
+            AddSovereignPawn("e15", Color.black, SovereignPawn.Quadrant.TopLeft);
+            AddSovereignPawn("f15", Color.black, SovereignPawn.Quadrant.TopLeft);
+            AddSovereignPawn("g15", Color.black, SovereignPawn.Quadrant.TopLeft);
+            AddSovereignPawn("h15", Color.black, SovereignPawn.Quadrant.TopLeft);
 
-            AddPieceToBoard(new SovereignPawn(Team.BLACK, "i15", SovereignPawn.Quadrant.TopRight));
-            AddPieceToBoard(new SovereignPawn(Team.BLACK, "j15", SovereignPawn.Quadrant.TopRight));
-            AddPieceToBoard(new SovereignPawn(Team.BLACK, "k15", SovereignPawn.Quadrant.TopRight));
-            AddPieceToBoard(new SovereignPawn(Team.BLACK, "l15", SovereignPawn.Quadrant.TopRight));
+            AddSovereignPawn("i15", Color.black, SovereignPawn.Quadrant.TopRight);
+            AddSovereignPawn("j15", Color.black, SovereignPawn.Quadrant.TopRight);
+            AddSovereignPawn("k15", Color.black, SovereignPawn.Quadrant.TopRight);
+            AddSovereignPawn("l15", Color.black, SovereignPawn.Quadrant.TopRight);
 
             for (int x = 0; x < BOARD_WIDTH; x++) {
                 if (x == 5 || x == 10) {
-                    AddPieceToBoard(new Knight(Team.WHITE, new BoardCoord(x, WHITE_BACKROW)));
-                    AddPieceToBoard(new Knight(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
+                    AddSovereignChessPiece(Piece.Knight, new BoardCoord(x, WHITE_BACKROW), Color.white);
+                    AddSovereignChessPiece(Piece.Knight, new BoardCoord(x, BLACK_BACKROW), Color.black);
                 } else if (x == 6 || x == 9) {
-                    AddPieceToBoard(new Bishop(Team.WHITE, new BoardCoord(x, WHITE_BACKROW)));
-                    AddPieceToBoard(new Bishop(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
+                    AddSovereignChessPiece(Piece.Bishop, new BoardCoord(x, WHITE_BACKROW), Color.white);
+                    AddSovereignChessPiece(Piece.Bishop, new BoardCoord(x, BLACK_BACKROW), Color.black);
                 }
             }
             #endregion
