@@ -309,6 +309,32 @@ namespace ChessGameModes {
             return false;
         }
 
+        public override bool CheckWinState() {
+            if (numConsecutiveCapturelessMoves == 100) {
+                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                return true;
+            }
+
+            foreach (ChessPiece piece in GetPieces()) {
+                if(currentTeamTurn == Team.WHITE) {
+                    if (whiteControlledColours.Contains(GetChessPieceColour(piece))) {
+                        if (CalculateAvailableMoves(piece).Count > 0) return false;
+                    }
+                } else {
+                    if (blackControlledColours.Contains(GetChessPieceColour(piece))) {
+                        if (CalculateAvailableMoves(piece).Count > 0) return false;
+                    }
+                }
+            }
+
+            if (IsPieceInCheck(currentRoyalPiece)) {
+                UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+            } else {
+                UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+            }
+            return true;
+        }
+
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
             BoardCoord[] positions = new BoardCoord[2];
             Color movedFromColour = board.GetCoordInfo(mover.GetBoardPosition()).boardChunk.GetComponent<MeshRenderer>().material.color;
