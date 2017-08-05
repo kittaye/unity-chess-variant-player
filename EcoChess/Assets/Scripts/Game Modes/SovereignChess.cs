@@ -458,6 +458,10 @@ namespace ChessGameModes {
 
                 if ((firstOccupier == null && secondOccupier == null) || IsThreat(mover, templateMove)) {
                     cancelDirectionalSlide = false;
+                    if (whiteControlledColours.Contains(GetChessPieceColour(mover)) && movedToColour == whiteCurrentOwnedColour
+                        || blackControlledColours.Contains(GetChessPieceColour(mover)) && movedToColour == blackCurrentOwnedColour) {
+                        return BoardCoord.NULL;
+                    }
                     return templateMove;
                 } else if (mover.GetBoardPosition() == positions[0] || mover.GetBoardPosition() == positions[1]) {
                     cancelDirectionalSlide = false;
