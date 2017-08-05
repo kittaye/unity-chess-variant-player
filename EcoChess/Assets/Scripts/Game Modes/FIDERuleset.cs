@@ -102,6 +102,7 @@ namespace ChessGameModes {
         public override void OnTurnComplete() {
             base.OnTurnComplete();
 
+            selectedPawnPromotion = Piece.Queen;
             ChessPiece temp = currentRoyalPiece;
             currentRoyalPiece = opposingRoyalPiece;
             opposingRoyalPiece = temp;
@@ -254,7 +255,7 @@ namespace ChessGameModes {
             if (_DisplayPromotionUI != null) _DisplayPromotionUI.Invoke(true);
         }
 
-        public void SetPawnPromotionTo(Piece piece) {
+        public virtual void SetPawnPromotionTo(Piece piece) {
             this.selectedPawnPromotion = piece;
         }
 
