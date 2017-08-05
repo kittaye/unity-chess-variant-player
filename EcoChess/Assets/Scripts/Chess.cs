@@ -203,17 +203,15 @@ public abstract class Chess {
         }
     }
 
-    protected ChessPiece AddPieceToBoard(ChessPiece piece, bool addToActiveTeam = true) {
+    protected ChessPiece AddPieceToBoard(ChessPiece piece) {
         if (CheckValidPlacement(piece)) {
             board.GetCoordInfo(piece.GetBoardPosition()).occupier = piece;
             piece.IsAlive = true;
             GameManager.Instance.InstantiateChessPiece(piece);
-            if (addToActiveTeam) {
-                if (piece.GetTeam() == Team.WHITE) {
-                    whitePieces.Add(piece);
-                } else {
-                    blackPieces.Add(piece);
-                }
+            if (piece.GetTeam() == Team.WHITE) {
+                whitePieces.Add(piece);
+            } else {
+                blackPieces.Add(piece);
             }
             return piece;
         }
