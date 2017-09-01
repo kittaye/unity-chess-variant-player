@@ -7,11 +7,13 @@ public class UIManager : MonoBehaviour {
     public static UIManager Instance;
     public Canvas mainCanvas;
     public GameObject promotionWindow;
-    public GameObject promoterPrefab;
+    public GameObject defectionWindow;
+    public GameObject spritePrefab;
 
     private Text teamTurnLbl;
     private Text gameModeLbl;
     private Text promoteToLbl;
+    private Text defectToLbl;
     private Text gameLogLbl;
     private List<GameObject> promotionOptions;
 
@@ -38,22 +40,35 @@ public class UIManager : MonoBehaviour {
             if (aText.name.Equals("PromoteTo_lbl")) {
                 promoteToLbl = aText;
             }
+            if (aText.name.Equals("DefectTo_lbl")) {
+                defectToLbl = aText;
+            }
             if (aText.name.Equals("GameLog_lbl")) {
                 gameLogLbl = aText;
             }
         }
-
-        OnDisplayPromotionOptions(false);
     }
 
     void Start() {
         UpdateGameModeText();
+
+        if (GameManager.Instance.chessGame is ChessGameModes.SovereignChess) {
+            ChessGameModes.SovereignChess._DisplayDefectionUI += OnDisplayDefectionOptions;
+            ChessGameModes.SovereignChess._SetDefectionOptions += OnSetDefectionOptions;
+        }
+
+        OnDisplayPromotionOptions(false);
+        OnDisplayDefectionOptions(false);
     }
 
     void OnDestroy() {
         GameManager._OnGameFinished -= OnGameFinished;
         ChessGameModes.FIDERuleset._DisplayPromotionUI -= OnDisplayPromotionOptions;
         ChessGameModes.FIDERuleset._OnPawnPromotionsChanged -= OnPawnPromotionOptionsChanged;
+        if (GameManager.Instance.chessGame is ChessGameModes.SovereignChess) {
+            ChessGameModes.SovereignChess._DisplayDefectionUI -= OnDisplayDefectionOptions;
+            ChessGameModes.SovereignChess._SetDefectionOptions -= OnSetDefectionOptions;
+        }
     }
 
     private void OnGameFinished() {
@@ -74,7 +89,7 @@ public class UIManager : MonoBehaviour {
         }
 
         for (int i = 0; i < pieces.Length; i++) {
-            GameObject go = Instantiate(promoterPrefab, promotionWindow.transform);
+            GameObject go = Instantiate(spritePrefab, promotionWindow.transform);
             go.name = pieces[i].ToString();
             go.GetComponent<Image>().sprite = Resources.Load<Sprite>(GameManager.Instance.chessGame.GetCurrentTeamTurn().ToString() + "_" + go.name);
             int j = i;
@@ -84,10 +99,36 @@ public class UIManager : MonoBehaviour {
     }
 
     public void OnDisplayPromotionOptions(bool value) {
-        if (value) {
-            promoteToLbl.text = "<color=white>Promote to:\n</color><b>" + ((ChessGameModes.FIDERuleset)GameManager.Instance.chessGame).selectedPawnPromotion.ToString() + "</b>";
-        }
+        promoteToLbl.text = "<color=white>Promote to:\n</color><b>" + ((ChessGameModes.FIDERuleset)GameManager.Instance.chessGame).selectedPawnPromotion.ToString() + "</b>";
         promotionWindow.SetActive(value);
+    }
+
+    public void OnDisplayDefectionOptions(bool value) {
+        if (GameManager.Instance.chessGame is ChessGameModes.SovereignChess) {
+            defectToLbl.text = "Click the king again to defect to team\n<b>" + SovereignExtensions.GetColourName(((ChessGameModes.SovereignChess)GameManager.Instance.chessGame).selectedDefection).ToString() + "</b>";
+        } else {
+            if (value == true) {
+                Debug.LogError("Wrong game mode! Do not use this method in any game mode other than Sovereign Chess.");
+                return;
+            }
+        }
+        defectionWindow.SetActive(value);
+    }
+
+    public void OnSetDefectionOptions(Color[] clrs) {
+        Button[] buttons = defectionWindow.GetComponentsInChildren<Button>();
+        for (int i = 0; i < buttons.Length; i++) {
+            buttons[i].onClick.RemoveListener(() => SelectDefectOption(clrs[i]));
+            Destroy(buttons[i].gameObject);
+        }
+
+        for (int i = 0; i < clrs.Length; i++) {
+            GameObject go = Instantiate(spritePrefab, defectionWindow.transform);
+            go.name = clrs[i].ToString();
+            go.GetComponent<Image>().color = clrs[i];
+            int j = i;
+            go.GetComponent<Button>().onClick.AddListener(() => SelectDefectOption(clrs[j]));
+        }
     }
 
     public void OnPawnPromotionOptionsChanged(Piece[] pieces) {
@@ -97,6 +138,13 @@ public class UIManager : MonoBehaviour {
     public void SelectPawnPromotion(Piece value) {
         promoteToLbl.text = "<color=white>Promote to:\n</color><b>" + value.ToString() + "</b>";
         ((ChessGameModes.FIDERuleset)GameManager.Instance.chessGame).SetPawnPromotionTo(value);
+    }
+
+    public void SelectDefectOption(Color value) {
+        if (GameManager.Instance.chessGame is ChessGameModes.SovereignChess) {
+            defectToLbl.text = "Click the king again to defect to team\n<b>" + SovereignExtensions.GetColourName(value) + "</b>";
+            ((ChessGameModes.SovereignChess)GameManager.Instance.chessGame).SetDefectOptionTo(value);
+        }
     }
 
     public void UpdateGameModeText() {
