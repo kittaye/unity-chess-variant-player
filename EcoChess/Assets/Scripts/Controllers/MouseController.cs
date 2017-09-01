@@ -56,6 +56,7 @@ public class MouseController : MonoBehaviour {
 
                 if (selectedCoord.occupier != null && chessGame.IsMoversTurn(selectedCoord.occupier)) {
                     UIManager.Instance.OnDisplayPromotionOptions(false);
+                    UIManager.Instance.OnDisplayDefectionOptions(false);
                     hasSelection = true;
                     lastSelectedOccupier = chessGame.board.GetCoordInfo(GetHoveredBoardCoord()).occupier;
                     CalculateLastOccupierAvailableMoves();
@@ -98,6 +99,7 @@ public class MouseController : MonoBehaviour {
         hasSelection = false;
         lastSelectedOccupierAvailableMoves.Clear();
         UIManager.Instance.OnDisplayPromotionOptions(false);
+        UIManager.Instance.OnDisplayDefectionOptions(false);
         chessGame.board.RemoveHighlightedCoordinates();
     }
 
