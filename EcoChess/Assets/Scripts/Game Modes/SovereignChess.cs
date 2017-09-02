@@ -295,9 +295,24 @@ namespace ChessGameModes {
 
             if (ColourControlSquares.TryGetValue(ownedColour, out positions)) {
                 bool doubleMoveDefection = false;
+                bool doubleMoveLegal = true;
+
                 BoardCoord[] secondaryMoves = mover.CalculateTemplateMoves().ToArray();
                 if (positionColour == selectedDefection) {
                     doubleMoveDefection = true;
+                }
+
+                // If the defection involves a second move of the king, determine whether a legal move exists.
+                if (doubleMoveDefection) {
+                    int validMoves = secondaryMoves.Length;
+                    for (int i = 0; i < secondaryMoves.Length; i++) {
+                        if (IsPieceInCheckAfterThisMove(mover, mover, secondaryMoves[i])) {
+                            validMoves--;
+                        }
+                    }
+                    if (validMoves == 0) {
+                        doubleMoveLegal = false;
+                    }
                 }
 
                 if (IsThreat(mover, positions[0]) || IsThreat(mover, positions[1])) {
@@ -310,20 +325,6 @@ namespace ChessGameModes {
                     foreach (Color color in tempOriginalControlledColours) {
                         if(color != selectedDefection) {
                             opposingControlledColours.Add(color);
-                        }
-                    }
-
-                    if (doubleMoveDefection) {
-                        int validMoves = secondaryMoves.Length;
-                        for (int i = 0; i < secondaryMoves.Length; i++) {
-                            if(IsPieceInCheckAfterThisMove(mover, mover, secondaryMoves[i])) {
-                                validMoves--;
-                            }
-                        }
-                        if(validMoves == 0) {
-                            return BoardCoord.NULL;
-                        } else {
-                            return mover.GetBoardPosition();
                         }
                     }
 
@@ -402,20 +403,9 @@ namespace ChessGameModes {
                         blackControlledColours = tempOriginalControlledColours;
                         whiteControlledColours = tempOriginalEnemyColours;
                     }
-                } else {
-                    if (doubleMoveDefection) {
-                        int validMoves = secondaryMoves.Length;
-                        for (int i = 0; i < secondaryMoves.Length; i++) {
-                            if (IsPieceInCheckAfterThisMove(mover, mover, secondaryMoves[i])) {
-                                validMoves--;
-                            }
-                        }
-                        if (validMoves == 0) {
-                            return BoardCoord.NULL;
-                        } else {
-                            return mover.GetBoardPosition();
-                        }
-                    }
+
+                } else if (doubleMoveDefection && doubleMoveLegal == false) {
+                    return BoardCoord.NULL;
                 }
                 return mover.GetBoardPosition();
             }
@@ -556,7 +546,7 @@ namespace ChessGameModes {
                         mover = promotedPiece;
                         if(mover is King) {
                             RemovePieceFromBoard(currentRoyalPiece);
-                            SwitchOwnedArmy(currentTeamTurn, GetChessPieceColour(currentRoyalPiece), GetChessPieceColour(mover));
+                            SwitchOwnedArmy(mover, GetChessPieceColour(currentRoyalPiece), GetChessPieceColour(mover));
                             currentRoyalPiece = mover;
                         }
                     }
@@ -592,7 +582,10 @@ namespace ChessGameModes {
         private void PerformDefectionMove(ChessPiece mover) {
             Color prevOwnedClr = GetChessPieceColour(mover);
             UpdateSovereignColour(mover, SovereignExtensions.GetColourName(selectedDefection));
-            SwitchOwnedArmy(currentTeamTurn, prevOwnedClr, selectedDefection);
+            SwitchOwnedArmy(mover, prevOwnedClr, selectedDefection);
+
+            HashSet<Color> controlledColours = GetControlledColours(mover);
+            HashSet<Color> opposingControlledColours = GetOpposingControlledColours(mover);
 
             if (prevOwnedClr == Color.black) {
                 mover.gameObject.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("WHITE_King");
@@ -604,12 +597,12 @@ namespace ChessGameModes {
             BoardCoord[] positions = new BoardCoord[2];
             if (ColourControlSquares.TryGetValue(prevOwnedClr, out positions)) {
                 if (IsThreat(mover, positions[0]) || IsThreat(mover, positions[1])) {
-                    GetOpposingControlledColours(mover).Add(prevOwnedClr);
+                    opposingControlledColours.Add(prevOwnedClr);
 
                     // Add all colours that the mover's team previously controlled except its newly owned colour, to the opposing team.
                     foreach (ChessPiece piece in GetPieces()) {
                         Color pieceClr = GetChessPieceColour(piece);
-                        if (GetControlledColours(mover).Contains(pieceClr)) {
+                        if (controlledColours.Contains(pieceClr)) {
                             // Loop through all colour control parents of this piece
                             while (ColourControlSquares.TryGetValue(pieceClr, out positions)) {
                                 // If the piece colour is the owned colour, break out
@@ -630,9 +623,9 @@ namespace ChessGameModes {
                                     break;
                                     // Else, if the opposing team controls this parent's colour, 
                                     // then add the child's colour to their team, and remove from defecting team.
-                                } else if(GetOpposingControlledColours(mover).Contains(GetChessPieceColour(parentColourControlOccupier))) {
-                                    GetOpposingControlledColours(mover).Add(pieceClr);
-                                    GetControlledColours(mover).Remove(pieceClr);
+                                } else if(opposingControlledColours.Contains(GetChessPieceColour(parentColourControlOccupier))) {
+                                    opposingControlledColours.Add(pieceClr);
+                                    controlledColours.Remove(pieceClr);
                                     break;
                                 }
 
@@ -645,14 +638,16 @@ namespace ChessGameModes {
             }
         }
 
-        private void SwitchOwnedArmy(Team team, Color previousColour, Color newColour) {
-            if (team == Team.WHITE) {
-                whiteControlledColours.Remove(previousColour);
-                whiteControlledColours.Add(newColour);
+        private void SwitchOwnedArmy(ChessPiece mover, Color previousColour, Color newColour) {
+            HashSet<Color> controlledColours = GetControlledColours(mover);
+            Color ownedColour = GetTeamOwnedColour(mover);
+
+            controlledColours.Remove(previousColour);
+            controlledColours.Add(newColour);
+
+            if(ownedColour == whiteCurrentOwnedColour) {
                 whiteCurrentOwnedColour = newColour;
             } else {
-                blackControlledColours.Remove(previousColour);
-                blackControlledColours.Add(newColour);
                 blackCurrentOwnedColour = newColour;
             }
         }
