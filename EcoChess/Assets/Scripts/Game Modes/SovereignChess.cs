@@ -590,11 +590,11 @@ namespace ChessGameModes {
         }
 
         private void PerformDefectionMove(ChessPiece mover) {
-            Color prevMoverClr = GetChessPieceColour(mover);
+            Color prevOwnedClr = GetChessPieceColour(mover);
             UpdateSovereignColour(mover, SovereignExtensions.GetColourName(selectedDefection));
-            SwitchOwnedArmy(currentTeamTurn, prevMoverClr, selectedDefection);
+            SwitchOwnedArmy(currentTeamTurn, prevOwnedClr, selectedDefection);
 
-            if (prevMoverClr == Color.black) {
+            if (prevOwnedClr == Color.black) {
                 mover.gameObject.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("WHITE_King");
             } else if (selectedDefection == Color.black) {
                 mover.gameObject.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("BLACK_King");
@@ -602,13 +602,9 @@ namespace ChessGameModes {
 
             // Re-check opposing team controls.
             BoardCoord[] positions = new BoardCoord[2];
-            if (ColourControlSquares.TryGetValue(prevMoverClr, out positions)) {
+            if (ColourControlSquares.TryGetValue(prevOwnedClr, out positions)) {
                 if (IsThreat(mover, positions[0]) || IsThreat(mover, positions[1])) {
-                    if (currentTeamTurn == Team.WHITE) {
-                        blackControlledColours.Add(prevMoverClr);
-                    } else {
-                        whiteControlledColours.Add(prevMoverClr);
-                    }
+                    GetOpposingControlledColours(mover).Add(prevOwnedClr);
 
                     // Add all colours that the mover's team previously controlled except its newly owned colour, to the opposing team.
                     foreach (ChessPiece piece in GetPieces()) {
@@ -621,23 +617,10 @@ namespace ChessGameModes {
                                     break;
                                 }
 
-                                // If the piece colour is the previously owned colour, remove it from current team and add it
-                                // to the opposing team and break out
-                                if (pieceClr == prevMoverClr) {
-                                    if (currentTeamTurn == Team.WHITE) {
-                                        whiteControlledColours.Remove(prevMoverClr);
-                                        blackControlledColours.Add(prevMoverClr);
-                                    } else {
-                                        blackControlledColours.Remove(prevMoverClr);
-                                        whiteControlledColours.Add(prevMoverClr);
-                                    }
-                                    break;
-                                }
-
                                 // Get colour control parent of this piece
                                 ChessPiece parentColourControlOccupier = null;
                                 for (int i = 0; i < 2; i++) {
-                                    if (IsAlly(mover, positions[i])) {
+                                    if (board.GetCoordInfo(positions[i]).occupier != null) {
                                         parentColourControlOccupier = board.GetCoordInfo(positions[i]).occupier;
                                     }
                                 }
@@ -645,8 +628,14 @@ namespace ChessGameModes {
                                 // If there is no parent, break out
                                 if(parentColourControlOccupier == null) {
                                     break;
+                                    // Else, if the opposing team controls this parent's colour, 
+                                    // then add the child's colour to their team, and remove from defecting team.
+                                } else if(GetOpposingControlledColours(mover).Contains(GetChessPieceColour(parentColourControlOccupier))) {
+                                    GetOpposingControlledColours(mover).Add(pieceClr);
+                                    GetControlledColours(mover).Remove(pieceClr);
+                                    break;
                                 }
- 
+
                                 // Otherwise, set piece colour to the parent's colour and repeat
                                 pieceClr = GetChessPieceColour(parentColourControlOccupier);
                             }
