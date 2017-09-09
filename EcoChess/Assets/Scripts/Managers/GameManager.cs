@@ -5,6 +5,7 @@ using ChessGameModes;
 public class GameManager : MonoBehaviour {
     public static GameManager Instance;
     public Chess chessGame { get; private set; }
+
     public GameObject piecePrefab;
     public GameObject boardChunkPrefab;
 
@@ -14,10 +15,7 @@ public class GameManager : MonoBehaviour {
 
     public static event System.Action _OnGameFinished;
 
-    // Use this for initialization
     void Awake () {
-        ui = FindObjectOfType<UIManager>();
-
         if (Instance != null && Instance != this) {
             Destroy(Instance);
         } else {
@@ -25,9 +23,12 @@ public class GameManager : MonoBehaviour {
         }
 
         chessGame = GameModeFactory.Create((GameMode)modeIndex);
-        //chessGame = new ChessGameModes.SovereignChess();
         chessGame.PopulateBoard();
         CenterCameraToBoard(chessGame.board);
+    }
+
+    private void Start() {
+        ui = UIManager.Instance;
         ui.CreatePawnPromotionOptions(((FIDERuleset)chessGame).pawnPromotionOptions);
     }
 
