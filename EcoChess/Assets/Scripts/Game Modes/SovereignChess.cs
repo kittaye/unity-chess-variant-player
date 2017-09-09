@@ -8,14 +8,7 @@ namespace ChessGameModes {
     /// 
     /// Winstate: Checkmate.
     /// Piece types: Orthodox.
-    /// Piece rules: All sliding pieces may only move up to 8 squares at a time. 
-    ///              Pawn enpassant is not allowed.
-    ///              Pawns must move and capture towards the center, either horizontally or vertically.
-    ///              Controlled pawns may promote to a king, which removes the previous king from the board and re-sets the owned colour.
-    ///              Pieces may not move to or over a square controlled by the opposing team unless to capture and gain control.
-    ///              Pieces may not move to a square of its own colour.
-    ///              Pieces may capture pieces to steal control from the opposing team.
-    ///              Kings may switch teams to a controlled colour.
+    /// Piece rules: All rules can be found at: http://www.sovereignchess.com/rules/ by Mark Bates.
     /// Board layout:
     ///     Q B R N ? ? ? ? ? ? ? ? N R N Q
     ///     R P P P ? ? ? ? ? ? ? ? P P P R
@@ -104,11 +97,89 @@ namespace ChessGameModes {
             return "Sovereign Chess";
         }
 
-        private void AddPromotionSquare(string algebraicKeyPosition) {
-            BoardCoord coord;
-            if (board.TryGetCoordWithKey(algebraicKeyPosition, out coord)) {
-                promotionSquares.Add(coord);
+        public override void OnTurnComplete() {
+            if (kingHasDoubleMoveDefection == false) {
+                base.OnTurnComplete();
             }
+            selectedDefection = (currentTeamTurn == Team.WHITE) ? whiteCurrentOwnedColour : blackCurrentOwnedColour;
+        }
+
+        public override bool IsMoversTurn(ChessPiece mover) {
+            if (currentTeamTurn == Team.WHITE) {
+                return whiteControlledColours.Contains(GetChessPieceColour(mover));
+            } else {
+                return blackControlledColours.Contains(GetChessPieceColour(mover));
+            }
+        }
+
+        public override bool CheckWinState() {
+            if (numConsecutiveCapturelessMoves == 100) {
+                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                return true;
+            }
+
+            foreach (ChessPiece piece in GetPieces()) {
+                if (currentTeamTurn == Team.WHITE) {
+                    if (whiteControlledColours.Contains(GetChessPieceColour(piece))) {
+                        if (CalculateAvailableMoves(piece).Count > 0) return false;
+                    }
+                } else {
+                    if (blackControlledColours.Contains(GetChessPieceColour(piece))) {
+                        if (CalculateAvailableMoves(piece).Count > 0) return false;
+                    }
+                }
+            }
+
+            if (IsPieceInCheck(currentRoyalPiece)) {
+                UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+            } else {
+                UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+            }
+            return true;
+        }
+
+        protected override bool IsThreat(ChessPiece mover, BoardCoord coord) {
+            if (AssertContainsCoord(coord)) {
+                ChessPiece occupier = board.GetCoordInfo(coord).occupier;
+                if (occupier != null) {
+                    if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
+                        return blackControlledColours.Contains(GetChessPieceColour(occupier));
+                    } else if (blackControlledColours.Contains(GetChessPieceColour(mover))) {
+                        return whiteControlledColours.Contains(GetChessPieceColour(occupier));
+                    }
+                } else {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        protected override bool IsAlly(ChessPiece mover, BoardCoord coord) {
+            if (AssertContainsCoord(coord)) {
+                ChessPiece occupier = board.GetCoordInfo(coord).occupier;
+                if (occupier != null) {
+                    if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
+                        return blackControlledColours.Contains(GetChessPieceColour(occupier)) == false;
+                    } else if (blackControlledColours.Contains(GetChessPieceColour(mover))) {
+                        return whiteControlledColours.Contains(GetChessPieceColour(occupier)) == false;
+                    } else {
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        public void SetDefectOptionTo(Color clr) {
+            this.selectedDefection = clr;
+            MouseController.Instance.CalculateLastOccupierAvailableMoves();
+        }
+
+        public override void SetPawnPromotionTo(Piece piece) {
+            base.SetPawnPromotionTo(piece);
+            MouseController.Instance.CalculateLastOccupierAvailableMoves();
         }
 
         protected override bool CanPromote(Pawn mover, BoardCoord[] availableMoves) {
@@ -120,13 +191,6 @@ namespace ChessGameModes {
             return false;
         }
 
-        public override void OnTurnComplete() {
-            if (kingHasDoubleMoveDefection == false) {
-                base.OnTurnComplete();
-            }
-            selectedDefection = (currentTeamTurn == Team.WHITE) ? whiteCurrentOwnedColour : blackCurrentOwnedColour;
-        }
-
         protected override ChessPiece CheckPawnPromotion(Pawn mover) {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
                 RemovePieceFromBoard(mover);
@@ -134,90 +198,6 @@ namespace ChessGameModes {
                 return AddSovereignChessPiece(selectedPawnPromotion, mover.GetBoardPosition(), mover.gameObject.GetComponent<SovereignColour>().colour);
             }
             return null;
-        }
-
-        public override void SetPawnPromotionTo(Piece piece) {
-            base.SetPawnPromotionTo(piece);
-            MouseController.Instance.CalculateLastOccupierAvailableMoves();
-        }
-
-        private void AddColourControlSquares(string algebraicKey, string algebraicKey2, ColourName color) {
-            BoardCoord coord1;
-            if (board.TryGetCoordWithKey(algebraicKey, out coord1)) {
-                board.GetCoordInfo(coord1).boardChunk.GetComponent<MeshRenderer>().material.color = SovereignExtensions.GetColour(color);
-            }
-            BoardCoord coord2;
-            if (board.TryGetCoordWithKey(algebraicKey2, out coord2)) {
-                board.GetCoordInfo(coord2).boardChunk.GetComponent<MeshRenderer>().material.color = SovereignExtensions.GetColour(color);
-            }
-            ColourControlSquares.Add(SovereignExtensions.GetColour(color), new BoardCoord[2] { coord1, coord2 });
-        }
-
-        private ChessPiece AddSovereignChessPiece(Piece piece, string algebraicKey, ColourName color) {
-            BoardCoord coord;
-            if (board.TryGetCoordWithKey(algebraicKey, out coord)) {
-                ChessPiece sovereignPiece;
-                if (color == ColourName.Black) {
-                    sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.BLACK, coord));
-                } else {
-                    sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.WHITE, coord));
-                }
-                if (sovereignPiece != null) {
-                    if (color != ColourName.Black) {
-                        sovereignPiece.gameObject.GetComponent<SpriteRenderer>().material.color = SovereignExtensions.GetColour(color);
-                    }
-                    sovereignPiece.gameObject.AddComponent<SovereignColour>().colour = color;
-                    return sovereignPiece;
-                }
-            }
-            return null;
-        }
-
-        private ChessPiece AddSovereignChessPiece(Piece piece, BoardCoord coord, ColourName color) {
-            if (board.ContainsCoord(coord)) {
-                ChessPiece sovereignPiece;
-                if (color == ColourName.Black) {
-                    sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.BLACK, coord));
-                } else {
-                    sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.WHITE, coord));
-                }
-                if (sovereignPiece != null) {
-                    if(color != ColourName.Black) {
-                        sovereignPiece.gameObject.GetComponent<SpriteRenderer>().material.color = SovereignExtensions.GetColour(color);
-                    }
-                    sovereignPiece.gameObject.AddComponent<SovereignColour>().colour = color;
-                    return sovereignPiece;
-                }
-            }
-            return null;
-        }
-
-        private SovereignPawn AddSovereignPawn(string algebraicKey, ColourName color, SovereignPawn.Quadrant quadrant) {
-            BoardCoord coord;
-            if (board.TryGetCoordWithKey(algebraicKey, out coord)) {
-                SovereignPawn sovereignPawn;
-                if (color == ColourName.Black) {
-                    sovereignPawn = (SovereignPawn)AddPieceToBoard(new SovereignPawn(Team.BLACK, coord, quadrant));
-                } else {
-                    sovereignPawn = (SovereignPawn)AddPieceToBoard(new SovereignPawn(Team.WHITE, coord, quadrant));
-                }
-                if (sovereignPawn != null) {
-                    if (color != ColourName.Black) {
-                        sovereignPawn.gameObject.GetComponent<SpriteRenderer>().material.color = SovereignExtensions.GetColour(color);
-                    }
-                    sovereignPawn.gameObject.AddComponent<SovereignColour>().colour = color;
-                    return sovereignPawn;
-                }
-            }
-            return null;
-        }
-
-        public override bool IsMoversTurn(ChessPiece mover) {
-            if(currentTeamTurn == Team.WHITE) {
-                return whiteControlledColours.Contains(GetChessPieceColour(mover));
-            } else {
-                return blackControlledColours.Contains(GetChessPieceColour(mover));
-            }
         }
 
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
@@ -286,6 +266,37 @@ namespace ChessGameModes {
             }
 
             return availableMoves;
+        }
+
+        private BoardCoord TryGetValidMove(ChessPiece mover, BoardCoord templateMove, out bool cancelDirectionalSlide) {
+            BoardCoord[] positions = new BoardCoord[2];
+            Color movedToColour = board.GetCoordInfo(templateMove).boardChunk.GetComponent<MeshRenderer>().material.color;
+
+            if (ColourControlSquares.TryGetValue(movedToColour, out positions)) {
+                bool controlledByAlly = false;
+                ChessPiece firstOccupier = board.GetCoordInfo(positions[0]).occupier;
+                ChessPiece secondOccupier = board.GetCoordInfo(positions[1]).occupier;
+
+                if ((firstOccupier == null && secondOccupier == null) || IsThreat(mover, templateMove)) {
+                    cancelDirectionalSlide = false;
+                    if (whiteControlledColours.Contains(GetChessPieceColour(mover)) && movedToColour == whiteCurrentOwnedColour
+                        || blackControlledColours.Contains(GetChessPieceColour(mover)) && movedToColour == blackCurrentOwnedColour) {
+                        return BoardCoord.NULL;
+                    }
+                    return templateMove;
+                } else if (mover.GetBoardPosition() == positions[0] || mover.GetBoardPosition() == positions[1]) {
+                    cancelDirectionalSlide = false;
+                    return templateMove;
+                } else if (IsAlly(mover, positions[0]) || IsAlly(mover, positions[1])) {
+                    controlledByAlly = true;
+                }
+
+                cancelDirectionalSlide = (controlledByAlly) ? false : true;
+                return BoardCoord.NULL;
+            } else {
+                cancelDirectionalSlide = false;
+                return templateMove;
+            }
         }
 
         private BoardCoord TryAddDefectionMove(ChessPiece mover) {
@@ -413,111 +424,6 @@ namespace ChessGameModes {
             return BoardCoord.NULL;
         }
 
-        public void SetDefectOptionTo(Color clr) {
-            this.selectedDefection = clr;
-            MouseController.Instance.CalculateLastOccupierAvailableMoves();
-        }
-
-        private Color GetTeamOwnedColour(ChessPiece piece) {
-            if (whiteControlledColours.Contains(GetChessPieceColour(piece))) {
-                return whiteCurrentOwnedColour;
-            } else if (blackControlledColours.Contains(GetChessPieceColour(piece))) {
-                return blackCurrentOwnedColour;
-            }
-            Debug.LogError("Piece has no control!");
-            return new Color(0, 0, 0, 0);
-        }
-
-        private Color GetOpposingTeamOwnedColour(ChessPiece piece) {
-            if (whiteControlledColours.Contains(GetChessPieceColour(piece))) {
-                return blackCurrentOwnedColour;
-            } else if (blackControlledColours.Contains(GetChessPieceColour(piece))) {
-                return whiteCurrentOwnedColour;
-            }
-            Debug.LogError("Piece has no control!");
-            return new Color(0, 0, 0, 0);
-        }
-
-        private HashSet<Color> GetControlledColours(ChessPiece piece) {
-            if (whiteControlledColours.Contains(GetChessPieceColour(piece))){
-                return whiteControlledColours;
-            } else if (blackControlledColours.Contains(GetChessPieceColour(piece))) {
-                return blackControlledColours;
-            }
-            Debug.LogError("Piece has no control!");
-            return null;
-        }
-
-        private HashSet<Color> GetOpposingControlledColours(ChessPiece piece) {
-            if (whiteControlledColours.Contains(GetChessPieceColour(piece))) {
-                return blackControlledColours;
-            } else if (blackControlledColours.Contains(GetChessPieceColour(piece))) {
-                return whiteControlledColours;
-            }
-            Debug.LogError("Piece has no control!");
-            return null;
-        }
-
-        protected override bool IsThreat(ChessPiece mover, BoardCoord coord) {
-            if (AssertContainsCoord(coord)) {
-                ChessPiece occupier = board.GetCoordInfo(coord).occupier;
-                if (occupier != null) {
-                    if(whiteControlledColours.Contains(GetChessPieceColour(mover))) {
-                        return blackControlledColours.Contains(GetChessPieceColour(occupier));
-                    } else if (blackControlledColours.Contains(GetChessPieceColour(mover))) {
-                        return whiteControlledColours.Contains(GetChessPieceColour(occupier));
-                    }
-                } else {
-                    return false;
-                }
-            }
-            return false;
-        }
-
-        protected override bool IsAlly(ChessPiece mover, BoardCoord coord) {
-            if (AssertContainsCoord(coord)) {
-                ChessPiece occupier = board.GetCoordInfo(coord).occupier;
-                if (occupier != null) {
-                    if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
-                        return blackControlledColours.Contains(GetChessPieceColour(occupier)) == false;
-                    } else if (blackControlledColours.Contains(GetChessPieceColour(mover))) {
-                        return whiteControlledColours.Contains(GetChessPieceColour(occupier)) == false;
-                    } else {
-                        return true;
-                    }
-                } else {
-                    return false;
-                }
-            }
-            return false;
-        }
-
-        public override bool CheckWinState() {
-            if (numConsecutiveCapturelessMoves == 100) {
-                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
-                return true;
-            }
-
-            foreach (ChessPiece piece in GetPieces()) {
-                if (currentTeamTurn == Team.WHITE) {
-                    if (whiteControlledColours.Contains(GetChessPieceColour(piece))) {
-                        if (CalculateAvailableMoves(piece).Count > 0) return false;
-                    }
-                } else {
-                    if (blackControlledColours.Contains(GetChessPieceColour(piece))) {
-                        if (CalculateAvailableMoves(piece).Count > 0) return false;
-                    }
-                }
-            }
-
-            if (IsPieceInCheck(currentRoyalPiece)) {
-                UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
-            } else {
-                UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
-            }
-            return true;
-        }
-
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
             BoardCoord[] positions = new BoardCoord[2];
             BoardCoord oldPos = mover.GetBoardPosition();
@@ -638,6 +544,129 @@ namespace ChessGameModes {
             }
         }
 
+        #region Helper Functions
+        private void AddColourControlSquares(string algebraicKey, string algebraicKey2, ColourName color) {
+            BoardCoord coord1;
+            if (board.TryGetCoordWithKey(algebraicKey, out coord1)) {
+                board.GetCoordInfo(coord1).boardChunk.GetComponent<MeshRenderer>().material.color = SovereignExtensions.GetColour(color);
+            }
+            BoardCoord coord2;
+            if (board.TryGetCoordWithKey(algebraicKey2, out coord2)) {
+                board.GetCoordInfo(coord2).boardChunk.GetComponent<MeshRenderer>().material.color = SovereignExtensions.GetColour(color);
+            }
+            ColourControlSquares.Add(SovereignExtensions.GetColour(color), new BoardCoord[2] { coord1, coord2 });
+        }
+
+        private void AddPromotionSquare(string algebraicKeyPosition) {
+            BoardCoord coord;
+            if (board.TryGetCoordWithKey(algebraicKeyPosition, out coord)) {
+                promotionSquares.Add(coord);
+            }
+        }
+
+        private ChessPiece AddSovereignChessPiece(Piece piece, string algebraicKey, ColourName color) {
+            BoardCoord coord;
+            if (board.TryGetCoordWithKey(algebraicKey, out coord)) {
+                ChessPiece sovereignPiece;
+                if (color == ColourName.Black) {
+                    sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.BLACK, coord));
+                } else {
+                    sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.WHITE, coord));
+                }
+                if (sovereignPiece != null) {
+                    if (color != ColourName.Black) {
+                        sovereignPiece.gameObject.GetComponent<SpriteRenderer>().material.color = SovereignExtensions.GetColour(color);
+                    }
+                    sovereignPiece.gameObject.AddComponent<SovereignColour>().colour = color;
+                    return sovereignPiece;
+                }
+            }
+            return null;
+        }
+
+        private ChessPiece AddSovereignChessPiece(Piece piece, BoardCoord coord, ColourName color) {
+            if (board.ContainsCoord(coord)) {
+                ChessPiece sovereignPiece;
+                if (color == ColourName.Black) {
+                    sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.BLACK, coord));
+                } else {
+                    sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.WHITE, coord));
+                }
+                if (sovereignPiece != null) {
+                    if (color != ColourName.Black) {
+                        sovereignPiece.gameObject.GetComponent<SpriteRenderer>().material.color = SovereignExtensions.GetColour(color);
+                    }
+                    sovereignPiece.gameObject.AddComponent<SovereignColour>().colour = color;
+                    return sovereignPiece;
+                }
+            }
+            return null;
+        }
+
+        private SovereignPawn AddSovereignPawn(string algebraicKey, ColourName color, SovereignPawn.Quadrant quadrant) {
+            BoardCoord coord;
+            if (board.TryGetCoordWithKey(algebraicKey, out coord)) {
+                SovereignPawn sovereignPawn;
+                if (color == ColourName.Black) {
+                    sovereignPawn = (SovereignPawn)AddPieceToBoard(new SovereignPawn(Team.BLACK, coord, quadrant));
+                } else {
+                    sovereignPawn = (SovereignPawn)AddPieceToBoard(new SovereignPawn(Team.WHITE, coord, quadrant));
+                }
+                if (sovereignPawn != null) {
+                    if (color != ColourName.Black) {
+                        sovereignPawn.gameObject.GetComponent<SpriteRenderer>().material.color = SovereignExtensions.GetColour(color);
+                    }
+                    sovereignPawn.gameObject.AddComponent<SovereignColour>().colour = color;
+                    return sovereignPawn;
+                }
+            }
+            return null;
+        }
+
+        private Color GetTeamOwnedColour(ChessPiece piece) {
+            if (whiteControlledColours.Contains(GetChessPieceColour(piece))) {
+                return whiteCurrentOwnedColour;
+            } else if (blackControlledColours.Contains(GetChessPieceColour(piece))) {
+                return blackCurrentOwnedColour;
+            }
+            Debug.LogError("Piece has no control!");
+            return new Color(0, 0, 0, 0);
+        }
+
+        private Color GetOpposingTeamOwnedColour(ChessPiece piece) {
+            if (whiteControlledColours.Contains(GetChessPieceColour(piece))) {
+                return blackCurrentOwnedColour;
+            } else if (blackControlledColours.Contains(GetChessPieceColour(piece))) {
+                return whiteCurrentOwnedColour;
+            }
+            Debug.LogError("Piece has no control!");
+            return new Color(0, 0, 0, 0);
+        }
+
+        private HashSet<Color> GetControlledColours(ChessPiece piece) {
+            if (whiteControlledColours.Contains(GetChessPieceColour(piece))) {
+                return whiteControlledColours;
+            } else if (blackControlledColours.Contains(GetChessPieceColour(piece))) {
+                return blackControlledColours;
+            }
+            Debug.LogError("Piece has no control!");
+            return null;
+        }
+
+        private HashSet<Color> GetOpposingControlledColours(ChessPiece piece) {
+            if (whiteControlledColours.Contains(GetChessPieceColour(piece))) {
+                return blackControlledColours;
+            } else if (blackControlledColours.Contains(GetChessPieceColour(piece))) {
+                return whiteControlledColours;
+            }
+            Debug.LogError("Piece has no control!");
+            return null;
+        }
+
+        private Color GetChessPieceColour(ChessPiece piece) {
+            return SovereignExtensions.GetColour(piece.gameObject.GetComponent<SovereignColour>().colour);
+        }
+
         private void SwitchOwnedArmy(ChessPiece mover, Color previousColour, Color newColour) {
             HashSet<Color> controlledColours = GetControlledColours(mover);
             Color ownedColour = GetTeamOwnedColour(mover);
@@ -645,7 +674,7 @@ namespace ChessGameModes {
             controlledColours.Remove(previousColour);
             controlledColours.Add(newColour);
 
-            if(ownedColour == whiteCurrentOwnedColour) {
+            if (ownedColour == whiteCurrentOwnedColour) {
                 whiteCurrentOwnedColour = newColour;
             } else {
                 blackCurrentOwnedColour = newColour;
@@ -709,44 +738,9 @@ namespace ChessGameModes {
             }
             return false;
         }
-
-        private Color GetChessPieceColour(ChessPiece piece) {
-            return SovereignExtensions.GetColour(piece.gameObject.GetComponent<SovereignColour>().colour);
-        }
-
-        private BoardCoord TryGetValidMove(ChessPiece mover, BoardCoord templateMove, out bool cancelDirectionalSlide) {
-            BoardCoord[] positions = new BoardCoord[2];
-            Color movedToColour = board.GetCoordInfo(templateMove).boardChunk.GetComponent<MeshRenderer>().material.color;
-
-            if (ColourControlSquares.TryGetValue(movedToColour, out positions)) {
-                bool controlledByAlly = false;
-                ChessPiece firstOccupier = board.GetCoordInfo(positions[0]).occupier;
-                ChessPiece secondOccupier = board.GetCoordInfo(positions[1]).occupier;
-
-                if ((firstOccupier == null && secondOccupier == null) || IsThreat(mover, templateMove)) {
-                    cancelDirectionalSlide = false;
-                    if (whiteControlledColours.Contains(GetChessPieceColour(mover)) && movedToColour == whiteCurrentOwnedColour
-                        || blackControlledColours.Contains(GetChessPieceColour(mover)) && movedToColour == blackCurrentOwnedColour) {
-                        return BoardCoord.NULL;
-                    }
-                    return templateMove;
-                } else if (mover.GetBoardPosition() == positions[0] || mover.GetBoardPosition() == positions[1]) {
-                    cancelDirectionalSlide = false;
-                    return templateMove;
-                } else if (IsAlly(mover, positions[0]) || IsAlly(mover, positions[1])) {
-                    controlledByAlly = true;
-                }
-
-                cancelDirectionalSlide = (controlledByAlly) ? false : true;
-                return BoardCoord.NULL;
-            } else {
-                cancelDirectionalSlide = false;
-                return templateMove;
-            }
-        }
+        #endregion
 
         public override void PopulateBoard() {
-#region WHITE+BLACK Teams
             currentRoyalPiece = (King)AddSovereignChessPiece(Piece.King, "i1", ColourName.White);
             opposingRoyalPiece = (King)AddSovereignChessPiece(Piece.King, "i16", ColourName.Black);
 
@@ -787,7 +781,8 @@ namespace ChessGameModes {
                     AddSovereignChessPiece(Piece.Bishop, new BoardCoord(x, BLACK_BACKROW), ColourName.Black);
                 }
             }
-            #endregion
+
+            //--------------------------------
 
             SovereignPawn.Quadrant currentQuadrant = SovereignPawn.Quadrant.BottomLeft;
             AddSovereignPawn("c2", ColourName.Pink, currentQuadrant);
@@ -858,7 +853,7 @@ namespace ChessGameModes {
             AddSovereignChessPiece(Piece.Rook, "c16", ColourName.Purple);
             AddSovereignChessPiece(Piece.Knight, "d16", ColourName.Purple);
 
-            //--------------------------
+            //-------------------------------
 
             AddSovereignChessPiece(Piece.Queen, "p1", ColourName.Silver);
             AddSovereignChessPiece(Piece.Rook, "p2", ColourName.Silver);
