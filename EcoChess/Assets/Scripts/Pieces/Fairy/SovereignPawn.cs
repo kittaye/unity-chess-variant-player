@@ -31,7 +31,7 @@ public class SovereignPawn : Pawn {
         switch (pieceQuadrant) {
             case Quadrant.BottomLeft:
                 if (pos.y > pos.x) return ClosestEdge.Left;
-                return ClosestEdge.Bottom;
+                else return ClosestEdge.Bottom;
             case Quadrant.BottomRight:
                 if (pos.y > 1) return ClosestEdge.Right;
                 else return ClosestEdge.Bottom;
@@ -40,7 +40,7 @@ public class SovereignPawn : Pawn {
                 else return ClosestEdge.Top;
             case Quadrant.TopRight:
                 if (pos.y > pos.x) return ClosestEdge.Top;
-                return ClosestEdge.Right;
+                else return ClosestEdge.Right;
             default:
                 Debug.LogError("Error! Quadrant: " + pieceQuadrant.ToString() + " is not supported.");
                 return ClosestEdge.Bottom;

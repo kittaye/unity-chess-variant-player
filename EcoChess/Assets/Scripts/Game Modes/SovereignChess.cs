@@ -17,8 +17,8 @@ namespace ChessGameModes {
     ///     R P . . r . . . . . . b . . P R     Capitals: neutral pieces
     ///     N P . . . y . p P . g . . . P N     ? top: FIDE black pieces
     ///     B P . . . . G . . s . . . . P B     ? bottom: FIDE white pieces
-    ///     Q P . . . o . W B . a . . . P Q
-    ///     Q P . . . a . B W . o . . . P Q     
+    ///     Q P . . . o . w B . a . . . P Q
+    ///     Q P . . . a . B w . o . . . P Q     
     ///     B P . . . . s . . G . . . . P B
     ///     N P . . . g . P p . y . . . P N
     ///     R P . . b . . . . . . r . . P R
@@ -27,7 +27,7 @@ namespace ChessGameModes {
     ///     R P P P ? ? ? ? ? ? ? ? P P P R
     ///     Q N R N ? ? ? ? ? ? ? ? N R B Q
     ///   
-    ///     r = red, y = yellow, g = green, b = blue, a = aqua, o = orange, P = Purple, p = pink, G = gray, s = silver, W = White, B = Black
+    ///     r = red, y = yellow, g = green, b = blue, a = aqua, o = orange, P = Purple, p = pink, G = gray, s = silver, w = white, B = Black
     /// </summary>
     public class SovereignChess : FIDERuleset {
         public static event Action<bool> _DisplayDefectionUI;
