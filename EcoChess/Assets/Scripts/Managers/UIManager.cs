@@ -152,14 +152,8 @@ public class UIManager : MonoBehaviour {
     }
 
     public void OnTurnComplete() {
+        teamTurnLbl.text = GameManager.Instance.chessGame.GetCurrentTurnLabel();
         Team newCurrentTeam = GameManager.Instance.chessGame.GetCurrentTeamTurn();
-        if (newCurrentTeam == Team.WHITE) {
-            teamTurnLbl.text = "White's move";
-            teamTurnLbl.color = Color.white;
-        } else {
-            teamTurnLbl.text = "Black's move";
-            teamTurnLbl.color = Color.black;
-        }
 
         foreach (GameObject item in promotionOptions) {
             item.GetComponent<Image>().sprite = Resources.Load<Sprite>(newCurrentTeam.ToString() + "_" + item.name);
