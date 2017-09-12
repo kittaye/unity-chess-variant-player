@@ -96,7 +96,7 @@ namespace ChessGameModes {
         }
 
         public override string ToString() {
-            return "FIDE";
+            return "Traditional Chess";
         }
 
         public override void OnTurnComplete() {

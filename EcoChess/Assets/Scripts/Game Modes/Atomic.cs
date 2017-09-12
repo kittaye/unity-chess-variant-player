@@ -13,7 +13,7 @@ namespace ChessGameModes {
         public Atomic() : base() { }
 
         public override string ToString() {
-            return "Atomic";
+            return "Atomic Chess";
         }
 
         public override bool CheckWinState() {
