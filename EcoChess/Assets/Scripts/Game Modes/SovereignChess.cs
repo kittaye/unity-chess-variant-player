@@ -172,6 +172,14 @@ namespace ChessGameModes {
             return false;
         }
 
+        public override string GetCurrentTurnLabel() {
+            if(currentTeamTurn == Team.WHITE) {
+                return SovereignExtensions.GetColourName(whiteCurrentOwnedColour).ToString() + "'s move";
+            } else {
+                return SovereignExtensions.GetColourName(blackCurrentOwnedColour).ToString() + "'s move";
+            }
+        }
+
         public void SetDefectOptionTo(Color clr) {
             this.selectedDefection = clr;
             MouseController.Instance.CalculateLastOccupierAvailableMoves();
