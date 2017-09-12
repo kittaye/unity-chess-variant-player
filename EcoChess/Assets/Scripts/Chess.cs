@@ -139,6 +139,14 @@ public abstract class Chess {
         return false;
     }
 
+    public virtual string GetCurrentTurnLabel() {
+        if (currentTeamTurn == Team.WHITE) {
+            return "White's move";
+        } else {
+            return "Black's move";
+        }
+    }
+
     private void UpdateSquareOccupiers(BoardCoord previousPosition, BoardCoord newPosition) {
         if (AssertContainsCoord(previousPosition) && AssertContainsCoord(newPosition)) {
             ChessPiece oldCoordOccupier = board.GetCoordInfo(previousPosition).occupier;
