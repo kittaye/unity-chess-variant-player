@@ -99,6 +99,9 @@ namespace ChessGameModes {
             return "Traditional Chess";
         }
 
+        /// <summary>
+        /// Called after a move is played. Resets the pawn promotion value, and swtiches the current and opposing royal pieces around.
+        /// </summary>
         public override void OnTurnComplete() {
             base.OnTurnComplete();
 
@@ -200,6 +203,10 @@ namespace ChessGameModes {
             return false;
         }
 
+        /// <summary>
+        /// Called in MovePiece. If a castling move was played, this method will perform the castle.
+        /// </summary>
+        /// <param name="mover">Piece to perform the castling move.</param>
         protected virtual void TryPerformCastlingRookMoves(ChessPiece mover) {
             if (mover.GetBoardPosition().x == 2) {
                 if (mover.GetTeam() == Team.WHITE) {
@@ -216,49 +223,12 @@ namespace ChessGameModes {
             }
         }
 
-        protected virtual Pawn CheckPawnEnPassantCapture(Pawn mover) {
-            if (board.ContainsCoord(mover.GetRelativeBoardCoord(0, -1)) && IsThreat(mover, mover.GetRelativeBoardCoord(0, -1))) {
-                ChessPiece occupier = board.GetCoordInfo(mover.GetRelativeBoardCoord(0, -1)).occupier;
-                if (occupier != null && occupier is Pawn && ((Pawn)occupier).validEnPassant) {
-                    mover.CaptureCount++;
-                    RemovePieceFromBoard(occupier);
-                    return (Pawn)occupier;
-                }
-            }
-            return null;
-        }
-
-        protected virtual bool CanPromote(Pawn mover, BoardCoord[] availableMoves) {
-            for (int i = 0; i < availableMoves.Length; i++) {
-                if (availableMoves[i].y == WHITE_BACKROW || availableMoves[i].y == BLACK_BACKROW) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        protected virtual ChessPiece CheckPawnPromotion(Pawn mover) {
-            if (mover.GetRelativeBoardCoord(0, 1).y < WHITE_BACKROW || mover.GetRelativeBoardCoord(0, 1).y > BLACK_BACKROW) {
-                RemovePieceFromBoard(mover);
-                RemovePieceFromActiveTeam(mover);
-                return AddPieceToBoard(ChessPieceFactory.Create(selectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
-            }
-            return null;
-        }
-
-        protected void SetPawnPromotionOptions(Piece[] pieces) {
-            pawnPromotionOptions = pieces;
-            if (_OnPawnPromotionsChanged != null) _OnPawnPromotionsChanged.Invoke(pawnPromotionOptions);
-        }
-
-        protected void OnDisplayPromotionUI(bool value) {
-            if (_DisplayPromotionUI != null) _DisplayPromotionUI.Invoke(true);
-        }
-
-        public virtual void SetPawnPromotionTo(Piece piece) {
-            this.selectedPawnPromotion = piece;
-        }
-
+        /// <summary>
+        /// Performs the castling move. Should be called within TryPerformCastlingRookMoves.
+        /// </summary>
+        /// <param name="castlingPiece">Piece to castle with.</param>
+        /// <param name="castlingPieceNewPos">Castling piece's final position.</param>
+        /// <returns></returns>
         protected ChessPiece PerformCastle(ChessPiece castlingPiece, BoardCoord castlingPieceNewPos) {
             if (AssertContainsCoord(castlingPieceNewPos)) {
                 if (castlingPiece != null) {
@@ -272,6 +242,84 @@ namespace ChessGameModes {
             return null;
         }
 
+        /// <summary>
+        /// Called in MovePiece. If an enpassant move was made, enpassant capture is performed.
+        /// </summary>
+        /// <param name="mover">Moving piece.</param>
+        /// <returns></returns>
+        protected virtual Pawn CheckPawnEnPassantCapture(Pawn mover) {
+            if (board.ContainsCoord(mover.GetRelativeBoardCoord(0, -1)) && IsThreat(mover, mover.GetRelativeBoardCoord(0, -1))) {
+                ChessPiece occupier = board.GetCoordInfo(mover.GetRelativeBoardCoord(0, -1)).occupier;
+                if (occupier != null && occupier is Pawn && ((Pawn)occupier).validEnPassant) {
+                    mover.CaptureCount++;
+                    RemovePieceFromBoard(occupier);
+                    return (Pawn)occupier;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Called in CalculateAvailableMoves. Determines if a pawn can promote on their move.
+        /// </summary>
+        /// <param name="mover">Moving pawn.</param>
+        /// <param name="availableMoves">The pawn's available moves to check.</param>
+        /// <returns></returns>
+        protected virtual bool CanPromote(Pawn mover, BoardCoord[] availableMoves) {
+            for (int i = 0; i < availableMoves.Length; i++) {
+                if (availableMoves[i].y == WHITE_BACKROW || availableMoves[i].y == BLACK_BACKROW) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Called in MovePiece. If a promoting move was made, the pawn is removed from the board and replaced with the selected pawn promotion.
+        /// </summary>
+        /// <param name="mover">Moving pawn.</param>
+        /// <returns></returns>
+        protected virtual ChessPiece CheckPawnPromotion(Pawn mover) {
+            if (mover.GetRelativeBoardCoord(0, 1).y < WHITE_BACKROW || mover.GetRelativeBoardCoord(0, 1).y > BLACK_BACKROW) {
+                RemovePieceFromBoard(mover);
+                RemovePieceFromActiveTeam(mover);
+                return AddPieceToBoard(ChessPieceFactory.Create(selectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Used to update the pawn promotion options at any point during the game.
+        /// </summary>
+        /// <param name="pieces">Set of pieces to change the pawn promotion options to.</param>
+        protected void SetPawnPromotionOptions(Piece[] pieces) {
+            pawnPromotionOptions = pieces;
+            if (_OnPawnPromotionsChanged != null) _OnPawnPromotionsChanged.Invoke(pawnPromotionOptions);
+        }
+
+        /// <summary>
+        /// Display the UI for showing pawn promotion options to choose from.
+        /// </summary>
+        /// <param name="value"></param>
+        protected void OnDisplayPromotionUI(bool value) {
+            if (_DisplayPromotionUI != null) _DisplayPromotionUI.Invoke(true);
+        }
+
+        /// <summary>
+        /// Set the current pawn promotion option to a specified piece.
+        /// </summary>
+        /// <param name="piece">Piece to set the pawn promotion option to.</param>
+        public virtual void SetPawnPromotionTo(Piece piece) {
+            this.selectedPawnPromotion = piece;
+        }
+
+        /// <summary>
+        /// Simulates a move, checks whether the piece-to-check is in check, then reverts the simulated move.
+        /// </summary>
+        /// <param name="pieceToCheck">Piece to check (usually the current or opposing royal piece).</param>
+        /// <param name="mover">Piece to move.</param>
+        /// <param name="dest">Destination to move to.</param>
+        /// <returns>True if the piece-to-check is in check after the simulated move.</returns>
         protected virtual bool IsPieceInCheckAfterThisMove(ChessPiece pieceToCheck, ChessPiece mover, BoardCoord dest) {
             if (AssertContainsCoord(dest)) {
                 if (checkingForCheck) return false;
@@ -305,6 +353,11 @@ namespace ChessGameModes {
             return false;
         }
 
+        /// <summary>
+        /// Determines whether the piece-to-check is currently in check.
+        /// </summary>
+        /// <param name="pieceToCheck">Piece to check (usually the current or opposing royal piece).</param>
+        /// <returns>True if the piece-to-check is in check.</returns>
         protected virtual bool IsPieceInCheck(ChessPiece pieceToCheck) {
             if (checkingForCheck) return false;
 
@@ -321,6 +374,11 @@ namespace ChessGameModes {
             return false;
         }
 
+        /// <summary>
+        /// Gets all possible check threats against the piece-to-check. This should vary between game-modes.
+        /// </summary>
+        /// <param name="pieceToCheck">Piece to check (usually the current or opposing royal piece).</param>
+        /// <returns>A list of chess pieces that can check the piece-to-check.</returns>
         protected virtual List<ChessPiece> GetAllPossibleCheckThreats(ChessPiece pieceToCheck) {
             List<ChessPiece> possibleCheckThreats = new List<ChessPiece>();
 
@@ -347,6 +405,11 @@ namespace ChessGameModes {
             return possibleCheckThreats;
         }
 
+        /// <summary>
+        /// Called in CalculateAvailableMoves. If an enpassant move is available, returns the enpassant move.
+        /// </summary>
+        /// <param name="mover">Moving pawn.</param>
+        /// <returns>Enpassant coordinate, otherwise null.</returns>
         protected virtual BoardCoord TryAddAvailableEnPassantMove(Pawn mover) {
             const int LEFT = -1;
             const int RIGHT = 1;
@@ -367,6 +430,13 @@ namespace ChessGameModes {
             return BoardCoord.NULL;
         }
 
+        /// <summary>
+        /// Called in CalculateAvailableMoves. Determines if a castling move can be made for a chess piece.
+        /// </summary>
+        /// <param name="king">Moving piece.</param>
+        /// <param name="canCastleLeftward">Can the piece castle leftwards?</param>
+        /// <param name="canCastleRightward">Can the piece castle rightwards?</param>
+        /// <returns>A list of board coordinates for available castle moves.</returns>
         protected virtual BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, bool canCastleLeftward = true, bool canCastleRightward = true) {
             const int LEFT = -1;
             const int RIGHT = 1;

@@ -244,7 +244,7 @@ public abstract class Chess {
     }
 
     /// <summary>
-    /// Called after a move is played.
+    /// Called after a move is played. Switches the current and opposing teams around.
     /// </summary>
     public virtual void OnTurnComplete() {
         currentTeamTurn = (currentTeamTurn == Team.WHITE) ? Team.BLACK : Team.WHITE;
