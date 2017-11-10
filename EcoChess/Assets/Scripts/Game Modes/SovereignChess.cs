@@ -159,9 +159,9 @@ namespace ChessGameModes {
                 ChessPiece occupier = board.GetCoordInfo(coord).occupier;
                 if (occupier != null) {
                     if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
-                        return blackControlledColours.Contains(GetChessPieceColour(occupier)) == false;
+                        return whiteControlledColours.Contains(GetChessPieceColour(occupier));
                     } else if (blackControlledColours.Contains(GetChessPieceColour(mover))) {
-                        return whiteControlledColours.Contains(GetChessPieceColour(occupier)) == false;
+                        return blackControlledColours.Contains(GetChessPieceColour(occupier));
                     } else {
                         return true;
                     }
@@ -246,6 +246,10 @@ namespace ChessGameModes {
             }
 
             if (mover is King) {
+                if (mover.MoveCount == 0) {
+                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover));
+                }
+
                 if (checkingForCheck == false) {
                     HashSet<Color> controlledColours = GetControlledColours(mover);
                     if (controlledColours.Count > 1) {
@@ -277,33 +281,52 @@ namespace ChessGameModes {
         }
 
         private BoardCoord TryGetValidMove(ChessPiece mover, BoardCoord templateMove, out bool cancelDirectionalSlide) {
-            BoardCoord[] positions = new BoardCoord[2];
+            BoardCoord[] colourPositions = new BoardCoord[2];
             Color movedToColour = board.GetCoordInfo(templateMove).boardChunk.GetComponent<MeshRenderer>().material.color;
 
-            if (ColourControlSquares.TryGetValue(movedToColour, out positions)) {
-                bool controlledByAlly = false;
-                ChessPiece firstOccupier = board.GetCoordInfo(positions[0]).occupier;
-                ChessPiece secondOccupier = board.GetCoordInfo(positions[1]).occupier;
+            // Moved to square is a coloured square...
+            if (ColourControlSquares.TryGetValue(movedToColour, out colourPositions)) {
+                // Check if moved to square is occupied AND not a threat... (must be an ally or neutral piece).
+                if (board.GetCoordInfo(templateMove).occupier != null && IsThreat(mover, templateMove) == false) {
+                    cancelDirectionalSlide = true;
+                    return BoardCoord.NULL;
+                }
+                
+                // Get occupiers of the squares of that colour
+                ChessPiece firstOccupier = board.GetCoordInfo(colourPositions[0]).occupier;
+                ChessPiece secondOccupier = board.GetCoordInfo(colourPositions[1]).occupier;
 
+                cancelDirectionalSlide = false;
+                // Check if no occupiers OR a threat...
                 if ((firstOccupier == null && secondOccupier == null) || IsThreat(mover, templateMove)) {
-                    cancelDirectionalSlide = false;
                     if (whiteControlledColours.Contains(GetChessPieceColour(mover)) && movedToColour == whiteCurrentOwnedColour
                         || blackControlledColours.Contains(GetChessPieceColour(mover)) && movedToColour == blackCurrentOwnedColour) {
                         return BoardCoord.NULL;
                     }
                     return templateMove;
-                } else if (mover.GetBoardPosition() == positions[0] || mover.GetBoardPosition() == positions[1]) {
+
+                    // Check if the mover is occuping one of the squares...
+                } else if (mover.GetBoardPosition() == colourPositions[0] || mover.GetBoardPosition() == colourPositions[1]) {
+                    return templateMove;
+
+                    // Check if a threat is occuping the squares of that colour...
+                } else if (IsThreat(mover, colourPositions[0]) || IsThreat(mover, colourPositions[1])) {
+                    cancelDirectionalSlide = true;
+                }
+                return BoardCoord.NULL;
+
+                // Else moved to square is not a coloured square...
+            } else {
+                // Check if moved to square is occupied AND not a threat... (must be an ally or neutral piece).
+                if (board.GetCoordInfo(templateMove).occupier != null && IsThreat(mover, templateMove) == false) {
+                    cancelDirectionalSlide = true;
+                    return BoardCoord.NULL;
+
+                    // Else a threat was found.
+                } else {
                     cancelDirectionalSlide = false;
                     return templateMove;
-                } else if (IsAlly(mover, positions[0]) || IsAlly(mover, positions[1])) {
-                    controlledByAlly = true;
                 }
-
-                cancelDirectionalSlide = (controlledByAlly) ? false : true;
-                return BoardCoord.NULL;
-            } else {
-                cancelDirectionalSlide = false;
-                return templateMove;
             }
         }
 
@@ -550,6 +573,55 @@ namespace ChessGameModes {
                     }
                 }
             }
+        }
+
+        protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, bool canCastleLeftward = true, bool canCastleRightward = true) {
+            const int LEFT = -1;
+            const int RIGHT = 1;
+
+            if (IsPieceInCheck(king) == false) {
+                List<BoardCoord> castleMoves = new List<BoardCoord>(2);
+
+                for (int i = LEFT; i <= RIGHT; i += 2) {
+                    if (!canCastleLeftward && i == LEFT) continue;
+                    if (!canCastleRightward && i == RIGHT) break;
+
+                    int x = king.GetBoardPosition().x + (i * 2);
+                    int y = king.GetBoardPosition().y;
+                    BoardCoord coord = new BoardCoord(x, y);
+
+                    // Check the square immediately next to the king.
+                    if(IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i, 0))) {
+                        continue;
+                    }
+
+                    // Check subesquent squares.
+                    while (board.ContainsCoord(coord)) {
+                        if (IsPieceInCheckAfterThisMove(king, king, coord)) {
+                            break;
+                        }
+
+                        ChessPiece occupier = board.GetCoordInfo(coord).occupier;
+                        if (occupier != null) {
+                            if (occupier is Rook && occupier.MoveCount == 0 && IsAlly(king, coord)) {
+                                ChessPiece occupierStop = null;
+                                coord = new BoardCoord(king.GetBoardPosition().x + i * 2, king.GetBoardPosition().y);
+                                while(occupierStop != occupier) {
+                                    castleMoves.Add(TryGetSpecificMove(king, coord));
+                                    coord.x += i;
+                                    occupierStop = board.GetCoordInfo(coord).occupier;
+                                }
+                            }
+                            break;
+                        }
+                        
+                        x += i;
+                        coord = new BoardCoord(x, y);
+                    }
+                }
+                return castleMoves.ToArray();
+            }
+            return new BoardCoord[0];
         }
 
         #region Helper Functions
