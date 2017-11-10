@@ -229,7 +229,7 @@ namespace ChessGameModes {
         /// <param name="castlingPiece">Piece to castle with.</param>
         /// <param name="castlingPieceNewPos">Castling piece's final position.</param>
         /// <returns></returns>
-        protected ChessPiece PerformCastle(ChessPiece castlingPiece, BoardCoord castlingPieceNewPos) {
+        protected virtual ChessPiece PerformCastle(ChessPiece castlingPiece, BoardCoord castlingPieceNewPos) {
             if (AssertContainsCoord(castlingPieceNewPos)) {
                 if (castlingPiece != null) {
                     RemovePieceFromBoard(castlingPiece);
