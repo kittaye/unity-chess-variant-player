@@ -114,7 +114,8 @@ namespace ChessGameModes {
 
         public override bool CheckWinState() {
             if (numConsecutiveCapturelessMoves == 100) {
-                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " 
+                    + SovereignExtensions.GetColourName(GetChessPieceColour(currentRoyalPiece)) + "'s move!");
                 return true;
             }
 
@@ -131,9 +132,10 @@ namespace ChessGameModes {
             }
 
             if (IsPieceInCheck(currentRoyalPiece)) {
-                UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                UIManager.Instance.Log("Team " + SovereignExtensions.GetColourName(GetChessPieceColour(currentRoyalPiece)) 
+                    + " has been checkmated -- Team " + SovereignExtensions.GetColourName(GetChessPieceColour(opposingRoyalPiece)) + " wins!");
             } else {
-                UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                UIManager.Instance.Log("Stalemate on " + SovereignExtensions.GetColourName(GetChessPieceColour(currentRoyalPiece)) + "'s move!");
             }
             return true;
         }
@@ -355,7 +357,7 @@ namespace ChessGameModes {
                     if (validMoves == 0) {
                         doubleMoveLegal = false;
                     }
-                }
+                } else if (IsPieceInCheck(mover)) return BoardCoord.NULL;
 
                 if (IsThreat(mover, positions[0]) || IsThreat(mover, positions[1])) {
                     HashSet<Color> controlledColours = GetControlledColours(mover);
@@ -464,18 +466,19 @@ namespace ChessGameModes {
             if (MakeMove(mover, destination)) {
                 if (mover is King) {
                     if (kingHasDoubleMoveDefection) kingHasDoubleMoveDefection = false;
-                    // Try perform castling move.
-                    if (mover.MoveCount == 1) {
-                        //TryPerformCastlingRookMoves(mover);
-                    }
+
                     // Try perform defection move.
                     if (oldPos == destination) {
                         PerformDefectionMove(mover);
-                        if(GetChessPieceColour(mover) == board.GetCoordInfo(mover.GetBoardPosition()).boardChunk.GetComponent<MeshRenderer>().material.color) {
+                        if (GetChessPieceColour(mover) == board.GetCoordInfo(mover.GetBoardPosition()).boardChunk.GetComponent<MeshRenderer>().material.color) {
                             kingHasDoubleMoveDefection = true;
                         }
                         return true;
-                    }
+
+                        // Else try perform castling move.
+                    } else if (mover.MoveCount == 1) {
+                        TryPerformCastlingRookMoves(mover);
+                    } 
                 } else if (mover is Pawn) {
                     if (mover is SovereignPawn) UpdatePawnQuadrant((SovereignPawn)mover);
                     ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
@@ -606,6 +609,19 @@ namespace ChessGameModes {
                             if (occupier is Rook && occupier.MoveCount == 0 && IsAlly(king, coord)) {
                                 ChessPiece occupierStop = null;
                                 coord = new BoardCoord(king.GetBoardPosition().x + i * 2, king.GetBoardPosition().y);
+                                if(GetTeamOwnedColour(king) == whiteCurrentOwnedColour) {
+                                    if(i == LEFT) {
+                                        aSideWhiteRook = (Rook)occupier;
+                                    } else {
+                                        hSideWhiteRook = (Rook)occupier;
+                                    }
+                                } else {
+                                    if (i == LEFT) {
+                                        aSideBlackRook = (Rook)occupier;
+                                    } else {
+                                        hSideBlackRook = (Rook)occupier;
+                                    }
+                                }
                                 while(occupierStop != occupier) {
                                     castleMoves.Add(TryGetSpecificMove(king, coord));
                                     coord.x += i;
@@ -622,6 +638,35 @@ namespace ChessGameModes {
                 return castleMoves.ToArray();
             }
             return new BoardCoord[0];
+        }
+
+        protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
+            if (mover.GetBoardPosition().x < 7) {
+                if (GetTeamOwnedColour(mover) == whiteCurrentOwnedColour) {
+                    aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(mover.GetBoardPosition().x + 1, mover.GetBoardPosition().y));
+                } else {
+                    aSideBlackRook = (Rook)PerformCastle(aSideBlackRook, new BoardCoord(mover.GetBoardPosition().x + 1, mover.GetBoardPosition().y));
+                }
+            } else if (mover.GetBoardPosition().x > 9) {
+                if (GetTeamOwnedColour(mover) == whiteCurrentOwnedColour) {
+                    hSideWhiteRook = (Rook)PerformCastle(hSideWhiteRook, new BoardCoord(mover.GetBoardPosition().x - 1, mover.GetBoardPosition().y));
+                } else {
+                    hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(mover.GetBoardPosition().x - 1, mover.GetBoardPosition().y));
+                }
+            }
+        }
+
+        protected override ChessPiece PerformCastle(ChessPiece castlingPiece, BoardCoord castlingPieceNewPos) {
+            if (AssertContainsCoord(castlingPieceNewPos)) {
+                if (castlingPiece != null) {
+                    RemovePieceFromBoard(castlingPiece);
+                    RemovePieceFromActiveTeam(castlingPiece);
+                    return AddSovereignChessPiece(Piece.Rook, castlingPieceNewPos, SovereignExtensions.GetColourName(GetChessPieceColour(castlingPiece)));
+                } else {
+                    Debug.LogError("Reference to the castling piece should not be null! Ensure references were made when the piece was first created.");
+                }
+            }
+            return null;
         }
 
         #region Helper Functions
