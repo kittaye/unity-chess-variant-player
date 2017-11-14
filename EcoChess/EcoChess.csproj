@@ -112,6 +112,7 @@
     <Compile Include="Assets\Scripts\Game Modes\GrandChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\GrasshopperChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\HalfChess.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Legan.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Horde.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Janus.cs" />
     <Compile Include="Assets\Scripts\Game Modes\KingOfTheHill.cs" />
@@ -138,9 +139,9 @@
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\Scripts\Managers\UIManager.cs" />
     <Compile Include="Assets\Scripts\Misc\ChessPieceFactory.cs" />
-    <Compile Include="Assets\Scripts\Misc\SovereignExtensions.cs" />
     <Compile Include="Assets\Scripts\Misc\GameModeFactory.cs" />
     <Compile Include="Assets\Scripts\Misc\SovereignColour.cs" />
+    <Compile Include="Assets\Scripts\Misc\SovereignExtensions.cs" />
     <Compile Include="Assets\Scripts\Pieces\ChessPiece.cs" />
     <Compile Include="Assets\Scripts\Pieces\Fairy\Amazon.cs" />
     <Compile Include="Assets\Scripts\Pieces\Fairy\BerolinaPawn.cs" />
@@ -149,7 +150,6 @@
     <Compile Include="Assets\Scripts\Pieces\Fairy\Grasshopper.cs" />
     <Compile Include="Assets\Scripts\Pieces\Fairy\Nightrider.cs" />
     <Compile Include="Assets\Scripts\Pieces\Fairy\Princess.cs" />
-    <Compile Include="Assets\Scripts\Pieces\Fairy\SovereignPawn.cs" />
     <Compile Include="Assets\Scripts\Pieces\Fairy\Wizard.cs" />
     <Compile Include="Assets\Scripts\Pieces\Orthodox\Bishop.cs" />
     <Compile Include="Assets\Scripts\Pieces\Orthodox\King.cs" />
@@ -157,6 +157,8 @@
     <Compile Include="Assets\Scripts\Pieces\Orthodox\Pawn.cs" />
     <Compile Include="Assets\Scripts\Pieces\Orthodox\Queen.cs" />
     <Compile Include="Assets\Scripts\Pieces\Orthodox\Rook.cs" />
+    <Compile Include="Assets\Scripts\Pieces\Other\LeganPawn.cs" />
+    <Compile Include="Assets\Scripts\Pieces\Other\SovereignPawn.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
