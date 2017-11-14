@@ -24,11 +24,6 @@ namespace ChessGameModes {
             return "Horde";
         }
 
-        public override void OnTurnComplete() {
-            currentTeamTurn = (currentTeamTurn == Team.WHITE) ? Team.BLACK : Team.WHITE;
-            opposingTeamTurn = (currentTeamTurn == Team.WHITE) ? Team.BLACK : Team.WHITE;
-        }
-
         public override bool CheckWinState() {
             if (numConsecutiveCapturelessMoves == 100) {
                 UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
