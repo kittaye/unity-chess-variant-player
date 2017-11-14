@@ -16,10 +16,6 @@ public class SovereignPawn : Pawn {
         this.pieceQuadrant = quadrant;
     }
 
-    public override string ToString() {
-        return GetTeam() + "_Pawn";
-    }
-
     public void ChangePieceQuadrant(Quadrant quadrant) {
         pieceQuadrant = quadrant;
     }
