@@ -9,6 +9,8 @@ public class UIManager : MonoBehaviour {
     public GameObject promotionWindow;
     public GameObject defectionWindow;
     public GameObject spritePrefab;
+    public Button nextVariantButton;
+    public Button prevVariantButton;
 
     private Text teamTurnLbl;
     private Text gameModeLbl;
@@ -55,6 +57,16 @@ public class UIManager : MonoBehaviour {
         if (GameManager.Instance.chessGame is ChessGameModes.SovereignChess) {
             ChessGameModes.SovereignChess._DisplayDefectionUI += OnDisplayDefectionOptions;
             ChessGameModes.SovereignChess._SetDefectionOptions += OnSetDefectionOptions;
+        }
+
+        prevVariantButton.gameObject.SetActive(false);
+        nextVariantButton.gameObject.SetActive(false);
+
+        if (GameManager.GetCurrentVariantIndex() != 0) {
+            prevVariantButton.gameObject.SetActive(true);
+        }
+        if (GameManager.GetCurrentVariantIndex() != GameManager.NUM_OF_VARIANTS - 1) {
+            nextVariantButton.gameObject.SetActive(true);
         }
 
         OnDisplayPromotionOptions(false);
