@@ -4,9 +4,10 @@ namespace ChessGameModes {
     public enum GameMode {
         ActiveChess, AlmostChess, AmazonChess, AndernachChess, AtomicChess, BalboChess, BerolinaChess, CapablancaChess,
         ChargeOfTheLightBrigadeChess, ChecklessChess, Chess960, ChigorinChess, DoubleChess, EmbassyChess, FIDE, GothicChess,
-        GrandChess, GrasshopperChess, HalfChess, Horde, JanusChess, KingOfTheHill, Knightmate, LadderChess, LeganChess, LosAlamosChess,
-        LosingChess, Microchess, MongredienChess, MonsterChess, NightriderChess, OmegaChess, PawnEndgameChess, PeasantsRevolt,
-        PerfectChess, RacingKings, ReversedRoyals, ShiftedChess, Silverman4x5, SovereignChess, ThreeCheck, UpsidedownChess, Weak
+        GrandChess, GrasshopperChess, HalfChess, Horde, JanusChess, JesonMor, KingOfTheHill, Knightmate, LadderChess, LeganChess,
+        LosAlamosChess, LosingChess, Microchess, MongredienChess, MonsterChess, NightriderChess, OmegaChess, PawnEndgameChess,
+        PeasantsRevolt, PerfectChess, RacingKings, ReversedRoyals, ShiftedChess, Silverman4x5, SovereignChess, ThreeCheck, UpsidedownChess,
+        Weak
     }
 
     public static class GameModeFactory {
@@ -54,6 +55,8 @@ namespace ChessGameModes {
                     return new Horde();
                 case GameMode.JanusChess:
                     return new Janus();
+                case GameMode.JesonMor:
+                    return new JesonMor();
                 case GameMode.KingOfTheHill:
                     return new KingOfTheHill();
                 case GameMode.Knightmate:
