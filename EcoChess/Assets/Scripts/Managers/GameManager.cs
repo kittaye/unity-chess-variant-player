@@ -5,11 +5,11 @@ using ChessGameModes;
 public class GameManager : MonoBehaviour {
     public static GameManager Instance;
     public Chess chessGame { get; private set; }
+    public static readonly int NUM_OF_VARIANTS = System.Enum.GetNames(typeof(GameMode)).Length;
 
     public GameObject piecePrefab;
     public GameObject boardChunkPrefab;
 
-    private static readonly int NUM_OF_VARIANTS = System.Enum.GetNames(typeof(GameMode)).Length;
     private static int modeIndex = 0;
     private UIManager ui;
 
@@ -34,12 +34,24 @@ public class GameManager : MonoBehaviour {
 
     private void Update() {
         if (Input.GetKeyDown(KeyCode.RightArrow) && modeIndex != NUM_OF_VARIANTS - 1) {
-            modeIndex = Mathf.Clamp(++modeIndex, 0, NUM_OF_VARIANTS - 1);
-            SceneManager.LoadScene(0);
+            LoadNextVariant();
         } else if (Input.GetKeyDown(KeyCode.LeftArrow) && modeIndex != 0) {
-            modeIndex = Mathf.Clamp(--modeIndex, 0, NUM_OF_VARIANTS - 1);
-            SceneManager.LoadScene(0);
+            LoadPreviousVariant();
         }
+    }
+
+    public void LoadNextVariant() {
+        modeIndex = Mathf.Clamp(++modeIndex, 0, NUM_OF_VARIANTS - 1);
+        SceneManager.LoadScene(0);
+    }
+
+    public void LoadPreviousVariant() {
+        modeIndex = Mathf.Clamp(--modeIndex, 0, NUM_OF_VARIANTS - 1);
+        SceneManager.LoadScene(0);
+    }
+
+    public static int GetCurrentVariantIndex() {
+        return modeIndex;
     }
 
     public void OnTurnComplete() {
