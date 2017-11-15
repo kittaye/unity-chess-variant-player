@@ -5,7 +5,8 @@ public enum Team { WHITE, BLACK }
 public enum MoveDirection { Up, Down, Left, Right, UpLeft, UpRight, DownLeft, DownRight }
 
 public abstract class Chess {
-    public ChessPiece lastMovedPiece { get; protected set; }
+    public ChessPiece lastMovedWhitePiece { get; protected set; }
+    public ChessPiece lastMovedBlackPiece { get; protected set; }
     public Board board { get; private set; }
 
     private List<ChessPiece> whitePieces;
@@ -18,7 +19,8 @@ public abstract class Chess {
         board = new Board(width, height, new Color(0.9f, 0.9f, 0.9f), new Color(0.1f, 0.1f, 0.1f));
         whitePieces = new List<ChessPiece>();
         blackPieces = new List<ChessPiece>();
-        lastMovedPiece = null;
+        lastMovedWhitePiece = null;
+        lastMovedBlackPiece = null;
         currentTeamTurn = Team.WHITE;
         opposingTeamTurn = Team.BLACK;
         numConsecutiveCapturelessMoves = 0;
@@ -28,7 +30,8 @@ public abstract class Chess {
         board = new Board(width, height, primaryBoardColour, secondaryBoardColour);
         whitePieces = new List<ChessPiece>();
         blackPieces = new List<ChessPiece>();
-        lastMovedPiece = null;
+        lastMovedWhitePiece = null;
+        lastMovedBlackPiece = null;
         currentTeamTurn = Team.WHITE;
         opposingTeamTurn = Team.BLACK;
         numConsecutiveCapturelessMoves = 0;
@@ -237,7 +240,10 @@ public abstract class Chess {
             if (wasThreat) mover.CaptureCount++;
             numConsecutiveCapturelessMoves = (wasThreat == false && (mover is Pawn) == false) ? numConsecutiveCapturelessMoves + 1 : 0;
             UpdateSquareOccupiers(previousPosition, mover.GetBoardPosition());
-            lastMovedPiece = mover;
+            if (mover.GetTeam() == Team.WHITE)
+                lastMovedWhitePiece = mover;
+            else
+                lastMovedBlackPiece = mover;
             return true;
         }
         return false;
@@ -361,8 +367,13 @@ public abstract class Chess {
     protected void SimulateMove(ChessPiece mover, BoardCoord dest, ChessPiece originalOccupier, out ChessPiece originalLastMover) {
         originalLastMover = null;
         if (AssertContainsCoord(dest)) {
-            if (lastMovedPiece != null) originalLastMover = lastMovedPiece;
-            lastMovedPiece = mover;
+            if (mover.GetTeam() == Team.WHITE) {
+                if (lastMovedWhitePiece != null) originalLastMover = lastMovedWhitePiece;
+                lastMovedWhitePiece = mover;
+            } else {
+                if (lastMovedBlackPiece != null) originalLastMover = lastMovedBlackPiece;
+                lastMovedBlackPiece = mover;
+            }
             if (originalOccupier != null) originalOccupier.IsAlive = false;
             board.GetCoordInfo(mover.GetBoardPosition()).occupier = null;
             board.GetCoordInfo(dest).occupier = mover;
@@ -388,7 +399,10 @@ public abstract class Chess {
             } else {
                 board.GetCoordInfo(dest).occupier = null;
             }
-            lastMovedPiece = originalLastMover;
+            if (mover.GetTeam() == Team.WHITE)
+                lastMovedWhitePiece = originalLastMover;
+            else
+                lastMovedBlackPiece = originalLastMover;
         }
     }
 
@@ -420,8 +434,8 @@ public abstract class Chess {
             iter++;
             x += xModifier;
             y += yModifier;
-            if (xWrap) x %= board.GetWidth();
-            if (yWrap) y %= board.GetHeight();
+            if (xWrap) x = MathExtensions.mod(x, board.GetWidth());
+            if (yWrap) y = MathExtensions.mod(y, board.GetHeight());
             coord = new BoardCoord(x, y);
 
             if (board.ContainsCoord(coord) == false) break;
@@ -465,8 +479,8 @@ public abstract class Chess {
             iter++;
             x += xModifier;
             y += yModifier;
-            if (xWrap) x %= board.GetWidth();
-            if (yWrap) y %= board.GetHeight();
+            if (xWrap) x = MathExtensions.mod(x, board.GetWidth());
+            if (yWrap) y = MathExtensions.mod(y, board.GetHeight());
             coord = new BoardCoord(x, y);
 
             if (board.ContainsCoord(coord) == false) break;
