@@ -38,7 +38,7 @@ namespace ChessGameModes {
             if (canCaptureThisTurn) {
                 return false;
             } else {
-                foreach (ChessPiece piece in GetPieces(currentTeamTurn)) {
+                foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
                     if (piece.IsAlive) {
                         if (CalculateAvailableMoves(piece).Count > 0) {
                             return false;
@@ -93,7 +93,7 @@ namespace ChessGameModes {
         }
 
         private bool CanCaptureAPiece() {
-            foreach (ChessPiece piece in GetPieces(currentTeamTurn)) {
+            foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
                 if (piece.IsAlive) {
                     BoardCoord[] templateMoves = piece.CalculateTemplateMoves().ToArray();
                     for (int i = 0; i < templateMoves.Length; i++) {
