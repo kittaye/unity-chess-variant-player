@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
-    /// JesonMor.cs is a chess variant that involves a custom board layout and unique pawn rules.
+    /// JesonMor.cs is a chess variant that involves a custom board layout and a custom winstate.
     /// 
     /// Winstate: Eliminate all pieces OR enter and leave the central square (e5).
     /// Piece types: Orthodox.

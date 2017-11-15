@@ -375,7 +375,8 @@ namespace ChessGameModes {
         }
 
         /// <summary>
-        /// Gets all possible check threats against the piece-to-check. This should vary between game-modes.
+        /// Gets all possible check threats against the piece-to-check. This should vary between game-modes 
+        /// that involve pieces that don't move directionally.
         /// </summary>
         /// <param name="pieceToCheck">Piece to check (usually the current or opposing royal piece).</param>
         /// <returns>A list of chess pieces that can check the piece-to-check.</returns>
