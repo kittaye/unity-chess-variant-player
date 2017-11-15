@@ -110,7 +110,7 @@ namespace ChessGameModes {
                         if (board.ContainsCoord(coord)) {
                             ChessPiece piece = board.GetCoordInfo(coord).occupier;
                             if (piece != null) {
-                                if (piece is Pawn && piece == lastMovedPiece && ((Pawn)piece).validEnPassant) {
+                                if (piece is Pawn && piece == LastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
                                     if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
                                         return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1));
                                     }

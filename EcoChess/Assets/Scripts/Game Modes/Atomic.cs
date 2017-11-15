@@ -137,7 +137,7 @@ namespace ChessGameModes {
                     BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
                     if (board.ContainsCoord(coord)) {
                         ChessPiece piece = board.GetCoordInfo(coord).occupier;
-                        if (piece is Pawn && piece == lastMovedPiece && ((Pawn)piece).validEnPassant) {
+                        if (piece is Pawn && piece == LastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
                             if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
                                 bool isValid = true;
                                 for (int x = -1; x <= 1 && isValid; x++) {

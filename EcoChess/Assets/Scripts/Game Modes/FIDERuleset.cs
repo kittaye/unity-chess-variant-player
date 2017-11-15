@@ -250,7 +250,7 @@ namespace ChessGameModes {
         protected virtual Pawn CheckPawnEnPassantCapture(Pawn mover) {
             if (board.ContainsCoord(mover.GetRelativeBoardCoord(0, -1)) && IsThreat(mover, mover.GetRelativeBoardCoord(0, -1))) {
                 ChessPiece occupier = board.GetCoordInfo(mover.GetRelativeBoardCoord(0, -1)).occupier;
-                if (occupier != null && occupier is Pawn && ((Pawn)occupier).validEnPassant) {
+                if (occupier != null && occupier is Pawn && occupier == LastMovedOpposingPiece(mover) && ((Pawn)occupier).validEnPassant) {
                     mover.CaptureCount++;
                     RemovePieceFromBoard(occupier);
                     return (Pawn)occupier;
@@ -420,7 +420,7 @@ namespace ChessGameModes {
                     BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
                     if (board.ContainsCoord(coord)) {
                         ChessPiece piece = board.GetCoordInfo(coord).occupier;
-                        if (piece is Pawn && piece == lastMovedPiece && ((Pawn)piece).validEnPassant) {
+                        if (piece is Pawn && piece == LastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
                             if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
                                 return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1));
                             }
@@ -429,6 +429,14 @@ namespace ChessGameModes {
                 }
             }
             return BoardCoord.NULL;
+        }
+
+        protected ChessPiece LastMovedOpposingPiece(ChessPiece mover) {
+            if(mover.GetTeam() == Team.WHITE) {
+                return lastMovedBlackPiece;
+            } else {
+                return lastMovedWhitePiece;
+            }
         }
 
         /// <summary>
