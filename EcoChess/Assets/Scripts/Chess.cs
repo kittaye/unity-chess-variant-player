@@ -409,6 +409,9 @@ public abstract class Chess {
         int yModifier;
         GetMoveDirectionModifiers(mover, dir, out xModifier, out yModifier, teamSensitive);
 
+        bool xWrap = mover.hasXWrapping;
+        bool yWrap = mover.hasYWrapping;
+
         uint iter = 0;
         uint threats = 0;
         BoardCoord coord;
@@ -417,6 +420,8 @@ public abstract class Chess {
             iter++;
             x += xModifier;
             y += yModifier;
+            if (xWrap) x %= board.GetWidth();
+            if (yWrap) y %= board.GetHeight();
             coord = new BoardCoord(x, y);
 
             if (board.ContainsCoord(coord) == false) break;
@@ -450,6 +455,9 @@ public abstract class Chess {
         int xModifier = mover.TeamSensitiveMove(xVariance);
         int yModifier = mover.TeamSensitiveMove(yVariance);
 
+        bool xWrap = mover.hasXWrapping;
+        bool yWrap = mover.hasYWrapping;
+
         uint iter = 0;
         BoardCoord coord;
         List<BoardCoord> moves = new List<BoardCoord>();
@@ -457,6 +465,8 @@ public abstract class Chess {
             iter++;
             x += xModifier;
             y += yModifier;
+            if (xWrap) x %= board.GetWidth();
+            if (yWrap) y %= board.GetHeight();
             coord = new BoardCoord(x, y);
 
             if (board.ContainsCoord(coord) == false) break;

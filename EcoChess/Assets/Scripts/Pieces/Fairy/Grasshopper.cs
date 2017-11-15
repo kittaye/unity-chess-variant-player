@@ -8,6 +8,14 @@ public class Grasshopper : ChessPiece {
     public Grasshopper(Team team, string algebraicKeyPosition) : base(team, algebraicKeyPosition) {
         m_pieceType = Piece.Grasshopper;
     }
+    public Grasshopper(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping) 
+        : base(team, position, allowXWrapping, allowYWrapping) {
+        m_pieceType = Piece.Grasshopper;
+    }
+    public Grasshopper(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping)
+    : base(team, algebraicKeyPosition, allowXWrapping, allowYWrapping) {
+        m_pieceType = Piece.Grasshopper;
+    }
 
     public override string ToString() {
         return GetTeam() + "_Grasshopper";

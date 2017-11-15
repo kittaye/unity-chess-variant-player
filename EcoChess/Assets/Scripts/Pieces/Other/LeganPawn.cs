@@ -8,6 +8,12 @@ public class LeganPawn : Pawn {
 
     public LeganPawn(Team team, BoardCoord position) : base(team, position, false, 1) { }
     public LeganPawn(Team team, string algebraicKeyPosition) : base(team, algebraicKeyPosition, false, 1) { }
+    public LeganPawn(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping) 
+        : base(team, position, allowXWrapping, allowYWrapping) {
+    }
+    public LeganPawn(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping)
+        : base(team, algebraicKeyPosition, allowXWrapping, allowYWrapping) {
+    }
 
     public override List<BoardCoord> CalculateTemplateMoves() {
         List<BoardCoord> moves = new List<BoardCoord>();

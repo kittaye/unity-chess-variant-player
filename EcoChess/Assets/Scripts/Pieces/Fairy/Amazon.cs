@@ -7,6 +7,14 @@ public class Amazon : ChessPiece {
     public Amazon(Team team, string algebraicKeyPosition) : base(team, algebraicKeyPosition) {
         m_pieceType = Piece.Amazon;
     }
+    public Amazon(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping) 
+        : base(team, position, allowXWrapping, allowYWrapping) {
+        m_pieceType = Piece.Amazon;
+    }
+    public Amazon(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping)
+    : base(team, algebraicKeyPosition, allowXWrapping, allowYWrapping) {
+        m_pieceType = Piece.Amazon;
+    }
 
     public override string ToString() {
         return GetTeam() + "_Amazon";
