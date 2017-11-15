@@ -4,18 +4,30 @@ using UnityEngine;
 
 namespace ChessGameModes {
     public class DummyVariant : FIDERuleset {
-        private new const int BOARD_WIDTH = 8;
-        private new const int BOARD_HEIGHT = 8;
+        private new const int BOARD_WIDTH = 12;
+        private new const int BOARD_HEIGHT = 12;
 
-        public DummyVariant() : base(BOARD_WIDTH, BOARD_HEIGHT) { }
+        public DummyVariant() : base(BOARD_WIDTH, BOARD_HEIGHT) {
+            board.RemoveBoardCoordinates(new string[] { "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9", "a10", "a11" });
+            board.RemoveBoardCoordinates(new string[] { "l2", "l3", "l4", "l5", "l6", "l7", "l8", "l9", "l10", "l11" });
+            board.RemoveBoardCoordinates(new string[] { "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1", "j1", "k1" });
+            board.RemoveBoardCoordinates(new string[] { "b12", "c12", "d12", "e12", "f12", "g12", "h12", "i12", "j12", "k12" });
+
+            board.SetCustomBoardCoordinateKey("a1", "W1");
+            board.SetCustomBoardCoordinateKey("l1", "W2");
+            board.SetCustomBoardCoordinateKey("a12", "W3");
+            board.SetCustomBoardCoordinateKey("l12", "W4");
+
+            board.ResetAlgebraicKeys("b2", 10, 10);
+        }
 
         public override string ToString() {
             return "Dummy Variant";
         }
 
         public override void PopulateBoard() {
-            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(4, WHITE_BACKROW)));
-            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(4, BLACK_BACKROW)));
+            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(4, 2)));
+            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(4, BLACK_BACKROW - 2)));
 
             AddPieceToBoard(new Princess(Team.WHITE, new BoardCoord(3, 3)));
             AddPieceToBoard(new Empress(Team.WHITE, new BoardCoord(4, 3)));

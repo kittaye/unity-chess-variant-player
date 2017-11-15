@@ -239,7 +239,6 @@ public class Board {
         if (ContainsCoord(coordToChange)) {
             coordinates[coordToChange].algebraicKey = newAlgebraicKey;
             coordinates[coordToChange].boardChunk.name = newAlgebraicKey;
-
         }
     }
 }
