@@ -106,6 +106,7 @@
     <Compile Include="Assets\Scripts\Game Modes\Chigorin.cs" />
     <Compile Include="Assets\Scripts\Game Modes\DoubleChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\DummyVariant.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Extinction.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Embassy.cs" />
     <Compile Include="Assets\Scripts\Game Modes\FIDERuleset.cs" />
     <Compile Include="Assets\Scripts\Game Modes\GothicChess.cs" />
