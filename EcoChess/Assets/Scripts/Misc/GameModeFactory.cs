@@ -5,7 +5,7 @@ namespace ChessGameModes {
         ActiveChess, AlmostChess, AmazonChess, AndernachChess, AtomicChess, BalboChess, BerolinaChess, CapablancaChess,
         ChargeOfTheLightBrigadeChess, ChecklessChess, Chess960, ChigorinChess, DoubleChess, EmbassyChess, FIDE, GothicChess,
         GrandChess, GrasshopperChess, HalfChess, Horde, JanusChess, JesonMor, KingOfTheHill, Knightmate, LadderChess, LeganChess,
-        LosAlamosChess, LosingChess, Microchess, MongredienChess, MonsterChess, NightriderChess, OmegaChess, PawnEndgameChess,
+        LosAlamosChess, LosingChess, MaharajahChess, Microchess, MongredienChess, MonsterChess, NightriderChess, OmegaChess, PawnEndgameChess,
         PeasantsRevolt, PerfectChess, RacingKings, ReversedRoyals, ShiftedChess, Silverman4x5, SovereignChess, ThreeCheck, UpsidedownChess,
         Weak
     }
@@ -69,6 +69,8 @@ namespace ChessGameModes {
                     return new LosAlamos();
                 case GameMode.LosingChess:
                     return new LosingChess();
+                case GameMode.MaharajahChess:
+                    return new Maharajah();
                 case GameMode.Microchess:
                     return new Microchess();
                 case GameMode.MongredienChess:
