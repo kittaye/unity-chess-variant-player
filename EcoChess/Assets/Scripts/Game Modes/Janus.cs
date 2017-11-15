@@ -30,6 +30,14 @@ namespace ChessGameModes {
             return "Janus Chess";
         }
 
+        protected override List<ChessPiece> GetAllPossibleCheckThreats(ChessPiece pieceToCheck) {
+            List<ChessPiece> possibleCheckThreats = base.GetAllPossibleCheckThreats(pieceToCheck);
+
+            GetPiecesOfType<Princess>(pieceToCheck.GetOpposingTeam()).ForEach(x => { possibleCheckThreats.Add(x); });
+
+            return possibleCheckThreats;
+        }
+
         public override void PopulateBoard() {
             currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(5, WHITE_BACKROW)));
             opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(5, BLACK_BACKROW)));

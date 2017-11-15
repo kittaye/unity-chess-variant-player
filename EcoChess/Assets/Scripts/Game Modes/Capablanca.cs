@@ -62,6 +62,15 @@ namespace ChessGameModes {
             }
         }
 
+        protected override List<ChessPiece> GetAllPossibleCheckThreats(ChessPiece pieceToCheck) {
+            List<ChessPiece> possibleCheckThreats = base.GetAllPossibleCheckThreats(pieceToCheck);
+
+            GetPiecesOfType<Princess>(pieceToCheck.GetOpposingTeam()).ForEach(x => { possibleCheckThreats.Add(x); });
+            GetPiecesOfType<Empress>(pieceToCheck.GetOpposingTeam()).ForEach(x => { possibleCheckThreats.Add(x); });
+
+            return possibleCheckThreats;
+        }
+
         protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
             if (mover.GetBoardPosition().x == 2) {
                 if (mover.GetTeam() == Team.WHITE) {
