@@ -3,11 +3,11 @@
 namespace ChessGameModes {
     public enum GameMode {
         ActiveChess, AdvanceChess, AlmostChess, AmazonChess, AndernachChess, AtomicChess, BalboChess, BerolinaChess, CapablancaChess,
-        ChargeOfTheLightBrigadeChess, ChecklessChess, Chess960, ChigorinChess, DoubleChess, EmbassyChess, ExtinctionChess, FianchettoChess, FIDE,
-        GothicChess, GrandChess, GrasshopperChess, HalfChess, Horde, JanusChess, JesonMor, KingOfTheHill, Knightmate, LadderChess, LeganChess,
-        LosAlamosChess, LosingChess, MaharajahChess, Microchess, MongredienChess, MonsterChess, NightriderChess, OmegaChess, PawnEndgameChess,
-        PeasantsRevolt, PerfectChess, RacingKings, ReversedRoyals, ShiftedChess, Silverman4x5, SovereignChess, ThreeCheck, UpsidedownChess,
-        Weak
+        ChargeOfTheLightBrigadeChess, ChecklessChess, CheshireCatChess, Chess960, ChigorinChess, DoubleChess, EmbassyChess, ExtinctionChess,
+        FianchettoChess, FIDE, GothicChess, GrandChess, GrasshopperChess, HalfChess, Horde, JanusChess, JesonMor, KingOfTheHill, Knightmate,
+        LadderChess, LeganChess, LosAlamosChess, LosingChess, MaharajahChess, Microchess, MongredienChess, MonsterChess, NightriderChess,
+        OmegaChess, PawnEndgameChess, PeasantsRevolt, PerfectChess, RacingKings, ReversedRoyals, ShiftedChess, Silverman4x5, SovereignChess,
+        ThreeCheck, UpsidedownChess, Weak
     }
 
     public static class GameModeFactory {
@@ -35,6 +35,8 @@ namespace ChessGameModes {
                     return new ChargeOfTheLightBrigade();
                 case GameMode.ChecklessChess:
                     return new Checkless();
+                case GameMode.CheshireCatChess:
+                    return new CheshireCat();
                 case GameMode.Chess960:
                     return new Chess960();
                 case GameMode.ChigorinChess:

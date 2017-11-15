@@ -93,6 +93,7 @@
     <Compile Include="Assets\Scripts\Data Structures\BoardCoord.cs" />
     <Compile Include="Assets\Scripts\Data Structures\CoordInfo.cs" />
     <Compile Include="Assets\Scripts\Game Modes\ActiveChess.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\CheshireCat.cs" />
     <Compile Include="Assets\Scripts\Game Modes\AlmostChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\AmazonChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Andernach.cs" />
