@@ -7,10 +7,13 @@ public class GameManager : MonoBehaviour {
     public Chess chessGame { get; private set; }
     public static readonly int NUM_OF_VARIANTS = System.Enum.GetNames(typeof(GameMode)).Length;
 
+    public Camera mainCamera;
     public GameObject piecePrefab;
     public GameObject boardChunkPrefab;
+    public bool flipBoardEveryTurn = true;
 
     private static int modeIndex = 0;
+    private string lastTurnLabel;
     private UIManager ui;
 
     public static event System.Action _OnGameFinished;
@@ -24,12 +27,13 @@ public class GameManager : MonoBehaviour {
 
         chessGame = GameModeFactory.Create((GameMode)modeIndex);
         chessGame.PopulateBoard();
-        CenterCameraToBoard(chessGame.board);
     }
 
     private void Start() {
+        CenterCameraToBoard(chessGame.board);
         ui = UIManager.Instance;
         ui.CreatePawnPromotionOptions(((FIDERuleset)chessGame).pawnPromotionOptions);
+        lastTurnLabel = chessGame.GetCurrentTurnLabel();
     }
 
     private void Update() {
@@ -37,6 +41,13 @@ public class GameManager : MonoBehaviour {
             LoadNextVariant();
         } else if (Input.GetKeyDown(KeyCode.LeftArrow) && modeIndex != 0) {
             LoadPreviousVariant();
+        }
+    }
+
+    public void FlipBoard() {
+        mainCamera.transform.Rotate(new Vector3(0, 0, 180));
+        foreach (ChessPiece piece in chessGame.GetPieces(true)) {
+            piece.gameObject.transform.Rotate(new Vector3(0, 0, 180));
         }
     }
 
@@ -57,16 +68,21 @@ public class GameManager : MonoBehaviour {
     public void OnTurnComplete() {
         chessGame.OnTurnComplete();
         ui.OnTurnComplete();
+
         if (chessGame.CheckWinState()) {
             if (_OnGameFinished != null) _OnGameFinished.Invoke();
         }
+
+        if(flipBoardEveryTurn && chessGame.GetCurrentTurnLabel().ToString() != lastTurnLabel) {
+            FlipBoard();
+        }
+        lastTurnLabel = chessGame.GetCurrentTurnLabel().ToString();
     }
 
     private void CenterCameraToBoard(Board board) {
-        float tallestDim = (board.GetHeight() > board.GetWidth()) ? board.GetHeight() : board.GetWidth();
-        GameObject camera = FindObjectOfType<Camera>().gameObject;
-        camera.GetComponent<Camera>().orthographicSize = tallestDim / camera.GetComponent<Camera>().aspect;
-        camera.transform.position = new Vector3(board.GetWidth() / 2f - 0.5f, board.GetHeight() / 2f - 0.5f, camera.gameObject.transform.position.z);
+        float tallestDim = Mathf.Max(board.GetHeight(), board.GetWidth());
+        mainCamera.orthographicSize = tallestDim / mainCamera.aspect;
+        mainCamera.transform.position = new Vector3(board.GetWidth() / 2f - 0.5f, board.GetHeight() / 2f - 0.5f, mainCamera.gameObject.transform.position.z);
     }
 
     public void InstantiateChessPiece(ChessPiece piece) {

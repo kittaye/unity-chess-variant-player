@@ -184,8 +184,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c6bfa004e2ebea47b71f975d136b250, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainCamera: {fileID: 810617034}
   piecePrefab: {fileID: 173496, guid: 5f8cfefe9184da24a90f4947748ea72a, type: 2}
   boardChunkPrefab: {fileID: 173496, guid: edfb46d4082747b418994fa4f068aba8, type: 2}
+  flipBoardEveryTurn: 1
 --- !u!1 &65124308
 GameObject:
   m_ObjectHideFlags: 0
