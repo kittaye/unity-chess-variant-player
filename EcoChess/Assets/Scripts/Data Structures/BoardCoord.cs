@@ -5,7 +5,7 @@ using System;
 public struct BoardCoord {
     public int x;
     public int y;
-    public static BoardCoord NULL = new BoardCoord(-1, -1);
+    public static BoardCoord NULL = new BoardCoord(int.MinValue, int.MinValue);
 
     public BoardCoord(int x, int y) {
         this.x = x;

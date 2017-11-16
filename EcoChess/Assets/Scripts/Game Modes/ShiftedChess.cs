@@ -127,9 +127,9 @@ namespace ChessGameModes {
 
         protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
             if (mover.GetBoardPosition().x == 1) {
-                aSideBlackRook = PerformCastle(aSideBlackRook, new BoardCoord(2, mover.GetBoardPosition().y));
+                aSideBlackRook = (Rook)PerformCastle(aSideBlackRook, new BoardCoord(2, mover.GetBoardPosition().y));
             } else if (mover.GetBoardPosition().x == 7) {
-                hSideWhiteRook = PerformCastle(hSideWhiteRook, new BoardCoord(6, mover.GetBoardPosition().y));
+                hSideWhiteRook = (Rook)PerformCastle(hSideWhiteRook, new BoardCoord(6, mover.GetBoardPosition().y));
             }
         }
     }

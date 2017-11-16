@@ -18,6 +18,20 @@ public class Pawn : ChessPiece {
         this.canEnPassantCapture = canEnPassantCapture;
         this.initialMoveLimit = initialMoveLimit;
     }
+    public Pawn(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping, bool canEnPassantCapture = true, uint initialMoveLimit = 2) 
+        : base(team, position, allowXWrapping, allowYWrapping) {
+        m_pieceType = Piece.Pawn;
+        this.validEnPassant = false;
+        this.canEnPassantCapture = canEnPassantCapture;
+        this.initialMoveLimit = initialMoveLimit;
+    }
+    public Pawn(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping, bool canEnPassantCapture = true, uint initialMoveLimit = 2)
+    : base(team, algebraicKeyPosition, allowXWrapping, allowYWrapping) {
+        m_pieceType = Piece.Pawn;
+        this.validEnPassant = false;
+        this.canEnPassantCapture = canEnPassantCapture;
+        this.initialMoveLimit = initialMoveLimit;
+    }
 
     public override string ToString() {
         return GetTeam() + "_Pawn";

@@ -30,7 +30,7 @@ public class Board {
 
     private GameObject InstantiateGameBoard() {
         if (this.GetWidth() > MAX_DIM || this.GetHeight() > MAX_DIM) {
-            Debug.LogWarning(string.Format("Board dimensions greater than {0} will not have naming support.", MAX_DIM));
+            Debug.LogError(string.Format("Board dimensions greater than {0} are not allowed.", MAX_DIM));
         }
 
         GameObject gameBoardObj = new GameObject("Board");
@@ -105,6 +105,21 @@ public class Board {
         return null;
     }
 
+    /// <summary>
+    /// Retrieves the details of a coordinate on the board.
+    /// </summary>
+    /// <param name="algebraicKey">Algebraic key value to search for.</param>
+    /// <returns></returns>
+    public CoordInfo GetCoordInfo(string algebraicKey) {
+        BoardCoord coord;
+        if (TryGetCoordWithKey(algebraicKey, out coord)) {
+            return coordinates[coord];
+        }
+
+        Debug.LogErrorFormat("ERROR: The GameBoard does not contain a CoordInfo for coordinate key: {0}", algebraicKey);
+        return null;
+    }
+
     public int GetHeight() {
         return (int)boardHeight;
     }
@@ -117,10 +132,15 @@ public class Board {
         return coordinates.ContainsKey(coord);
     }
 
+    public bool ContainsCoord(string coordKey) {
+        BoardCoord c;
+        return TryGetCoordWithKey(coordKey, out c);
+    }
+
     public bool RemoveBoardCoordinates(string coordKey) {
         BoardCoord coord;
         if (TryGetCoordWithKey(coordKey, out coord)) {
-            GetCoordInfo(coord).boardChunk.SetActive(false);
+            MonoBehaviour.Destroy(GetCoordInfo(coord).boardChunk);
             coordinates.Remove(coord);
             return true;
         }
@@ -131,7 +151,7 @@ public class Board {
         for (int i = 0; i < coordKeys.Length; i++) {
             BoardCoord coord;
             if (TryGetCoordWithKey(coordKeys[i], out coord)) {
-                GetCoordInfo(coord).boardChunk.SetActive(false);
+                MonoBehaviour.Destroy(GetCoordInfo(coord).boardChunk);
                 coordinates.Remove(coord);
             }
         }
@@ -139,7 +159,7 @@ public class Board {
 
     public bool RemoveBoardCoordinates(BoardCoord coord) {
         if (ContainsCoord(coord)) {
-            GetCoordInfo(coord).boardChunk.SetActive(false);
+            MonoBehaviour.Destroy(GetCoordInfo(coord).boardChunk);
             coordinates.Remove(coord);
             return true;
         }
@@ -149,27 +169,11 @@ public class Board {
     public void RemoveBoardCoordinates(BoardCoord[] coords) {
         for (int i = 0; i < coords.Length; i++) {
             if (ContainsCoord(coords[i])) {
-                GetCoordInfo(coords[i]).boardChunk.SetActive(false);
+                MonoBehaviour.Destroy(GetCoordInfo(coords[i]).boardChunk);
                 coordinates.Remove(coords[i]);
             }
         }
     }
-
-    public bool AddCustomBoardCoordinate(BoardCoord coord, string algebraicCode) {
-        if (ContainsCoord(coord)) {
-            Debug.LogErrorFormat("Board already contains coord: {0}. Cannot add to board.", coord.ToString());
-            return false;
-        }
-        foreach (KeyValuePair<BoardCoord, CoordInfo> item in coordinates) {
-            if (item.Value.algebraicKey.Equals(algebraicCode)) {
-                Debug.LogErrorFormat("Board already contains algebraic code: {0}. Cannot add to board.", algebraicCode);
-            }
-            return false;
-        }
-        coordinates.Add(coord, new CoordInfo(algebraicCode));
-        return true;
-    }
-
 
     public void HighlightCoordinates(BoardCoord[] coords) {
         RemoveHighlightedCoordinates();
@@ -189,5 +193,52 @@ public class Board {
             }
         }
         highlightedCoords.Clear();
+    }
+
+    public void SetCustomBoardAlgebraicKeys(BoardCoord coordToStartFrom, int stopAfterXPos, int stopAfterYPos) {
+        if (stopAfterXPos >= MAX_DIM || stopAfterYPos >= MAX_DIM || coordToStartFrom.x >= MAX_DIM || coordToStartFrom.y >= MAX_DIM) {
+            Debug.LogError(string.Format("Board dimensions greater than {0} are not allowed.", MAX_DIM));
+        } else if (coordToStartFrom.x < 0 || coordToStartFrom.y < 0) {
+            Debug.LogError("Starting boardcoord values are undefined! Do not use negative numbers.");
+        }
+
+        for (int y = coordToStartFrom.y; y <= stopAfterYPos; y++) {
+            for (int x = coordToStartFrom.x; x <= stopAfterXPos; x++) {
+                SetCustomBoardCoordinateKey(new BoardCoord(x, y), boardLetters[x - coordToStartFrom.x] + boardNumbers[y - coordToStartFrom.y]);
+            }
+        }
+    }
+
+    public void ResetAlgebraicKeys(string coordKeyToStartFrom, int stopAfterXPos, int stopAfterYPos) {
+        BoardCoord coordToStartFrom;
+        if(TryGetCoordWithKey(coordKeyToStartFrom, out coordToStartFrom) == false) {
+            return;
+        }
+        if (stopAfterXPos >= MAX_DIM || stopAfterYPos >= MAX_DIM || coordToStartFrom.x >= MAX_DIM || coordToStartFrom.y >= MAX_DIM) {
+            Debug.LogError(string.Format("Board dimensions greater than {0} are not allowed.", MAX_DIM));
+        } else if (coordToStartFrom.x < 0 || coordToStartFrom.y < 0) {
+            Debug.LogError("Starting boardcoord values are undefined! Do not use negative numbers.");
+        }
+
+        for (int y = coordToStartFrom.y; y <= stopAfterYPos; y++) {
+            for (int x = coordToStartFrom.x; x <= stopAfterXPos; x++) {
+                SetCustomBoardCoordinateKey(new BoardCoord(x, y), boardLetters[x - coordToStartFrom.x] + boardNumbers[y - coordToStartFrom.y]);
+            }
+        }
+    }
+
+    public void SetCustomBoardCoordinateKey(string coordToChange, string newAlgebraicKey) {
+        CoordInfo coordInfo = GetCoordInfo(coordToChange);
+        if(coordInfo != null) {
+            coordInfo.algebraicKey = newAlgebraicKey;
+            coordInfo.boardChunk.name = newAlgebraicKey;
+        }
+    }
+
+    public void SetCustomBoardCoordinateKey(BoardCoord coordToChange, string newAlgebraicKey) {
+        if (ContainsCoord(coordToChange)) {
+            coordinates[coordToChange].algebraicKey = newAlgebraicKey;
+            coordinates[coordToChange].boardChunk.name = newAlgebraicKey;
+        }
     }
 }

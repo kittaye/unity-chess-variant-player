@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2017
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EcoChess.Plugins", "EcoChess.Plugins.csproj", "{2E73344C-056B-DA86-9DCA-9F75FAB0A2C3}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EcoChess", "EcoChess.csproj", "{734B794F-6BC6-9DA1-3E54-B52910827DDB}"
 EndProject
 Global
@@ -11,10 +9,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2E73344C-056B-DA86-9DCA-9F75FAB0A2C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2E73344C-056B-DA86-9DCA-9F75FAB0A2C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2E73344C-056B-DA86-9DCA-9F75FAB0A2C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2E73344C-056B-DA86-9DCA-9F75FAB0A2C3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{734B794F-6BC6-9DA1-3E54-B52910827DDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{734B794F-6BC6-9DA1-3E54-B52910827DDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{734B794F-6BC6-9DA1-3E54-B52910827DDB}.Release|Any CPU.ActiveCfg = Release|Any CPU

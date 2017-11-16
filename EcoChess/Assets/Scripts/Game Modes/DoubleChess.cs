@@ -94,15 +94,15 @@ namespace ChessGameModes {
         protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
             if (mover.GetBoardPosition().x == 2) {
                 if (mover.GetTeam() == Team.WHITE) {
-                    aSideWhiteRook = PerformCastle(aSideWhiteRook, new BoardCoord(3, mover.GetBoardPosition().y));
+                    aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(3, mover.GetBoardPosition().y));
                 } else {
-                    aSideBlackRook = PerformCastle(aSideBlackRook, new BoardCoord(3, mover.GetBoardPosition().y));
+                    aSideBlackRook = (Rook)PerformCastle(aSideBlackRook, new BoardCoord(3, mover.GetBoardPosition().y));
                 }
             } else if (mover.GetBoardPosition().x == 14) {
                 if (mover.GetTeam() == Team.WHITE) {
-                    hSideWhiteRook = PerformCastle(hSideWhiteRook, new BoardCoord(13, mover.GetBoardPosition().y));
+                    hSideWhiteRook = (Rook)PerformCastle(hSideWhiteRook, new BoardCoord(13, mover.GetBoardPosition().y));
                 } else {
-                    hSideBlackRook = PerformCastle(hSideBlackRook, new BoardCoord(13, mover.GetBoardPosition().y));
+                    hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(13, mover.GetBoardPosition().y));
                 }
             }
         }
@@ -148,7 +148,7 @@ namespace ChessGameModes {
                         if (board.ContainsCoord(coord)) {
                             ChessPiece piece = board.GetCoordInfo(coord).occupier;
                             if (piece != null) {
-                                if (piece is Pawn && piece == lastMovedPiece && ((Pawn)piece).validEnPassant) {
+                                if (piece is Pawn && piece == LastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
                                     if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
                                         return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1));
                                     }

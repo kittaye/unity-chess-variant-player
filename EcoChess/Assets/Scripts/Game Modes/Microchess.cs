@@ -7,7 +7,7 @@ namespace ChessGameModes {
     /// 
     /// Winstate: Checkmate.
     /// Piece types: Orthodox.
-    /// Piece rules: No castling, no pawn double moves.
+    /// Piece rules: No castling, no pawn double moves, no enpassant.
     /// Board layout:
     ///     k n b r
     ///     p . . .
@@ -43,21 +43,20 @@ namespace ChessGameModes {
         }
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            BoardCoord oldPos = mover.GetBoardPosition();
-
             // Try make the move
             if (MakeMove(mover, destination)) {
                 // Check castling moves
                 if (mover is King && mover.MoveCount == 1) {
                     if (mover.GetBoardPosition() == new BoardCoord(1, WHITE_BACKROW)) {
-                        aSideWhiteRook = PerformCastle(aSideWhiteRook, new BoardCoord(2, WHITE_BACKROW));
+                        aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(2, WHITE_BACKROW));
                     } else if (mover.GetBoardPosition() == new BoardCoord(2, BLACK_BACKROW)) {
-                        hSideBlackRook = PerformCastle(hSideBlackRook, new BoardCoord(1, BLACK_BACKROW));
+                        hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(1, BLACK_BACKROW));
                     }
                 } else if (mover is Pawn) {
-                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
-                    CheckPawnEnPassantCapture((Pawn)mover);
-                    CheckPawnPromotion((Pawn)mover);
+                    ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
+                    if (promotedPiece != null) {
+                        mover = promotedPiece;
+                    }
                 }
                 return true;
             }

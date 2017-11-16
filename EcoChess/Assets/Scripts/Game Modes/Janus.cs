@@ -30,6 +30,14 @@ namespace ChessGameModes {
             return "Janus Chess";
         }
 
+        protected override List<ChessPiece> GetAllPossibleCheckThreats(ChessPiece pieceToCheck) {
+            List<ChessPiece> possibleCheckThreats = base.GetAllPossibleCheckThreats(pieceToCheck);
+
+            GetPiecesOfType<Princess>(pieceToCheck.GetOpposingTeam()).ForEach(x => { possibleCheckThreats.Add(x); });
+
+            return possibleCheckThreats;
+        }
+
         public override void PopulateBoard() {
             currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(5, WHITE_BACKROW)));
             opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(5, BLACK_BACKROW)));
@@ -62,15 +70,15 @@ namespace ChessGameModes {
         protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
             if (mover.GetBoardPosition().x == 2) {
                 if (mover.GetTeam() == Team.WHITE) {
-                    aSideWhiteRook = PerformCastle(aSideWhiteRook, new BoardCoord(3, mover.GetBoardPosition().y));
+                    aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(3, mover.GetBoardPosition().y));
                 } else {
-                    aSideBlackRook = PerformCastle(aSideBlackRook, new BoardCoord(3, mover.GetBoardPosition().y));
+                    aSideBlackRook = (Rook)PerformCastle(aSideBlackRook, new BoardCoord(3, mover.GetBoardPosition().y));
                 }
             } else if (mover.GetBoardPosition().x == 8) {
                 if (mover.GetTeam() == Team.WHITE) {
-                    hSideWhiteRook = PerformCastle(hSideWhiteRook, new BoardCoord(7, mover.GetBoardPosition().y));
+                    hSideWhiteRook = (Rook)PerformCastle(hSideWhiteRook, new BoardCoord(7, mover.GetBoardPosition().y));
                 } else {
-                    hSideBlackRook = PerformCastle(hSideBlackRook, new BoardCoord(7, mover.GetBoardPosition().y));
+                    hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(7, mover.GetBoardPosition().y));
                 }
             }
         }

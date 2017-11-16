@@ -28,7 +28,7 @@ namespace ChessGameModes {
 
         public override void OnTurnComplete() {
             base.OnTurnComplete();
-            if(currentTeamTurn == Team.WHITE) {
+            if(GetCurrentTeamTurn() == Team.WHITE) {
                 selectedPawnPromotion = Piece.Queen;
             } else {
                 selectedPawnPromotion = Piece.Knight;

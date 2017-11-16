@@ -10,6 +10,8 @@ public abstract class ChessPiece {
     public int MoveCount { get; private set; }
     public int CaptureCount { get; set; }
     public bool IsAlive { get; set; }
+    public bool hasXWrapping { get; set; }
+    public bool hasYWrapping { get; set; }
 
     protected Chess chessGame;
 
@@ -19,6 +21,8 @@ public abstract class ChessPiece {
         m_BoardPosition = position;
         MoveCount = 0;
         IsAlive = false;
+        hasXWrapping = false;
+        hasYWrapping = false;
     }
 
     public ChessPiece(Team team, string algebraicKeyPosition) {
@@ -30,6 +34,31 @@ public abstract class ChessPiece {
         }
         MoveCount = 0;
         IsAlive = false;
+        hasXWrapping = false;
+        hasYWrapping = false;
+    }
+
+    public ChessPiece(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping) {
+        chessGame = GameManager.Instance.chessGame;
+        m_Team = team;
+        m_BoardPosition = position;
+        MoveCount = 0;
+        IsAlive = false;
+        this.hasXWrapping = allowXWrapping;
+        this.hasYWrapping = allowYWrapping;
+    }
+
+    public ChessPiece(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping) {
+        chessGame = GameManager.Instance.chessGame;
+        m_Team = team;
+        BoardCoord position = BoardCoord.NULL;
+        if (chessGame.board.TryGetCoordWithKey(algebraicKeyPosition, out position)) {
+            m_BoardPosition = position;
+        }
+        MoveCount = 0;
+        IsAlive = false;
+        this.hasXWrapping = allowXWrapping;
+        this.hasYWrapping = allowYWrapping;
     }
 
     public abstract List<BoardCoord> CalculateTemplateMoves();
