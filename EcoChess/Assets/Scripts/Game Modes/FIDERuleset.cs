@@ -189,7 +189,7 @@ namespace ChessGameModes {
             if (MakeMove(mover, destination)) {
                 // Check castling moves
                 if (mover is King && mover.MoveCount == 1) {
-                    PerformCastlingRookMove(mover);
+                    TryPerformCastlingRookMoves(mover);
                 } else if (mover is Pawn) {
                     ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
                     CheckPawnEnPassantCapture((Pawn)mover);
@@ -207,7 +207,7 @@ namespace ChessGameModes {
         /// Called in MovePiece. If a castling move was played, this method will perform the castle.
         /// </summary>
         /// <param name="mover">Piece to perform the castling move.</param>
-        protected virtual void PerformCastlingRookMove(ChessPiece mover) {
+        protected virtual void TryPerformCastlingRookMoves(ChessPiece mover) {
             if (mover.GetBoardPosition().x == 2) {
                 if (mover.GetTeam() == Team.WHITE) {
                     aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(3, mover.GetBoardPosition().y));
