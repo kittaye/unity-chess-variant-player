@@ -73,7 +73,7 @@ public class GameManager : MonoBehaviour {
             if (_OnGameFinished != null) _OnGameFinished.Invoke();
         }
 
-        if(flipBoardEveryTurn && chessGame.GetCurrentTurnLabel().ToString() != lastTurnLabel) {
+        if(chessGame.allowBoardFlipping && flipBoardEveryTurn && chessGame.GetCurrentTurnLabel().ToString() != lastTurnLabel) {
             FlipBoard();
         }
         lastTurnLabel = chessGame.GetCurrentTurnLabel().ToString();
