@@ -477,7 +477,7 @@ namespace ChessGameModes {
 
                         // Else try perform castling move.
                     } else if (mover.MoveCount == 1) {
-                        TryPerformCastlingRookMoves(mover);
+                        PerformCastlingRookMove(mover);
                     } 
                 } else if (mover is Pawn) {
                     if (mover is SovereignPawn) UpdatePawnQuadrant((SovereignPawn)mover);
@@ -640,7 +640,7 @@ namespace ChessGameModes {
             return new BoardCoord[0];
         }
 
-        protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
+        protected override void PerformCastlingRookMove(ChessPiece mover) {
             if (mover.GetBoardPosition().x < 7) {
                 if (GetTeamOwnedColour(mover) == whiteCurrentOwnedColour) {
                     aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(mover.GetBoardPosition().x + 1, mover.GetBoardPosition().y));

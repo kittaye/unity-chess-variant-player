@@ -71,7 +71,7 @@ namespace ChessGameModes {
             return possibleCheckThreats;
         }
 
-        protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
+        protected override void PerformCastlingRookMove(ChessPiece mover) {
             if (mover.GetBoardPosition().x == 2) {
                 if (mover.GetTeam() == Team.WHITE) {
                     aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(3, mover.GetBoardPosition().y));
