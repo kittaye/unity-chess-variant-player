@@ -8,6 +8,7 @@ public abstract class Chess {
     public ChessPiece lastMovedWhitePiece { get; protected set; }
     public ChessPiece lastMovedBlackPiece { get; protected set; }
     public Board board { get; private set; }
+    public bool allowBoardFlipping;
 
     private List<ChessPiece> whitePieces;
     private List<ChessPiece> blackPieces;
@@ -24,6 +25,7 @@ public abstract class Chess {
         currentTeamTurn = Team.WHITE;
         opposingTeamTurn = Team.BLACK;
         numConsecutiveCapturelessMoves = 0;
+        allowBoardFlipping = true;
     }
 
     public Chess(uint width, uint height, Color primaryBoardColour, Color secondaryBoardColour) {
@@ -35,6 +37,7 @@ public abstract class Chess {
         currentTeamTurn = Team.WHITE;
         opposingTeamTurn = Team.BLACK;
         numConsecutiveCapturelessMoves = 0;
+        allowBoardFlipping = true;
     }
 
     /// <summary>
