@@ -1,1 +1,1 @@
-To play with this tool, download the latest version and ensure files are all in the same directory. Then run the exe to start.
+To play with this tool, download the latest version at https://kittaye.wordpress.com/category/downloads/ and ensure downloaded files are all in the same directory. Then run the unity exe to start.
