@@ -5,6 +5,7 @@ using System.Text;
 
 public class Board {
     public GameObject gameBoardObj { get; private set; }
+    public bool isFlipped;
 
     private readonly uint boardWidth;
     private readonly uint boardHeight;
@@ -21,6 +22,7 @@ public class Board {
         coordinates = new Dictionary<BoardCoord, CoordInfo>();
         boardWidth = width;
         boardHeight = height;
+        isFlipped = false;
         this.primaryBoardColour = primaryBoardColour;
         this.secondaryBoardColour = secondaryBoardColour;
 

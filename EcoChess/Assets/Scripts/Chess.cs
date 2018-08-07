@@ -313,6 +313,9 @@ public abstract class Chess {
             if (piece.GetTeam() == Team.WHITE) {
                 whitePieces.Add(piece);
             } else {
+                if (board.isFlipped) {
+                    piece.gameObject.transform.Rotate(new Vector3(0, 0, 180));
+                }
                 blackPieces.Add(piece);
             }
             return piece;

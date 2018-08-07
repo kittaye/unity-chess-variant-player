@@ -45,6 +45,7 @@ public class GameManager : MonoBehaviour {
     }
 
     public void FlipBoard() {
+        chessGame.board.isFlipped = !chessGame.board.isFlipped;
         mainCamera.transform.Rotate(new Vector3(0, 0, 180));
         foreach (ChessPiece piece in chessGame.GetPieces(true)) {
             piece.gameObject.transform.Rotate(new Vector3(0, 0, 180));
