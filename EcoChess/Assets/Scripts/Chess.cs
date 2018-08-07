@@ -5,16 +5,18 @@ public enum Team { WHITE, BLACK }
 public enum MoveDirection { Up, Down, Left, Right, UpLeft, UpRight, DownLeft, DownRight }
 
 public abstract class Chess {
-    public ChessPiece lastMovedWhitePiece { get; protected set; }
-    public ChessPiece lastMovedBlackPiece { get; protected set; }
+
     public Board board { get; private set; }
     public bool allowBoardFlipping;
 
-    private List<ChessPiece> whitePieces;
-    private List<ChessPiece> blackPieces;
     protected Team currentTeamTurn;
     protected Team opposingTeamTurn;
     protected uint numConsecutiveCapturelessMoves { get; private set; }
+
+    private List<ChessPiece> whitePieces;
+    private List<ChessPiece> blackPieces;
+    private ChessPiece lastMovedWhitePiece;
+    private ChessPiece lastMovedBlackPiece;
 
     public Chess(uint width, uint height) {
         board = new Board(width, height, new Color(0.9f, 0.9f, 0.9f), new Color(0.1f, 0.1f, 0.1f));
@@ -72,6 +74,24 @@ public abstract class Chess {
 
     public Team GetOpposingTeamTurn() {
         return opposingTeamTurn;
+    }
+
+    public ChessPiece GetTeamLastMovedPiece(Team team) {
+        if(team == Team.WHITE) {
+            return lastMovedWhitePiece;
+        } else {
+            return lastMovedBlackPiece;
+        }
+    }
+
+    public void SetTeamLastMovedPiece(ChessPiece piece) {
+        if (piece != null) {
+            if (piece.GetTeam() == Team.WHITE) {
+                lastMovedWhitePiece = piece;
+            } else {
+                lastMovedBlackPiece = piece;
+            }
+        }
     }
 
     /// <summary>
@@ -212,6 +232,31 @@ public abstract class Chess {
     }
 
     /// <summary>
+    /// Adds a chess piece to a team based on it's own team value.
+    /// </summary>
+    /// <param name="piece">Piece to add.</param>
+    protected void AddPieceToActiveTeam(ChessPiece piece) {
+        if (piece.GetTeam() == Team.WHITE) {
+            whitePieces.Add(piece);
+        } else {
+            blackPieces.Add(piece);
+        }
+    }
+
+    /// <summary>
+    /// Removes a chess piece from it's team.
+    /// </summary>
+    /// <param name="piece">Piece to remove.</param>
+    /// <returns>True if the removal was successful.</returns>
+    protected bool RemovePieceFromActiveTeam(ChessPiece piece) {
+        if (piece.GetTeam() == Team.WHITE) {
+            return whitePieces.Remove(piece);
+        } else {
+            return blackPieces.Remove(piece);
+        }
+    }
+
+    /// <summary>
     /// Used to update the occupiers of affected squares after a move is played.
     /// </summary>
     /// <param name="previousPosition"></param>
@@ -234,7 +279,7 @@ public abstract class Chess {
     /// </summary>
     /// <param name="mover"></param>
     /// <param name="destination"></param>
-    /// <returns></returns>
+    /// <returns>Returns true if the move was successful.</returns>
     protected bool MakeMove(ChessPiece mover, BoardCoord destination) {
         BoardCoord previousPosition = mover.GetBoardPosition();
         bool wasThreat = IsThreat(mover, destination);
@@ -243,10 +288,7 @@ public abstract class Chess {
             if (wasThreat) mover.CaptureCount++;
             numConsecutiveCapturelessMoves = (wasThreat == false && (mover is Pawn) == false) ? numConsecutiveCapturelessMoves + 1 : 0;
             UpdateSquareOccupiers(previousPosition, mover.GetBoardPosition());
-            if (mover.GetTeam() == Team.WHITE)
-                lastMovedWhitePiece = mover;
-            else
-                lastMovedBlackPiece = mover;
+            SetTeamLastMovedPiece(mover);
             return true;
         }
         return false;
@@ -273,31 +315,6 @@ public abstract class Chess {
             return true;
         }
         return false;
-    }
-
-    /// <summary>
-    /// Removes a chess piece from it's team.
-    /// </summary>
-    /// <param name="piece">Piece to remove.</param>
-    /// <returns>True if the removal was successful.</returns>
-    protected bool RemovePieceFromActiveTeam(ChessPiece piece) {
-        if (piece.GetTeam() == Team.WHITE) {
-            return whitePieces.Remove(piece);
-        } else {
-            return blackPieces.Remove(piece);
-        }
-    }
-
-    /// <summary>
-    /// Adds a chess piece to a team based on it's own team value.
-    /// </summary>
-    /// <param name="piece">Piece to add.</param>
-    protected void AddPieceToActiveTeam(ChessPiece piece) {
-        if (piece.GetTeam() == Team.WHITE) {
-            whitePieces.Add(piece);
-        } else {
-            blackPieces.Add(piece);
-        }
     }
 
     /// <summary>
@@ -370,14 +387,13 @@ public abstract class Chess {
     protected void SimulateMove(ChessPiece mover, BoardCoord dest, ChessPiece originalOccupier, out ChessPiece originalLastMover) {
         originalLastMover = null;
         if (AssertContainsCoord(dest)) {
-            if (mover.GetTeam() == Team.WHITE) {
-                if (lastMovedWhitePiece != null) originalLastMover = lastMovedWhitePiece;
-                lastMovedWhitePiece = mover;
-            } else {
-                if (lastMovedBlackPiece != null) originalLastMover = lastMovedBlackPiece;
-                lastMovedBlackPiece = mover;
+            originalLastMover = GetTeamLastMovedPiece(mover.GetTeam());
+            SetTeamLastMovedPiece(mover);
+
+            if (originalOccupier != null) {
+                originalOccupier.IsAlive = false;
             }
-            if (originalOccupier != null) originalOccupier.IsAlive = false;
+
             board.GetCoordInfo(mover.GetBoardPosition()).occupier = null;
             board.GetCoordInfo(dest).occupier = mover;
             mover.SetBoardPosition(dest);
@@ -396,16 +412,15 @@ public abstract class Chess {
         if (AssertContainsCoord(dest)) {
             mover.SetBoardPosition(oldPos);
             board.GetCoordInfo(mover.GetBoardPosition()).occupier = mover;
+
             if (originalOccupier != null) {
                 originalOccupier.IsAlive = true;
                 board.GetCoordInfo(dest).occupier = originalOccupier;
             } else {
                 board.GetCoordInfo(dest).occupier = null;
             }
-            if (mover.GetTeam() == Team.WHITE)
-                lastMovedWhitePiece = originalLastMover;
-            else
-                lastMovedBlackPiece = originalLastMover;
+
+            SetTeamLastMovedPiece(originalLastMover);
         }
     }
 

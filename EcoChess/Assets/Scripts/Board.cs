@@ -36,13 +36,14 @@ public class Board {
         }
 
         GameObject gameBoardObj = new GameObject("Board");
+        GameObject boardChunkObj = GameManager.Instance.boardChunkPrefab;
 
         //Create the board from the bottom up, row by row.
         for (int y = 0; y < this.GetHeight(); y++) {
             for (int x = 0; x < this.GetWidth(); x++) {
                 //Instantiate board piece at (x,y) and parent it to the board.
                 GameObject go = MonoBehaviour.Instantiate
-                    (GameManager.Instance.boardChunkPrefab, new Vector3(x, y), GameManager.Instance.boardChunkPrefab.transform.rotation, gameBoardObj.transform);
+                    (boardChunkObj, new Vector3(x, y), boardChunkObj.transform.rotation, gameBoardObj.transform);
 
                 //Rename piece to match the board coordinate its on.
                 coordinates.Add(new BoardCoord(x, y), new CoordInfo(boardLetters[x] + boardNumbers[y], go));

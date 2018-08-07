@@ -433,9 +433,9 @@ namespace ChessGameModes {
 
         protected ChessPiece LastMovedOpposingPiece(ChessPiece mover) {
             if(mover.GetTeam() == Team.WHITE) {
-                return lastMovedBlackPiece;
+                return GetTeamLastMovedPiece(Team.BLACK);
             } else {
-                return lastMovedWhitePiece;
+                return GetTeamLastMovedPiece(Team.WHITE);
             }
         }
 
