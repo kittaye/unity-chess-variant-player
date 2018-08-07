@@ -310,13 +310,10 @@ public abstract class Chess {
             board.GetCoordInfo(piece.GetBoardPosition()).occupier = piece;
             piece.IsAlive = true;
             GameManager.Instance.InstantiateChessPiece(piece);
-            if (piece.GetTeam() == Team.WHITE) {
-                whitePieces.Add(piece);
-            } else {
-                if (board.isFlipped) {
-                    piece.gameObject.transform.Rotate(new Vector3(0, 0, 180));
-                }
-                blackPieces.Add(piece);
+            AddPieceToActiveTeam(piece);
+
+            if (piece.GetTeam() == Team.BLACK && board.isFlipped) {
+                piece.gameObject.transform.Rotate(new Vector3(0, 0, 180));
             }
             return piece;
         }
