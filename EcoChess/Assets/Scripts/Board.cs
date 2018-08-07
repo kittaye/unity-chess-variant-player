@@ -42,8 +42,7 @@ public class Board {
             for (int x = 0; x < this.GetWidth(); x++) {
                 //Instantiate board piece at (x,y) and parent it to the board.
                 GameObject go = MonoBehaviour.Instantiate
-                    (GameManager.Instance.boardChunkPrefab, new Vector3(x, y), GameManager.Instance.boardChunkPrefab.transform.rotation);
-                go.transform.SetParent(gameBoardObj.transform);
+                    (GameManager.Instance.boardChunkPrefab, new Vector3(x, y), GameManager.Instance.boardChunkPrefab.transform.rotation, gameBoardObj.transform);
 
                 //Rename piece to match the board coordinate its on.
                 coordinates.Add(new BoardCoord(x, y), new CoordInfo(boardLetters[x] + boardNumbers[y], go));
@@ -151,11 +150,7 @@ public class Board {
 
     public void RemoveBoardCoordinates(string[] coordKeys) {
         for (int i = 0; i < coordKeys.Length; i++) {
-            BoardCoord coord;
-            if (TryGetCoordWithKey(coordKeys[i], out coord)) {
-                MonoBehaviour.Destroy(GetCoordInfo(coord).boardChunk);
-                coordinates.Remove(coord);
-            }
+            RemoveBoardCoordinates(coordKeys[i]);
         }
     }
 
@@ -170,10 +165,7 @@ public class Board {
 
     public void RemoveBoardCoordinates(BoardCoord[] coords) {
         for (int i = 0; i < coords.Length; i++) {
-            if (ContainsCoord(coords[i])) {
-                MonoBehaviour.Destroy(GetCoordInfo(coords[i]).boardChunk);
-                coordinates.Remove(coords[i]);
-            }
+            RemoveBoardCoordinates(coords[i]);
         }
     }
 
