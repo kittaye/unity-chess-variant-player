@@ -17,7 +17,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     R # B Q K B N R
     /// </summary>
-    public class NightriderChess : FIDERuleset {
+    public class NightriderChess : Chess {
         public NightriderChess() : base() {
             pawnPromotionOptions = new Piece[5] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight, Piece.Nightrider };
         }

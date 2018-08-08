@@ -17,7 +17,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     . . . . K . . .
     /// </summary>
-    public class PawnEndgame : FIDERuleset {
+    public class PawnEndgame : Chess {
         public PawnEndgame() : base() { }
 
         public override string ToString() {

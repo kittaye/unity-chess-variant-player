@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace ChessGameModes {
-    public class DummyVariant : FIDERuleset {
+    public class DummyVariant : Chess {
         private new const int BOARD_WIDTH = 12;
         private new const int BOARD_HEIGHT = 12;
 

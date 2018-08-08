@@ -10,7 +10,7 @@ namespace ChessGameModes {
     /// Piece rules: King isn't royal -- can castle unrestricted by checks.
     /// Board layout: Orthodox.
     /// </summary>
-    public class Extinction : FIDERuleset {
+    public class Extinction : Chess {
         private readonly Piece[] pieces;
         private readonly Dictionary<Piece, int> whitePieceCounts;
         private readonly Dictionary<Piece, int> blackPieceCounts;

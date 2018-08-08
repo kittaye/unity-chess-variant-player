@@ -17,7 +17,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     $ ^ Q A K B N R
     /// </summary>
-    public class PerfectChess : FIDERuleset {
+    public class PerfectChess : Chess {
         private Empress aSideWhiteEmpress;
         private Empress aSideBlackEmpress;
 

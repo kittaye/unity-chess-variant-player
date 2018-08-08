@@ -22,7 +22,7 @@ namespace ChessGameModes {
     ///     p Q   
     ///     K 
     /// </summary>
-    public class LadderChess : FIDERuleset {
+    public class LadderChess : Chess {
         private new const int BOARD_WIDTH = 5;
         private new const int BOARD_HEIGHT = 12;
         private List<BoardCoord> promotionSquares;

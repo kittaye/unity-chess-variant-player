@@ -15,7 +15,7 @@ namespace ChessGameModes {
     ///     p p p p
     ///     R Q K R
     /// </summary>
-    public class Silverman4x5 : FIDERuleset {
+    public class Silverman4x5 : Chess {
         private new const uint BOARD_WIDTH = 4;
         private new const uint BOARD_HEIGHT = 5;
 

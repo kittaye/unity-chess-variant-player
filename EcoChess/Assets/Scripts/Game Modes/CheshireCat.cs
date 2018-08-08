@@ -10,7 +10,7 @@ namespace ChessGameModes {
     /// Piece rules: No castling, piece can move over - but not onto - removed squares. King's first move moves like a queen.
     /// Board layout: Orthodox.
     /// </summary>
-    public class CheshireCat : FIDERuleset {
+    public class CheshireCat : Chess {
 
         public CheshireCat() : base() {
         }

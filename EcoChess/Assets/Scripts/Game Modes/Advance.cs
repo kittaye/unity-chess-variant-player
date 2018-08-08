@@ -18,7 +18,7 @@ namespace ChessGameModes {
     ///     . . . . . . . .
     ///     R N B Q K B N R
     /// </summary>
-    public class Advance : FIDERuleset {
+    public class Advance : Chess {
         public Advance() : base() {
         }
 

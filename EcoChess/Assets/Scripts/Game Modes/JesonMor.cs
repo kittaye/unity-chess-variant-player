@@ -18,7 +18,7 @@ namespace ChessGameModes {
     ///     . . . . . . . . .
     ///     N N N N N N N N N
     /// </summary>
-    public class JesonMor : FIDERuleset {
+    public class JesonMor : Chess {
         protected new const int BOARD_WIDTH = 9;
         protected new const int BOARD_HEIGHT = 9;
 

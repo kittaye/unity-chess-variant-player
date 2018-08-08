@@ -11,7 +11,7 @@ namespace ChessGameModes {
     /// Piece rules: no castling, kings have no royalty, pawns may promote to kings.
     /// Board layout: FIDE standard.
     /// </summary>
-    public class LosingChess : FIDERuleset {
+    public class LosingChess : Chess {
         private bool canCaptureThisTurn;
 
         public LosingChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {

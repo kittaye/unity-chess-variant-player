@@ -19,7 +19,7 @@ namespace ChessGameModes {
     ///     k r b n N B R K
     ///     q r b n N B R Q
     /// </summary>
-    public class RacingKings : FIDERuleset {
+    public class RacingKings : Chess {
         public RacingKings() : base(BOARD_WIDTH, BOARD_HEIGHT) {
             this.allowBoardFlipping = false;
         }

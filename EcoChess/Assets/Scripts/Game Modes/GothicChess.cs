@@ -17,7 +17,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p p p
     ///     R N B Q $ K ^ B N R
     /// </summary>
-    public class GothicChess : FIDERuleset {
+    public class GothicChess : Chess {
         private new const int BOARD_WIDTH = 10;
 
         public GothicChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {

@@ -9,7 +9,7 @@ namespace ChessGameModes {
     /// Piece types: Orthodox.
     /// Board layout: FIDE standard.
     /// </summary>
-    public class Checkless : FIDERuleset {
+    public class Checkless : Chess {
         private bool checkingForCheckmate;
 
         public Checkless() : base() {

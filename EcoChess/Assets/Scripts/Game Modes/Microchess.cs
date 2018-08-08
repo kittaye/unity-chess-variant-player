@@ -15,7 +15,7 @@ namespace ChessGameModes {
     ///     . . . p
     ///     R B N K
     /// </summary>
-    public class Microchess : FIDERuleset {
+    public class Microchess : Chess {
         private new const int BOARD_WIDTH = 4;
         private new const int BOARD_HEIGHT = 5;
 

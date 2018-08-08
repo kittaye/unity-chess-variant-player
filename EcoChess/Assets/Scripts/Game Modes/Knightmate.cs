@@ -19,7 +19,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     R K B Q N B K R
     /// </summary>
-    public class Knightmate : FIDERuleset {
+    public class Knightmate : Chess {
         public Knightmate() : base(BOARD_WIDTH, BOARD_HEIGHT) {
             pawnPromotionOptions = new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.King };
         }

@@ -17,7 +17,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     R N B Q K B N R
     /// </summary>
-    public class Weak : FIDERuleset {
+    public class Weak : Chess {
         public Weak() : base() {
         }
 

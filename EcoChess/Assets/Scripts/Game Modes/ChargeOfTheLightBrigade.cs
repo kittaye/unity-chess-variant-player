@@ -17,7 +17,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     . Q . Q K Q . .
     /// </summary>
-    public class ChargeOfTheLightBrigade : FIDERuleset {
+    public class ChargeOfTheLightBrigade : Chess {
         public ChargeOfTheLightBrigade() : base() {
             pawnPromotionOptions = new Piece[0];
         }

@@ -29,7 +29,7 @@ namespace ChessGameModes {
     ///   
     ///     r = red, y = yellow, g = green, b = blue, a = aqua, o = orange, P = Purple, p = pink, G = gray, s = silver, w = white, B = Black
     /// </summary>
-    public class SovereignChess : FIDERuleset {
+    public class SovereignChess : Chess {
         public static event Action<bool> _DisplayDefectionUI;
         public static event Action<Color[]> _SetDefectionOptions;
         public List<Color> defectionOptions { get; protected set; }

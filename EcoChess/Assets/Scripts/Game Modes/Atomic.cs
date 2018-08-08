@@ -9,7 +9,7 @@ namespace ChessGameModes {
     /// Piece types: Orthodox.
     /// Board layout: FIDE standard.
     /// </summary>
-    public class Atomic : FIDERuleset {
+    public class Atomic : Chess {
         public Atomic() : base() { }
 
         public override string ToString() {

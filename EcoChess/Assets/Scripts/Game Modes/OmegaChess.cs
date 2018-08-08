@@ -19,7 +19,7 @@ namespace ChessGameModes {
     ///       C R N B Q K B N R C 
     ///     W                     W
     /// </summary>
-    public class OmegaChess : FIDERuleset {
+    public class OmegaChess : Chess {
         private new const int BOARD_WIDTH = 12;
         private new const int BOARD_HEIGHT = 12;
         private new const int WHITE_BACKROW = 1;

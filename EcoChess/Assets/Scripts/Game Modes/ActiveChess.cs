@@ -17,7 +17,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p p
     ///     R N B Q K B N R Q
     /// </summary>
-    public class ActiveChess : FIDERuleset {
+    public class ActiveChess : Chess {
         private new const int BOARD_WIDTH = 9;
         public ActiveChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {
         }

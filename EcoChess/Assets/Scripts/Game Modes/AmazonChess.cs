@@ -9,7 +9,7 @@ namespace ChessGameModes {
     /// Piece types: Orthodox + Amazons.
     /// Board layout: FIDE standard but queens are amazons.
     /// </summary>
-    public class AmazonChess : FIDERuleset {
+    public class AmazonChess : Chess {
         public AmazonChess() : base() {
             selectedPawnPromotion = Piece.Amazon;
             pawnPromotionOptions = new Piece[4] { Piece.Amazon, Piece.Rook, Piece.Bishop, Piece.Knight };

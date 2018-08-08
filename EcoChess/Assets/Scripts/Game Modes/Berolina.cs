@@ -10,7 +10,7 @@ namespace ChessGameModes {
     /// Piece types: Orthodox + Berolina Pawn.
     /// Board layout: FIDE standard.
     /// </summary>
-    public class Berolina : FIDERuleset {
+    public class Berolina : Chess {
         public Berolina() : base() {
         }
 

@@ -14,6 +14,7 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
     <CompilerResponseFile></CompilerResponseFile>
+    <UnityProjectGenerator>VSTU</UnityProjectGenerator>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.6.1f1</UnityVersion>
@@ -105,7 +106,6 @@
     <Compile Include="Assets\Scripts\Game Modes\DummyVariant.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Embassy.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Extinction.cs" />
-    <Compile Include="Assets\Scripts\Game Modes\FIDERuleset.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Fianchetto.cs" />
     <Compile Include="Assets\Scripts\Game Modes\GothicChess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\GrandChess.cs" />

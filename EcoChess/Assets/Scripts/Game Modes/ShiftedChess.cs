@@ -18,7 +18,7 @@ namespace ChessGameModes {
     ///     p p p p K B N R
     ///     R B N Q 
     /// </summary>  
-    public class ShiftedChess : FIDERuleset {
+    public class ShiftedChess : Chess {
         private new const int BOARD_WIDTH = 9;
         private new const int BOARD_HEIGHT = 9;
 

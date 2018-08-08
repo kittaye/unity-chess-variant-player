@@ -18,7 +18,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     R N N $ K N N R
     /// </summary>
-    public class Chigorin : FIDERuleset {
+    public class Chigorin : Chess {
         public Chigorin() : base() {
         }
 

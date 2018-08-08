@@ -17,7 +17,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     R B B Q K N N R
     /// </summary>
-    public class Mongredien : FIDERuleset {
+    public class Mongredien : Chess {
         public Mongredien() : base() {
         }
 

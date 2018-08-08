@@ -16,7 +16,7 @@ namespace ChessGameModes {
     ///     p p p p p p
     ///     R N Q K N R
     /// </summary>
-    public class LosAlamos : FIDERuleset {
+    public class LosAlamos : Chess {
         private new const int BOARD_WIDTH = 6;
         private new const int BOARD_HEIGHT = 6;
 

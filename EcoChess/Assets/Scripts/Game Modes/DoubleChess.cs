@@ -23,7 +23,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p p p p p p p p p
     ///     R N B Q K B N R R N B Q K B N R
     /// </summary>
-    public class DoubleChess : FIDERuleset {
+    public class DoubleChess : Chess {
         private new const int BOARD_WIDTH = 16;
         private new const int BOARD_HEIGHT = 12;
         private King secondCurrentKing;

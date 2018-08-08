@@ -10,7 +10,7 @@ namespace ChessGameModes {
     /// Piece rules: Pieces may move off only the left and right edges of the board and appear on the other side. No castling.
     /// Board layout: Orthodox.
     /// </summary>
-    public class Cylinder : FIDERuleset {
+    public class Cylinder : Chess {
 
         public Cylinder() : base() {
         }

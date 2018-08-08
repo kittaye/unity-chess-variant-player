@@ -17,7 +17,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     ? ? ? ? ? ? ? ?
     /// </summary>
-    public class Chess960 : FIDERuleset {
+    public class Chess960 : Chess {
         public Chess960() : base() { }
 
         public override string ToString() {

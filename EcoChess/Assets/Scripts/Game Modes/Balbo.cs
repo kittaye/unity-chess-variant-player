@@ -20,7 +20,7 @@ namespace ChessGameModes {
     ///           R N B N R   
     ///             Q B K 
     /// </summary>
-    public class Balbo : FIDERuleset {
+    public class Balbo : Chess {
         private new const int BOARD_WIDTH = 11;
         private new const int BOARD_HEIGHT = 10;
         private new const int WHITE_PAWNROW = 2;

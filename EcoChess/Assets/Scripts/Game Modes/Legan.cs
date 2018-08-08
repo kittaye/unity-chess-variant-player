@@ -18,7 +18,7 @@ namespace ChessGameModes {
     ///     . . . . p p Q B
     ///     . . . p R B N K
     /// </summary>
-    public class Legan : FIDERuleset {
+    public class Legan : Chess {
         private List<BoardCoord> promotionSquares;
 
         public Legan() : base() {

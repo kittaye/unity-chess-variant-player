@@ -18,7 +18,7 @@ namespace ChessGameModes {
     ///     . . . . . . . . 
     ///     . . . . A . . . 
     /// </summary>
-    public class Maharajah : FIDERuleset {
+    public class Maharajah : Chess {
 
         public Maharajah() : base() {
         }
