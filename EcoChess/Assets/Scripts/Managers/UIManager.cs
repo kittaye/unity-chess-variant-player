@@ -29,8 +29,8 @@ public class UIManager : MonoBehaviour {
 
         promotionOptions = new List<GameObject>();
         GameManager._OnGameFinished += OnGameFinished;
-        ChessGameModes.FIDERuleset._DisplayPromotionUI += OnDisplayPromotionOptions;
-        ChessGameModes.FIDERuleset._OnPawnPromotionsChanged += OnPawnPromotionOptionsChanged;
+        ChessGameModes.Chess._DisplayPromotionUI += OnDisplayPromotionOptions;
+        ChessGameModes.Chess._OnPawnPromotionsChanged += OnPawnPromotionOptionsChanged;
 
         foreach (Text aText in mainCanvas.GetComponentsInChildren<Text>()) {
             if (aText.name.Equals("TeamTurn_lbl")) {
@@ -75,8 +75,8 @@ public class UIManager : MonoBehaviour {
 
     void OnDestroy() {
         GameManager._OnGameFinished -= OnGameFinished;
-        ChessGameModes.FIDERuleset._DisplayPromotionUI -= OnDisplayPromotionOptions;
-        ChessGameModes.FIDERuleset._OnPawnPromotionsChanged -= OnPawnPromotionOptionsChanged;
+        ChessGameModes.Chess._DisplayPromotionUI -= OnDisplayPromotionOptions;
+        ChessGameModes.Chess._OnPawnPromotionsChanged -= OnPawnPromotionOptionsChanged;
         if (GameManager.Instance.chessGame is ChessGameModes.SovereignChess) {
             ChessGameModes.SovereignChess._DisplayDefectionUI -= OnDisplayDefectionOptions;
             ChessGameModes.SovereignChess._SetDefectionOptions -= OnSetDefectionOptions;
@@ -111,7 +111,7 @@ public class UIManager : MonoBehaviour {
     }
 
     public void OnDisplayPromotionOptions(bool value) {
-        promoteToLbl.text = "<color=white>Promote to:\n</color><b>" + ((ChessGameModes.FIDERuleset)GameManager.Instance.chessGame).selectedPawnPromotion.ToString() + "</b>";
+        promoteToLbl.text = "<color=white>Promote to:\n</color><b>" + (GameManager.Instance.chessGame.selectedPawnPromotion.ToString()) + "</b>";
         promotionWindow.SetActive(value);
     }
 
@@ -149,7 +149,7 @@ public class UIManager : MonoBehaviour {
 
     public void SelectPawnPromotion(Piece value) {
         promoteToLbl.text = "<color=white>Promote to:\n</color><b>" + value.ToString() + "</b>";
-        ((ChessGameModes.FIDERuleset)GameManager.Instance.chessGame).SetPawnPromotionTo(value);
+        GameManager.Instance.chessGame.SetPawnPromotionTo(value);
     }
 
     public void SelectDefectOption(Color value) {

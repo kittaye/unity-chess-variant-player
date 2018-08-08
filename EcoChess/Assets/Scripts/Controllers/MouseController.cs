@@ -14,7 +14,7 @@ public class MouseController : MonoBehaviour {
     private Vector3 lastMousePos;
     private readonly Color defaultColor = new Color(0.001f, 0.001f, 0.001f, 1f);
     private readonly Color highlightColor = new Color(0.1f, 0.1f, 0.1f);
-    private Chess chessGame;
+    private ChessGameModes.Chess chessGame;
 
     private void Awake() {
         if (Instance != null && Instance != this) {

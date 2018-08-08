@@ -13,7 +13,7 @@ public abstract class ChessPiece {
     public bool hasXWrapping { get; set; }
     public bool hasYWrapping { get; set; }
 
-    protected Chess chessGame;
+    protected ChessGameModes.Chess chessGame;
 
     public ChessPiece(Team team, BoardCoord position) {
         chessGame = GameManager.Instance.chessGame;

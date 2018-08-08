@@ -32,7 +32,7 @@ public class GameManager : MonoBehaviour {
     private void Start() {
         CenterCameraToBoard(chessGame.board);
         ui = UIManager.Instance;
-        ui.CreatePawnPromotionOptions(((FIDERuleset)chessGame).pawnPromotionOptions);
+        ui.CreatePawnPromotionOptions(chessGame.pawnPromotionOptions);
         lastTurnLabel = chessGame.GetCurrentTurnLabel();
     }
 
