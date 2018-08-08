@@ -20,28 +20,6 @@ namespace ChessGameModes {
     ///     R N B Q K B N R
     /// </summary>
     public class FIDERuleset : Chess {
-        public static event Action<bool> _DisplayPromotionUI;
-        public static event Action<Piece[]> _OnPawnPromotionsChanged;
-        public Piece[] pawnPromotionOptions { get; protected set; }
-        public Piece selectedPawnPromotion { get; protected set; }
-
-        protected const int BOARD_WIDTH = 8;
-        protected const int BOARD_HEIGHT = 8;
-        protected const int WHITE_BACKROW = 0;
-        protected const int WHITE_PAWNROW = 1;
-        protected int BLACK_BACKROW;
-        protected int BLACK_PAWNROW;
-
-        protected ChessPiece currentRoyalPiece;
-        protected ChessPiece opposingRoyalPiece;
-
-        protected Rook aSideWhiteRook;
-        protected Rook hSideWhiteRook;
-        protected Rook aSideBlackRook;
-        protected Rook hSideBlackRook;
-
-        protected bool checkingForCheck;
-        protected List<ChessPiece> opposingTeamCheckThreats;
 
         public FIDERuleset(uint boardWidth, uint boardHeight) : base(boardWidth, boardHeight) {
             BLACK_BACKROW = board.GetHeight() - 1;
@@ -286,31 +264,6 @@ namespace ChessGameModes {
                 return AddPieceToBoard(ChessPieceFactory.Create(selectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
             }
             return null;
-        }
-
-        /// <summary>
-        /// Used to update the pawn promotion options at any point during the game.
-        /// </summary>
-        /// <param name="pieces">Set of pieces to change the pawn promotion options to.</param>
-        protected void SetPawnPromotionOptions(Piece[] pieces) {
-            pawnPromotionOptions = pieces;
-            if (_OnPawnPromotionsChanged != null) _OnPawnPromotionsChanged.Invoke(pawnPromotionOptions);
-        }
-
-        /// <summary>
-        /// Display the UI for showing pawn promotion options to choose from.
-        /// </summary>
-        /// <param name="value"></param>
-        protected void OnDisplayPromotionUI(bool value) {
-            if (_DisplayPromotionUI != null) _DisplayPromotionUI.Invoke(true);
-        }
-
-        /// <summary>
-        /// Set the current pawn promotion option to a specified piece.
-        /// </summary>
-        /// <param name="piece">Piece to set the pawn promotion option to.</param>
-        public virtual void SetPawnPromotionTo(Piece piece) {
-            this.selectedPawnPromotion = piece;
         }
 
         /// <summary>

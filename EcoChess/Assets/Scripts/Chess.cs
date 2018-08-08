@@ -1,17 +1,36 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public enum Team { WHITE, BLACK }
 public enum MoveDirection { Up, Down, Left, Right, UpLeft, UpRight, DownLeft, DownRight }
 
 public abstract class Chess {
 
+    public static event Action<bool> _DisplayPromotionUI;
+    public static event Action<Piece[]> _OnPawnPromotionsChanged;
+    public Piece[] pawnPromotionOptions { get; protected set; }
+    public Piece selectedPawnPromotion { get; protected set; }
     public Board board { get; private set; }
     public bool allowBoardFlipping;
 
+    protected const int BOARD_WIDTH = 8;
+    protected const int BOARD_HEIGHT = 8;
+    protected const int WHITE_BACKROW = 0;
+    protected const int WHITE_PAWNROW = 1;
+    protected int BLACK_BACKROW;
+    protected int BLACK_PAWNROW;
     protected Team currentTeamTurn;
     protected Team opposingTeamTurn;
     protected uint numConsecutiveCapturelessMoves { get; private set; }
+    protected bool checkingForCheck;
+    protected List<ChessPiece> opposingTeamCheckThreats;
+    protected ChessPiece currentRoyalPiece;
+    protected ChessPiece opposingRoyalPiece;
+    protected Rook aSideWhiteRook;
+    protected Rook hSideWhiteRook;
+    protected Rook aSideBlackRook;
+    protected Rook hSideBlackRook;
 
     private List<ChessPiece> whitePieces;
     private List<ChessPiece> blackPieces;
@@ -92,6 +111,31 @@ public abstract class Chess {
                 lastMovedBlackPiece = piece;
             }
         }
+    }
+
+    /// <summary>
+    /// Used to update the pawn promotion options at any point during the game.
+    /// </summary>
+    /// <param name="pieces">Set of pieces to change the pawn promotion options to.</param>
+    protected void SetPawnPromotionOptions(Piece[] pieces) {
+        pawnPromotionOptions = pieces;
+        if (_OnPawnPromotionsChanged != null) _OnPawnPromotionsChanged.Invoke(pawnPromotionOptions);
+    }
+
+    /// <summary>
+    /// Display the UI for showing pawn promotion options to choose from.
+    /// </summary>
+    /// <param name="value"></param>
+    protected void OnDisplayPromotionUI(bool value) {
+        if (_DisplayPromotionUI != null) _DisplayPromotionUI.Invoke(true);
+    }
+
+    /// <summary>
+    /// Set the current pawn promotion option to a specified piece.
+    /// </summary>
+    /// <param name="piece">Piece to set the pawn promotion option to.</param>
+    public virtual void SetPawnPromotionTo(Piece piece) {
+        this.selectedPawnPromotion = piece;
     }
 
     /// <summary>
