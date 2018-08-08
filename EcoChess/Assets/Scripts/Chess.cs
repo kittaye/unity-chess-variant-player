@@ -30,6 +30,8 @@ public class Chess {
     public Board board { get; private set; }
     public bool allowBoardFlipping;
 
+    protected const int BOARD_WIDTH = 8;
+    protected const int BOARD_HEIGHT = 8;
     protected const int WHITE_BACKROW = 0;
     protected const int WHITE_PAWNROW = 1;
     protected int BLACK_BACKROW;
@@ -51,8 +53,22 @@ public class Chess {
     private ChessPiece lastMovedWhitePiece;
     private ChessPiece lastMovedBlackPiece;
 
+    public Chess() {
+        board = new Board(BOARD_WIDTH, BOARD_HEIGHT, new Color(0.9f, 0.9f, 0.9f), new Color(0.1f, 0.1f, 0.1f));
+        Init();
+    }
+
     public Chess(uint width, uint height) {
         board = new Board(width, height, new Color(0.9f, 0.9f, 0.9f), new Color(0.1f, 0.1f, 0.1f));
+        Init();
+    }
+
+    public Chess(uint width, uint height, Color primaryBoardColour, Color secondaryBoardColour) {
+        board = new Board(width, height, primaryBoardColour, secondaryBoardColour);
+        Init();
+    }
+
+    private void Init() {
         whitePieces = new List<ChessPiece>();
         blackPieces = new List<ChessPiece>();
         lastMovedWhitePiece = null;
@@ -71,28 +87,6 @@ public class Chess {
         checkingForCheck = false;
         pawnPromotionOptions = new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight };
         selectedPawnPromotion = Piece.Queen;
-    }
-
-    public Chess(uint width, uint height, Color primaryBoardColour, Color secondaryBoardColour) {
-        board = new Board(width, height, primaryBoardColour, secondaryBoardColour);
-        whitePieces = new List<ChessPiece>();
-        blackPieces = new List<ChessPiece>();
-        lastMovedWhitePiece = null;
-        lastMovedBlackPiece = null;
-        currentTeamTurn = Team.WHITE;
-        opposingTeamTurn = Team.BLACK;
-        numConsecutiveCapturelessMoves = 0;
-        allowBoardFlipping = true;
-
-                    BLACK_BACKROW = board.GetHeight() - 1;
-            BLACK_PAWNROW = board.GetHeight() - 2;
-            currentRoyalPiece = opposingRoyalPiece = null;
-            aSideWhiteRook = hSideWhiteRook = null;
-            aSideBlackRook = hSideWhiteRook = null;
-            opposingTeamCheckThreats = null;
-            checkingForCheck = false;
-            pawnPromotionOptions = new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight };
-            selectedPawnPromotion = Piece.Queen;
     }
 
     public override string ToString() {
