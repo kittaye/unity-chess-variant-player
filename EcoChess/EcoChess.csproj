@@ -79,8 +79,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Board.cs" />
-    <Compile Include="Assets\Scripts\Chess.cs" />
     <Compile Include="Assets\Scripts\Controllers\CameraControl.cs" />
     <Compile Include="Assets\Scripts\Controllers\MouseController.cs" />
     <Compile Include="Assets\Scripts\Data Structures\BoardCoord.cs" />
@@ -99,6 +97,7 @@
     <Compile Include="Assets\Scripts\Game Modes\ChargeOfTheLightBrigade.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Checkless.cs" />
     <Compile Include="Assets\Scripts\Game Modes\CheshireCat.cs" />
+    <Compile Include="Assets\Scripts\Game Modes\Chess.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Chess960.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Chigorin.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Cylinder.cs" />
@@ -139,6 +138,7 @@
     <Compile Include="Assets\Scripts\Game Modes\Weak.cs" />
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\Scripts\Managers\UIManager.cs" />
+    <Compile Include="Assets\Scripts\Misc\Board.cs" />
     <Compile Include="Assets\Scripts\Misc\MathExtensions.cs" />
     <Compile Include="Assets\Scripts\Misc\SovereignColour.cs" />
     <Compile Include="Assets\Scripts\Misc\SovereignExtensions.cs" />
