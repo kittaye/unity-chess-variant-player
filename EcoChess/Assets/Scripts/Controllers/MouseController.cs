@@ -27,7 +27,7 @@ public class MouseController : MonoBehaviour {
     }
 
     private void Start() {
-        chessGame = GameManager.Instance.chessGame;
+        chessGame = GameManager.Instance.ChessGame;
     }
 
     private void OnDestroy() {

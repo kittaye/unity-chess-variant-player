@@ -4,7 +4,7 @@ using ChessGameModes;
 
 public class GameManager : MonoBehaviour {
     public static GameManager Instance;
-    public Chess chessGame { get; private set; }
+    public Chess ChessGame { get; private set; }
     public static readonly int NUM_OF_VARIANTS = System.Enum.GetNames(typeof(GameMode)).Length;
 
     public Camera mainCamera;
@@ -25,15 +25,15 @@ public class GameManager : MonoBehaviour {
             Instance = this;
         }
 
-        chessGame = GameModeFactory.Create((GameMode)modeIndex);
-        chessGame.PopulateBoard();
+        ChessGame = GameModeFactory.Create((GameMode)modeIndex);
+        ChessGame.PopulateBoard();
     }
 
     private void Start() {
-        CenterCameraToBoard(chessGame.board);
+        CenterCameraToBoard(ChessGame.board);
         ui = UIManager.Instance;
-        ui.CreatePawnPromotionOptions(chessGame.pawnPromotionOptions);
-        lastTurnLabel = chessGame.GetCurrentTurnLabel();
+        ui.CreatePawnPromotionOptions(ChessGame.pawnPromotionOptions);
+        lastTurnLabel = ChessGame.GetCurrentTurnLabel();
     }
 
     private void Update() {
@@ -45,9 +45,9 @@ public class GameManager : MonoBehaviour {
     }
 
     public void FlipBoard() {
-        chessGame.board.isFlipped = !chessGame.board.isFlipped;
+        ChessGame.board.isFlipped = !ChessGame.board.isFlipped;
         mainCamera.transform.Rotate(new Vector3(0, 0, 180));
-        foreach (ChessPiece piece in chessGame.GetPieces(true)) {
+        foreach (ChessPiece piece in ChessGame.GetPieces(true)) {
             piece.gameObject.transform.Rotate(new Vector3(0, 0, 180));
         }
     }
@@ -67,17 +67,17 @@ public class GameManager : MonoBehaviour {
     }
 
     public void OnTurnComplete() {
-        chessGame.OnTurnComplete();
+        ChessGame.OnTurnComplete();
         ui.OnTurnComplete();
 
-        if (chessGame.CheckWinState()) {
+        if (ChessGame.CheckWinState()) {
             if (_OnGameFinished != null) _OnGameFinished.Invoke();
         }
 
-        if(chessGame.allowBoardFlipping && flipBoardEveryTurn && chessGame.GetCurrentTurnLabel().ToString() != lastTurnLabel) {
+        if(ChessGame.allowBoardFlipping && flipBoardEveryTurn && ChessGame.GetCurrentTurnLabel().ToString() != lastTurnLabel) {
             FlipBoard();
         }
-        lastTurnLabel = chessGame.GetCurrentTurnLabel().ToString();
+        lastTurnLabel = ChessGame.GetCurrentTurnLabel().ToString();
     }
 
     private void CenterCameraToBoard(Board board) {
@@ -90,7 +90,7 @@ public class GameManager : MonoBehaviour {
         piece.gameObject = Instantiate(piecePrefab, piece.GetBoardPosition(), piecePrefab.transform.rotation);
         piece.gameObject.SetActive(true);
         piece.gameObject.name = piece.ToString();
-        piece.gameObject.transform.SetParent(chessGame.board.gameBoardObj.transform);
+        piece.gameObject.transform.SetParent(ChessGame.board.gameBoardObj.transform);
         piece.gameObject.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>(piece.ToString());
     }
 }
