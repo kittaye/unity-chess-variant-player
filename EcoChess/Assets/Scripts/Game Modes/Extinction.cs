@@ -113,7 +113,7 @@ namespace ChessGameModes {
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
             BoardCoord oldPos = mover.GetBoardPosition();
-            ChessPiece capturedPiece = board.GetCoordInfo(destination).occupier;
+            ChessPiece capturedPiece = Board.GetCoordInfo(destination).occupier;
 
             // Try make the move
             if (MakeMove(mover, destination)) {
@@ -164,8 +164,8 @@ namespace ChessGameModes {
                 int y = king.GetBoardPosition().y;
                 BoardCoord coord = new BoardCoord(x, y);
 
-                while (board.ContainsCoord(coord)) {
-                    ChessPiece occupier = board.GetCoordInfo(coord).occupier;
+                while (Board.ContainsCoord(coord)) {
+                    ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
                     if (occupier != null) {
                         if (occupier is Rook && occupier.MoveCount == 0) {
                             if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i, 0)) == false

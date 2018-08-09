@@ -113,8 +113,8 @@ namespace ChessGameModes {
             if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
-                    if (board.ContainsCoord(coord)) {
-                        ChessPiece piece = board.GetCoordInfo(coord).occupier;
+                    if (Board.ContainsCoord(coord)) {
+                        ChessPiece piece = Board.GetCoordInfo(coord).occupier;
                         if (piece is Pawn && piece == LastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
                             return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1));
                         }

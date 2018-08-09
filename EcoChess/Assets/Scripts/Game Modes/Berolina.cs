@@ -51,8 +51,8 @@ namespace ChessGameModes {
             if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
-                    if (board.ContainsCoord(coord)) {
-                        ChessPiece piece = board.GetCoordInfo(coord).occupier;
+                    if (Board.ContainsCoord(coord)) {
+                        ChessPiece piece = Board.GetCoordInfo(coord).occupier;
                         if (piece is Pawn && piece == LastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
                             if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(0, 1)) == false) {
                                 return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(0, 1));
@@ -69,8 +69,8 @@ namespace ChessGameModes {
             const int RIGHT = 1;
 
             for (int i = LEFT; i <= RIGHT; i += 2) {
-                if (board.ContainsCoord(mover.GetRelativeBoardCoord(i, -1)) && IsThreat(mover, mover.GetRelativeBoardCoord(i, -1))) {
-                    ChessPiece occupier = board.GetCoordInfo(mover.GetRelativeBoardCoord(i, -1)).occupier;
+                if (Board.ContainsCoord(mover.GetRelativeBoardCoord(i, -1)) && IsThreat(mover, mover.GetRelativeBoardCoord(i, -1))) {
+                    ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(i, -1)).occupier;
                     if (occupier != null && occupier is Pawn && ((Pawn)occupier).validEnPassant) {
                         mover.CaptureCount++;
                         RemovePieceFromBoard(occupier);

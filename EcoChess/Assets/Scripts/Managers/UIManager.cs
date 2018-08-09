@@ -111,7 +111,7 @@ public class UIManager : MonoBehaviour {
     }
 
     public void OnDisplayPromotionOptions(bool value) {
-        promoteToLbl.text = "<color=white>Promote to:\n</color><b>" + (GameManager.Instance.ChessGame.selectedPawnPromotion.ToString()) + "</b>";
+        promoteToLbl.text = "<color=white>Promote to:\n</color><b>" + (GameManager.Instance.ChessGame.SelectedPawnPromotion.ToString()) + "</b>";
         promotionWindow.SetActive(value);
     }
 

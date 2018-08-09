@@ -29,10 +29,10 @@ namespace ChessGameModes {
         public override void OnTurnComplete() {
             base.OnTurnComplete();
             if (GetCurrentTeamTurn() == Team.WHITE) {
-                selectedPawnPromotion = Piece.Empress;
+                SelectedPawnPromotion = Piece.Empress;
                 SetPawnPromotionOptions(new Piece[2] { Piece.Empress, Piece.Knight });
             } else {
-                selectedPawnPromotion = Piece.Queen;
+                SelectedPawnPromotion = Piece.Queen;
                 SetPawnPromotionOptions(new Piece[2] { Piece.Queen, Piece.Bishop });
             }
         }

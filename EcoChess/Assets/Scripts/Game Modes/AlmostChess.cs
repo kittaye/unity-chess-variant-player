@@ -11,8 +11,8 @@ namespace ChessGameModes {
     /// </summary>
     public class AlmostChess : Chess {
         public AlmostChess() : base() {
-            selectedPawnPromotion = Piece.Empress;
-            pawnPromotionOptions = new Piece[4] { Piece.Empress, Piece.Rook, Piece.Bishop, Piece.Knight };
+            SelectedPawnPromotion = Piece.Empress;
+            PawnPromotionOptions = new Piece[4] { Piece.Empress, Piece.Rook, Piece.Bishop, Piece.Knight };
         }
 
         public override string ToString() {

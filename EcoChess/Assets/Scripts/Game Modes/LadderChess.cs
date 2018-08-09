@@ -28,7 +28,7 @@ namespace ChessGameModes {
         private List<BoardCoord> promotionSquares;
 
         public LadderChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-            board.RemoveBoardCoordinates(new string[]
+            Board.RemoveBoardCoordinates(new string[]
             { "b1", "c1", "d1", "e1",
               "c2", "d2", "e2",
               "d3", "e3",
@@ -58,7 +58,7 @@ namespace ChessGameModes {
 
         private void AddPromotionSquare(string algebraicKeyPosition) {
             BoardCoord coord;
-            if (board.TryGetCoordWithKey(algebraicKeyPosition, out coord)) {
+            if (Board.TryGetCoordWithKey(algebraicKeyPosition, out coord)) {
                 promotionSquares.Add(coord);
             }
         }
@@ -76,7 +76,7 @@ namespace ChessGameModes {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
                 RemovePieceFromBoard(mover);
                 RemovePieceFromActiveTeam(mover);
-                return AddPieceToBoard(ChessPieceFactory.Create(selectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
+                return AddPieceToBoard(ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
             }
             return null;
         }

@@ -30,9 +30,9 @@ public class GameManager : MonoBehaviour {
     }
 
     private void Start() {
-        CenterCameraToBoard(ChessGame.board);
+        CenterCameraToBoard(ChessGame.Board);
         ui = UIManager.Instance;
-        ui.CreatePawnPromotionOptions(ChessGame.pawnPromotionOptions);
+        ui.CreatePawnPromotionOptions(ChessGame.PawnPromotionOptions);
         lastTurnLabel = ChessGame.GetCurrentTurnLabel();
     }
 
@@ -45,7 +45,7 @@ public class GameManager : MonoBehaviour {
     }
 
     public void FlipBoard() {
-        ChessGame.board.isFlipped = !ChessGame.board.isFlipped;
+        ChessGame.Board.isFlipped = !ChessGame.Board.isFlipped;
         mainCamera.transform.Rotate(new Vector3(0, 0, 180));
         foreach (ChessPiece piece in ChessGame.GetPieces(true)) {
             piece.gameObject.transform.Rotate(new Vector3(0, 0, 180));
@@ -90,7 +90,7 @@ public class GameManager : MonoBehaviour {
         piece.gameObject = Instantiate(piecePrefab, piece.GetBoardPosition(), piecePrefab.transform.rotation);
         piece.gameObject.SetActive(true);
         piece.gameObject.name = piece.ToString();
-        piece.gameObject.transform.SetParent(ChessGame.board.gameBoardObj.transform);
+        piece.gameObject.transform.SetParent(ChessGame.Board.gameBoardObj.transform);
         piece.gameObject.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>(piece.ToString());
     }
 }

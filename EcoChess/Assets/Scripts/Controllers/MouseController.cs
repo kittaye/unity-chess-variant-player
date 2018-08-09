@@ -44,7 +44,7 @@ public class MouseController : MonoBehaviour {
 
         if (Input.GetMouseButtonDown(0)) {
             if (hoveredObj != null) {
-                CoordInfo selectedCoord = chessGame.board.GetCoordInfo(GetHoveredBoardCoord());
+                CoordInfo selectedCoord = chessGame.Board.GetCoordInfo(GetHoveredBoardCoord());
 
                 if (hasSelection && lastSelectedOccupierAvailableMoves.Contains(GetHoveredBoardCoord())) {
                     if (chessGame.MovePiece(lastSelectedOccupier, GetHoveredBoardCoord())) {
@@ -58,7 +58,7 @@ public class MouseController : MonoBehaviour {
                     UIManager.Instance.OnDisplayPromotionOptions(false);
                     UIManager.Instance.OnDisplayDefectionOptions(false);
                     hasSelection = true;
-                    lastSelectedOccupier = chessGame.board.GetCoordInfo(GetHoveredBoardCoord()).occupier;
+                    lastSelectedOccupier = chessGame.Board.GetCoordInfo(GetHoveredBoardCoord()).occupier;
                     CalculateLastOccupierAvailableMoves();
                     return;
                 }
@@ -71,9 +71,9 @@ public class MouseController : MonoBehaviour {
     }
 
     public void CalculateLastOccupierAvailableMoves() {
-        chessGame.board.RemoveHighlightedCoordinates();
+        chessGame.Board.RemoveHighlightedCoordinates();
         lastSelectedOccupierAvailableMoves = chessGame.CalculateAvailableMoves(lastSelectedOccupier);
-        chessGame.board.HighlightCoordinates(lastSelectedOccupierAvailableMoves.ToArray());
+        chessGame.Board.HighlightCoordinates(lastSelectedOccupierAvailableMoves.ToArray());
     }
 
     private void UpdateHoveredObj() {
@@ -100,13 +100,13 @@ public class MouseController : MonoBehaviour {
         lastSelectedOccupierAvailableMoves.Clear();
         UIManager.Instance.OnDisplayPromotionOptions(false);
         UIManager.Instance.OnDisplayDefectionOptions(false);
-        chessGame.board.RemoveHighlightedCoordinates();
+        chessGame.Board.RemoveHighlightedCoordinates();
     }
 
     private BoardCoord GetHoveredBoardCoord() {
         if (hoveredObj != null) {
             BoardCoord coord;
-            if (chessGame.board.TryGetCoordWithKey(hoveredObj.name, out coord)) {
+            if (chessGame.Board.TryGetCoordWithKey(hoveredObj.name, out coord)) {
                 return coord;
             }
         }

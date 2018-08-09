@@ -143,10 +143,10 @@ namespace ChessGameModes {
             if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     int y = 0;
-                    while(board.ContainsCoord(mover.GetRelativeBoardCoord(i, y))) {
+                    while(Board.ContainsCoord(mover.GetRelativeBoardCoord(i, y))) {
                         BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, y));
-                        if (board.ContainsCoord(coord)) {
-                            ChessPiece piece = board.GetCoordInfo(coord).occupier;
+                        if (Board.ContainsCoord(coord)) {
+                            ChessPiece piece = Board.GetCoordInfo(coord).occupier;
                             if (piece != null) {
                                 if (piece is Pawn && piece == LastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
                                     if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
@@ -166,8 +166,8 @@ namespace ChessGameModes {
 
         protected override Pawn CheckPawnEnPassantCapture(Pawn mover) {
             int y = -1;
-            while(board.ContainsCoord(mover.GetRelativeBoardCoord(0, y))) {
-                ChessPiece occupier = board.GetCoordInfo(mover.GetRelativeBoardCoord(0, y)).occupier;
+            while(Board.ContainsCoord(mover.GetRelativeBoardCoord(0, y))) {
+                ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(0, y)).occupier;
 
                 if(occupier != null) {
                     if (IsThreat(mover, occupier.GetBoardPosition())) {

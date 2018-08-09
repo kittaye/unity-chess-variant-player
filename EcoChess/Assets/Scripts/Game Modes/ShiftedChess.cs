@@ -23,7 +23,7 @@ namespace ChessGameModes {
         private new const int BOARD_HEIGHT = 9;
 
         public ShiftedChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-            board.RemoveBoardCoordinates(new string[]
+            Board.RemoveBoardCoordinates(new string[]
             { "a1", "a2", "a3", "a4", "a9",
               "b9", "c9", "d9",
               "e5",

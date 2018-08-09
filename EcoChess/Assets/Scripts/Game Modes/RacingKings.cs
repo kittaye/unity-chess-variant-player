@@ -103,7 +103,7 @@ namespace ChessGameModes {
         private bool IsAKingInCheckAfterThisMove(ChessPiece mover, BoardCoord dest) {
             if (AssertContainsCoord(dest)) {
                 // Temporarily simulate the move actually happening
-                ChessPiece originalOccupier = board.GetCoordInfo(dest).occupier;
+                ChessPiece originalOccupier = Board.GetCoordInfo(dest).occupier;
                 ChessPiece originalLastMover;
                 BoardCoord oldPos = mover.GetBoardPosition();
                 SimulateMove(mover, dest, originalOccupier, out originalLastMover);

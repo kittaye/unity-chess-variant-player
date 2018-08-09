@@ -97,10 +97,10 @@ namespace ChessGameModes {
 
                 int failsafe = 0;
                 while (pieceToCheck.GetBoardPosition() != coord || failsafe < 9) {
-                    if (board.ContainsCoord(coord) == false) break;
+                    if (Board.ContainsCoord(coord) == false) break;
 
                     if (IsThreat(pieceToCheck, coord)) {
-                        possibleCheckThreats.Add(board.GetCoordInfo(coord).occupier);
+                        possibleCheckThreats.Add(Board.GetCoordInfo(coord).occupier);
                     }
                     coord.x += xModifier;
                     coord.y += yModifier;
@@ -126,8 +126,8 @@ namespace ChessGameModes {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     int modulusRelativeX = MathExtensions.mod(i, BOARD_WIDTH);
                     BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(modulusRelativeX, 0), threatOnly: true);
-                    if (board.ContainsCoord(coord)) {
-                        ChessPiece piece = board.GetCoordInfo(coord).occupier;
+                    if (Board.ContainsCoord(coord)) {
+                        ChessPiece piece = Board.GetCoordInfo(coord).occupier;
                         if (piece is Pawn && piece == LastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
                             if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(modulusRelativeX, 1)) == false) {
                                 return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(modulusRelativeX, 1));

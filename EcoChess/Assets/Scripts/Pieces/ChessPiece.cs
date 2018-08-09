@@ -29,7 +29,7 @@ public abstract class ChessPiece {
         chessGame = GameManager.Instance.ChessGame;
         m_Team = team;
         BoardCoord position = BoardCoord.NULL;
-        if(chessGame.board.TryGetCoordWithKey(algebraicKeyPosition, out position)) {
+        if(chessGame.Board.TryGetCoordWithKey(algebraicKeyPosition, out position)) {
             m_BoardPosition = position;
         }
         MoveCount = 0;
@@ -52,7 +52,7 @@ public abstract class ChessPiece {
         chessGame = GameManager.Instance.ChessGame;
         m_Team = team;
         BoardCoord position = BoardCoord.NULL;
-        if (chessGame.board.TryGetCoordWithKey(algebraicKeyPosition, out position)) {
+        if (chessGame.Board.TryGetCoordWithKey(algebraicKeyPosition, out position)) {
             m_BoardPosition = position;
         }
         MoveCount = 0;

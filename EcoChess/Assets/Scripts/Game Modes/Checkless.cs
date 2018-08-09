@@ -53,7 +53,7 @@ namespace ChessGameModes {
                 if (checkingForCheckmate) return false;
 
                 // Temporarily simulate the move actually happening
-                ChessPiece originalOccupier = board.GetCoordInfo(dest).occupier;
+                ChessPiece originalOccupier = Board.GetCoordInfo(dest).occupier;
                 ChessPiece originalLastMover;
                 BoardCoord oldPos = mover.GetBoardPosition();
                 SimulateMove(mover, dest, originalOccupier, out originalLastMover);
@@ -81,7 +81,7 @@ namespace ChessGameModes {
                 checkingForCheckmate = false;
 
                 if (occupier != null) {
-                    board.GetCoordInfo(occupier.GetBoardPosition()).occupier = occupier;
+                    Board.GetCoordInfo(occupier.GetBoardPosition()).occupier = occupier;
                     occupier.IsAlive = true;
                     occupier.gameObject.SetActive(true);
                 }

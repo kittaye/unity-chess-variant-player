@@ -11,8 +11,8 @@ namespace ChessGameModes {
     /// </summary>
     public class AmazonChess : Chess {
         public AmazonChess() : base() {
-            selectedPawnPromotion = Piece.Amazon;
-            pawnPromotionOptions = new Piece[4] { Piece.Amazon, Piece.Rook, Piece.Bishop, Piece.Knight };
+            SelectedPawnPromotion = Piece.Amazon;
+            PawnPromotionOptions = new Piece[4] { Piece.Amazon, Piece.Rook, Piece.Bishop, Piece.Knight };
         }
 
         public override string ToString() {

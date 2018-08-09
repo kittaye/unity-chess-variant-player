@@ -21,7 +21,7 @@ namespace ChessGameModes {
         private new const int BOARD_WIDTH = 10;
 
         public GothicChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-            pawnPromotionOptions = new Piece[6] { Piece.Queen, Piece.Empress, Piece.Princess, Piece.Rook, Piece.Bishop, Piece.Knight };
+            PawnPromotionOptions = new Piece[6] { Piece.Queen, Piece.Empress, Piece.Princess, Piece.Rook, Piece.Bishop, Piece.Knight };
         }
 
         public override string ToString() {
@@ -100,8 +100,8 @@ namespace ChessGameModes {
                     int y = king.GetBoardPosition().y;
                     BoardCoord coord = new BoardCoord(x, y);
 
-                    while (board.ContainsCoord(coord)) {
-                        ChessPiece occupier = board.GetCoordInfo(coord).occupier;
+                    while (Board.ContainsCoord(coord)) {
+                        ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
                         if (occupier != null) {
                             if (occupier is Rook && occupier.MoveCount == 0) {
                                 if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i, 0)) == false

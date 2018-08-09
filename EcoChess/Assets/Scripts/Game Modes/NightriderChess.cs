@@ -19,7 +19,7 @@ namespace ChessGameModes {
     /// </summary>
     public class NightriderChess : Chess {
         public NightriderChess() : base() {
-            pawnPromotionOptions = new Piece[5] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight, Piece.Nightrider };
+            PawnPromotionOptions = new Piece[5] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight, Piece.Nightrider };
         }
 
         public override string ToString() {

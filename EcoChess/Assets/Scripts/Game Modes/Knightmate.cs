@@ -21,7 +21,7 @@ namespace ChessGameModes {
     /// </summary>
     public class Knightmate : Chess {
         public Knightmate() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-            pawnPromotionOptions = new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.King };
+            PawnPromotionOptions = new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.King };
         }
 
         public override string ToString() {
@@ -131,8 +131,8 @@ namespace ChessGameModes {
                     int y = knight.GetBoardPosition().y;
                     BoardCoord coord = new BoardCoord(x, y);
 
-                    while (board.ContainsCoord(coord)) {
-                        ChessPiece occupier = board.GetCoordInfo(coord).occupier;
+                    while (Board.ContainsCoord(coord)) {
+                        ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
                         if (occupier != null) {
                             if (occupier is Rook && occupier.MoveCount == 0) {
                                 if (IsPieceInCheckAfterThisMove(knight, knight, knight.GetBoardPosition() + new BoardCoord(i * 2, 0)) == false) {

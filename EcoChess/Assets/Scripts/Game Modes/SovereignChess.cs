@@ -52,7 +52,7 @@ namespace ChessGameModes {
         private readonly Dictionary<Color, BoardCoord[]> ColourControlSquares = new Dictionary<Color, BoardCoord[]>(24);
 
         public SovereignChess() : base(BOARD_WIDTH, BOARD_HEIGHT, primaryBoardColour, secondaryBoardColour) {
-            pawnPromotionOptions = new Piece[5] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight, Piece.King };
+            PawnPromotionOptions = new Piece[5] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight, Piece.King };
             defectionOptions = new List<Color>();
             selectedDefection = whiteCurrentOwnedColour;
 
@@ -142,7 +142,7 @@ namespace ChessGameModes {
 
         protected override bool IsThreat(ChessPiece mover, BoardCoord coord) {
             if (AssertContainsCoord(coord)) {
-                ChessPiece occupier = board.GetCoordInfo(coord).occupier;
+                ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
                 if (occupier != null) {
                     if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
                         return blackControlledColours.Contains(GetChessPieceColour(occupier));
@@ -158,7 +158,7 @@ namespace ChessGameModes {
 
         protected override bool IsAlly(ChessPiece mover, BoardCoord coord) {
             if (AssertContainsCoord(coord)) {
-                ChessPiece occupier = board.GetCoordInfo(coord).occupier;
+                ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
                 if (occupier != null) {
                     if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
                         return whiteControlledColours.Contains(GetChessPieceColour(occupier));
@@ -205,7 +205,7 @@ namespace ChessGameModes {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
                 RemovePieceFromBoard(mover);
                 RemovePieceFromActiveTeam(mover);
-                return AddSovereignChessPiece(selectedPawnPromotion, mover.GetBoardPosition(), mover.gameObject.GetComponent<SovereignColour>().colour);
+                return AddSovereignChessPiece(SelectedPawnPromotion, mover.GetBoardPosition(), mover.gameObject.GetComponent<SovereignColour>().colour);
             }
             return null;
         }
@@ -224,7 +224,7 @@ namespace ChessGameModes {
                 }
                 
                 if (mover is SovereignPawn) {
-                    if (selectedPawnPromotion == Piece.King && promotionSquares.Contains(templateMoves[i]) && IsPieceInCheckAfterThisMove(mover, mover, templateMoves[i])) {
+                    if (SelectedPawnPromotion == Piece.King && promotionSquares.Contains(templateMoves[i]) && IsPieceInCheckAfterThisMove(mover, mover, templateMoves[i])) {
                         continue;
                     } else if (IsThreat(mover, templateMoves[i]) == false && QuadrantBoundariesExceeded((SovereignPawn)mover, templateMoves[i])) {
                         continue;
@@ -284,19 +284,19 @@ namespace ChessGameModes {
 
         private BoardCoord TryGetValidMove(ChessPiece mover, BoardCoord templateMove, out bool cancelDirectionalSlide) {
             BoardCoord[] colourPositions = new BoardCoord[2];
-            Color movedToColour = board.GetCoordInfo(templateMove).boardChunk.GetComponent<MeshRenderer>().material.color;
+            Color movedToColour = Board.GetCoordInfo(templateMove).boardChunk.GetComponent<MeshRenderer>().material.color;
 
             // Moved to square is a coloured square...
             if (ColourControlSquares.TryGetValue(movedToColour, out colourPositions)) {
                 // Check if moved to square is occupied AND not a threat... (must be an ally or neutral piece).
-                if (board.GetCoordInfo(templateMove).occupier != null && IsThreat(mover, templateMove) == false) {
+                if (Board.GetCoordInfo(templateMove).occupier != null && IsThreat(mover, templateMove) == false) {
                     cancelDirectionalSlide = true;
                     return BoardCoord.NULL;
                 }
                 
                 // Get occupiers of the squares of that colour
-                ChessPiece firstOccupier = board.GetCoordInfo(colourPositions[0]).occupier;
-                ChessPiece secondOccupier = board.GetCoordInfo(colourPositions[1]).occupier;
+                ChessPiece firstOccupier = Board.GetCoordInfo(colourPositions[0]).occupier;
+                ChessPiece secondOccupier = Board.GetCoordInfo(colourPositions[1]).occupier;
 
                 cancelDirectionalSlide = false;
                 // Check if no occupiers OR a threat...
@@ -320,7 +320,7 @@ namespace ChessGameModes {
                 // Else moved to square is not a coloured square...
             } else {
                 // Check if moved to square is occupied AND not a threat... (must be an ally or neutral piece).
-                if (board.GetCoordInfo(templateMove).occupier != null && IsThreat(mover, templateMove) == false) {
+                if (Board.GetCoordInfo(templateMove).occupier != null && IsThreat(mover, templateMove) == false) {
                     cancelDirectionalSlide = true;
                     return BoardCoord.NULL;
 
@@ -334,7 +334,7 @@ namespace ChessGameModes {
 
         private BoardCoord TryAddDefectionMove(ChessPiece mover) {
             BoardCoord[] positions = new BoardCoord[2];
-            Color positionColour = board.GetCoordInfo(mover.GetBoardPosition()).boardChunk.GetComponent<MeshRenderer>().material.color;
+            Color positionColour = Board.GetCoordInfo(mover.GetBoardPosition()).boardChunk.GetComponent<MeshRenderer>().material.color;
             Color ownedColour = GetTeamOwnedColour(mover);
 
             if (ColourControlSquares.TryGetValue(ownedColour, out positions)) {
@@ -403,7 +403,7 @@ namespace ChessGameModes {
                                     ChessPiece parentColourControlOccupier = null;
                                     for (int i = 0; i < 2; i++) {
                                         if (IsThreat(mover, positions[i])) {
-                                            parentColourControlOccupier = board.GetCoordInfo(positions[i]).occupier;
+                                            parentColourControlOccupier = Board.GetCoordInfo(positions[i]).occupier;
                                         }
                                     }
 
@@ -460,7 +460,7 @@ namespace ChessGameModes {
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
             BoardCoord[] positions = new BoardCoord[2];
             BoardCoord oldPos = mover.GetBoardPosition();
-            Color movedFromColour = board.GetCoordInfo(oldPos).boardChunk.GetComponent<MeshRenderer>().material.color;
+            Color movedFromColour = Board.GetCoordInfo(oldPos).boardChunk.GetComponent<MeshRenderer>().material.color;
 
             // Try make the move
             if (MakeMove(mover, destination)) {
@@ -470,7 +470,7 @@ namespace ChessGameModes {
                     // Try perform defection move.
                     if (oldPos == destination) {
                         PerformDefectionMove(mover);
-                        if (GetChessPieceColour(mover) == board.GetCoordInfo(mover.GetBoardPosition()).boardChunk.GetComponent<MeshRenderer>().material.color) {
+                        if (GetChessPieceColour(mover) == Board.GetCoordInfo(mover.GetBoardPosition()).boardChunk.GetComponent<MeshRenderer>().material.color) {
                             kingHasDoubleMoveDefection = true;
                         }
                         return true;
@@ -502,7 +502,7 @@ namespace ChessGameModes {
                     }
                 }
 
-                Color destinationColour = board.GetCoordInfo(destination).boardChunk.GetComponent<MeshRenderer>().material.color;
+                Color destinationColour = Board.GetCoordInfo(destination).boardChunk.GetComponent<MeshRenderer>().material.color;
                 if (destinationColour != whiteCurrentOwnedColour && destinationColour != blackCurrentOwnedColour) {
                     if (ColourControlSquares.TryGetValue(destinationColour, out positions)) {
                         if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
@@ -553,8 +553,8 @@ namespace ChessGameModes {
                                 // Get colour control parent of this piece
                                 ChessPiece parentColourControlOccupier = null;
                                 for (int i = 0; i < 2; i++) {
-                                    if (board.GetCoordInfo(positions[i]).occupier != null) {
-                                        parentColourControlOccupier = board.GetCoordInfo(positions[i]).occupier;
+                                    if (Board.GetCoordInfo(positions[i]).occupier != null) {
+                                        parentColourControlOccupier = Board.GetCoordInfo(positions[i]).occupier;
                                     }
                                 }
 
@@ -599,12 +599,12 @@ namespace ChessGameModes {
                     }
 
                     // Check subesquent squares.
-                    while (board.ContainsCoord(coord)) {
+                    while (Board.ContainsCoord(coord)) {
                         if (IsPieceInCheckAfterThisMove(king, king, coord)) {
                             break;
                         }
 
-                        ChessPiece occupier = board.GetCoordInfo(coord).occupier;
+                        ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
                         if (occupier != null) {
                             if (occupier is Rook && occupier.MoveCount == 0 && IsAlly(king, coord)) {
                                 ChessPiece occupierStop = null;
@@ -625,7 +625,7 @@ namespace ChessGameModes {
                                 while(occupierStop != occupier) {
                                     castleMoves.Add(TryGetSpecificMove(king, coord));
                                     coord.x += i;
-                                    occupierStop = board.GetCoordInfo(coord).occupier;
+                                    occupierStop = Board.GetCoordInfo(coord).occupier;
                                 }
                             }
                             break;
@@ -672,26 +672,26 @@ namespace ChessGameModes {
         #region Helper Functions
         private void AddColourControlSquares(string algebraicKey, string algebraicKey2, ColourName color) {
             BoardCoord coord1;
-            if (board.TryGetCoordWithKey(algebraicKey, out coord1)) {
-                board.GetCoordInfo(coord1).boardChunk.GetComponent<MeshRenderer>().material.color = SovereignExtensions.GetColour(color);
+            if (Board.TryGetCoordWithKey(algebraicKey, out coord1)) {
+                Board.GetCoordInfo(coord1).boardChunk.GetComponent<MeshRenderer>().material.color = SovereignExtensions.GetColour(color);
             }
             BoardCoord coord2;
-            if (board.TryGetCoordWithKey(algebraicKey2, out coord2)) {
-                board.GetCoordInfo(coord2).boardChunk.GetComponent<MeshRenderer>().material.color = SovereignExtensions.GetColour(color);
+            if (Board.TryGetCoordWithKey(algebraicKey2, out coord2)) {
+                Board.GetCoordInfo(coord2).boardChunk.GetComponent<MeshRenderer>().material.color = SovereignExtensions.GetColour(color);
             }
             ColourControlSquares.Add(SovereignExtensions.GetColour(color), new BoardCoord[2] { coord1, coord2 });
         }
 
         private void AddPromotionSquare(string algebraicKeyPosition) {
             BoardCoord coord;
-            if (board.TryGetCoordWithKey(algebraicKeyPosition, out coord)) {
+            if (Board.TryGetCoordWithKey(algebraicKeyPosition, out coord)) {
                 promotionSquares.Add(coord);
             }
         }
 
         private ChessPiece AddSovereignChessPiece(Piece piece, string algebraicKey, ColourName color) {
             BoardCoord coord;
-            if (board.TryGetCoordWithKey(algebraicKey, out coord)) {
+            if (Board.TryGetCoordWithKey(algebraicKey, out coord)) {
                 ChessPiece sovereignPiece;
                 if (color == ColourName.Black) {
                     sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.BLACK, coord));
@@ -710,7 +710,7 @@ namespace ChessGameModes {
         }
 
         private ChessPiece AddSovereignChessPiece(Piece piece, BoardCoord coord, ColourName color) {
-            if (board.ContainsCoord(coord)) {
+            if (Board.ContainsCoord(coord)) {
                 ChessPiece sovereignPiece;
                 if (color == ColourName.Black) {
                     sovereignPiece = AddPieceToBoard(ChessPieceFactory.Create(piece, Team.BLACK, coord));
@@ -730,7 +730,7 @@ namespace ChessGameModes {
 
         private SovereignPawn AddSovereignPawn(string algebraicKey, ColourName color, SovereignPawn.Quadrant quadrant) {
             BoardCoord coord;
-            if (board.TryGetCoordWithKey(algebraicKey, out coord)) {
+            if (Board.TryGetCoordWithKey(algebraicKey, out coord)) {
                 SovereignPawn sovereignPawn;
                 if (color == ColourName.Black) {
                     sovereignPawn = (SovereignPawn)AddPieceToBoard(new SovereignPawn(Team.BLACK, coord, quadrant));
