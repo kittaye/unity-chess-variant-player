@@ -29,15 +29,10 @@ namespace ChessGameModes {
         }
 
         public override void OnTurnComplete() {
-            if (isWhiteSecondMove == false && currentTeamTurn == Team.WHITE) {
+            if (isWhiteSecondMove == false && GetCurrentTeamTurn() == Team.WHITE) {
                 isWhiteSecondMove = true;
             } else {
-                currentTeamTurn = (currentTeamTurn == Team.WHITE) ? Team.BLACK : Team.WHITE;
-                opposingTeamTurn = (currentTeamTurn == Team.WHITE) ? Team.BLACK : Team.WHITE;
-                ChessPiece temp = currentRoyalPiece;
-                currentRoyalPiece = opposingRoyalPiece;
-                opposingRoyalPiece = temp;
-                isWhiteSecondMove = false;
+                base.OnTurnComplete();
             }
         }
 
@@ -65,12 +60,11 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            if (numConsecutiveCapturelessMoves == 100) {
-                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+            if (CapturelessMovesLimit()) {
                 return true;
             }
 
-            if(isWhiteSecondMove) {
+            if (isWhiteSecondMove) {
                 if (IsPieceInCheck(opposingRoyalPiece)) {
                     UIManager.Instance.Log("Team " + GetOpposingTeamTurn().ToString() + " has been checkmated -- Team " + GetCurrentTeamTurn().ToString() + " wins!");
                     return true;

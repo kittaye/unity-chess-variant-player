@@ -25,8 +25,7 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            if (numConsecutiveCapturelessMoves == 100) {
-                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+            if (CapturelessMovesLimit()) {
                 return true;
             }
 

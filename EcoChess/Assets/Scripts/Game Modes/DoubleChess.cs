@@ -77,6 +77,10 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
+            if (CapturelessMovesLimit()) {
+                return true;
+            }
+
             foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
                 if (piece.IsAlive) {
                     if (CalculateAvailableMoves(piece).Count > 0) return false;

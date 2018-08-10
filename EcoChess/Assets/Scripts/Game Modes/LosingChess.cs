@@ -23,12 +23,11 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            if (numConsecutiveCapturelessMoves == 100) {
-                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+            if (CapturelessMovesLimit()) {
                 return true;
             }
 
-            if(GetPieces(GetCurrentTeamTurn()).TrueForAll(x => x.IsAlive == false)) {
+            if (GetPieces(GetCurrentTeamTurn()).TrueForAll(x => x.IsAlive == false)) {
                 UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has lost all pieces -- Team " + GetCurrentTeamTurn().ToString() + " wins!");
                 return true;
             }

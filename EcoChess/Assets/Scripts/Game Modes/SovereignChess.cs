@@ -101,11 +101,11 @@ namespace ChessGameModes {
             if (kingHasDoubleMoveDefection == false) {
                 base.OnTurnComplete();
             }
-            selectedDefection = (currentTeamTurn == Team.WHITE) ? whiteCurrentOwnedColour : blackCurrentOwnedColour;
+            selectedDefection = (GetCurrentTeamTurn() == Team.WHITE) ? whiteCurrentOwnedColour : blackCurrentOwnedColour;
         }
 
         public override bool IsMoversTurn(ChessPiece mover) {
-            if (currentTeamTurn == Team.WHITE) {
+            if (GetCurrentTeamTurn() == Team.WHITE) {
                 return whiteControlledColours.Contains(GetChessPieceColour(mover));
             } else {
                 return blackControlledColours.Contains(GetChessPieceColour(mover));
@@ -113,14 +113,14 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            if (numConsecutiveCapturelessMoves == 100) {
+            if (GetNumConseqCapturelessMoves() >= 100) {
                 UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " 
                     + SovereignExtensions.GetColourName(GetChessPieceColour(currentRoyalPiece)) + "'s move!");
                 return true;
             }
 
             foreach (ChessPiece piece in GetPieces()) {
-                if (currentTeamTurn == Team.WHITE) {
+                if (GetCurrentTeamTurn() == Team.WHITE) {
                     if (whiteControlledColours.Contains(GetChessPieceColour(piece))) {
                         if (CalculateAvailableMoves(piece).Count > 0) return false;
                     }
@@ -175,7 +175,7 @@ namespace ChessGameModes {
         }
 
         public override string GetCurrentTurnLabel() {
-            if(currentTeamTurn == Team.WHITE) {
+            if(GetCurrentTeamTurn() == Team.WHITE) {
                 return SovereignExtensions.GetColourName(whiteCurrentOwnedColour).ToString() + "'s move";
             } else {
                 return SovereignExtensions.GetColourName(blackCurrentOwnedColour).ToString() + "'s move";

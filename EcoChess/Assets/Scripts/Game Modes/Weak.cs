@@ -27,7 +27,7 @@ namespace ChessGameModes {
 
         public override void OnTurnComplete() {
             base.OnTurnComplete();
-            if(currentTeamTurn == Team.WHITE) {
+            if(GetCurrentTeamTurn() == Team.WHITE) {
                 SelectedPawnPromotion = Piece.Queen;
             } else {
                 SelectedPawnPromotion = Piece.Knight;
@@ -79,7 +79,7 @@ namespace ChessGameModes {
                 if (enPassantMove != BoardCoord.NULL) {
                     availableMoves.Add(enPassantMove);
                 }
-                if (checkingForCheck == false && currentTeamTurn == Team.WHITE && CanPromote((Pawn)mover, availableMoves.ToArray())) {
+                if (checkingForCheck == false && GetCurrentTeamTurn() == Team.WHITE && CanPromote((Pawn)mover, availableMoves.ToArray())) {
                     OnDisplayPromotionUI(true);
                 }
             }
