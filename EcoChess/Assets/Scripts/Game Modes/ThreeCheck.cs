@@ -8,7 +8,7 @@ namespace ChessGameModes {
     /// Piece types: Orthodox.
     /// Board layout: FIDE standard.
     /// </summary>
-    public class ThreeCheck : FIDERuleset {
+    public class ThreeCheck : Chess {
         private int numOfChecksWHITE;
         private int numOfChecksBLACK;
 

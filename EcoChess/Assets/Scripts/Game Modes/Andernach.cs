@@ -10,7 +10,7 @@ namespace ChessGameModes {
     /// Piece types: Orthodox.
     /// Board layout: FIDE standard.
     /// </summary>
-    public class Andernach : FIDERuleset {
+    public class Andernach : Chess {
         public Andernach() : base() {
         }
 

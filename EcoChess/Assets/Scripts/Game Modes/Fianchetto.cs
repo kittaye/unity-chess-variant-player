@@ -17,7 +17,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     B N R Q K R N B
     /// </summary>
-    public class Fianchetto : FIDERuleset {
+    public class Fianchetto : Chess {
         public Fianchetto() : base() {
         }
 

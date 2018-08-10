@@ -13,10 +13,10 @@ public abstract class ChessPiece {
     public bool hasXWrapping { get; set; }
     public bool hasYWrapping { get; set; }
 
-    protected Chess chessGame;
+    protected ChessGameModes.Chess chessGame;
 
     public ChessPiece(Team team, BoardCoord position) {
-        chessGame = GameManager.Instance.chessGame;
+        chessGame = GameManager.Instance.ChessGame;
         m_Team = team;
         m_BoardPosition = position;
         MoveCount = 0;
@@ -26,10 +26,10 @@ public abstract class ChessPiece {
     }
 
     public ChessPiece(Team team, string algebraicKeyPosition) {
-        chessGame = GameManager.Instance.chessGame;
+        chessGame = GameManager.Instance.ChessGame;
         m_Team = team;
         BoardCoord position = BoardCoord.NULL;
-        if(chessGame.board.TryGetCoordWithKey(algebraicKeyPosition, out position)) {
+        if(chessGame.Board.TryGetCoordWithKey(algebraicKeyPosition, out position)) {
             m_BoardPosition = position;
         }
         MoveCount = 0;
@@ -39,7 +39,7 @@ public abstract class ChessPiece {
     }
 
     public ChessPiece(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping) {
-        chessGame = GameManager.Instance.chessGame;
+        chessGame = GameManager.Instance.ChessGame;
         m_Team = team;
         m_BoardPosition = position;
         MoveCount = 0;
@@ -49,10 +49,10 @@ public abstract class ChessPiece {
     }
 
     public ChessPiece(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping) {
-        chessGame = GameManager.Instance.chessGame;
+        chessGame = GameManager.Instance.ChessGame;
         m_Team = team;
         BoardCoord position = BoardCoord.NULL;
-        if (chessGame.board.TryGetCoordWithKey(algebraicKeyPosition, out position)) {
+        if (chessGame.Board.TryGetCoordWithKey(algebraicKeyPosition, out position)) {
             m_BoardPosition = position;
         }
         MoveCount = 0;

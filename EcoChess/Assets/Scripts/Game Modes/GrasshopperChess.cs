@@ -17,11 +17,11 @@ namespace ChessGameModes {
     ///     G G G G G G G G
     ///     R N B Q K B N R
     /// </summary>
-    public class GrasshopperChess : FIDERuleset {
+    public class GrasshopperChess : Chess {
         private new const int WHITE_PAWNROW = 2;
         public GrasshopperChess() : base() {
-            pawnPromotionOptions = new Piece[5] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight, Piece.Grasshopper };
-            BLACK_PAWNROW = board.GetHeight() - 3;
+            PawnPromotionOptions = new Piece[5] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight, Piece.Grasshopper };
+            BLACK_PAWNROW = Board.GetHeight() - 3;
         }
 
         public override string ToString() {

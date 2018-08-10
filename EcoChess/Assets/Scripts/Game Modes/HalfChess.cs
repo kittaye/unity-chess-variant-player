@@ -13,7 +13,7 @@ namespace ChessGameModes {
     ///     k b . . . . B K
     ///     r n . . . . N R
     /// </summary>
-    public class HalfChess : FIDERuleset {
+    public class HalfChess : Chess {
         private new const int BOARD_HEIGHT = 4;
 
         public HalfChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {

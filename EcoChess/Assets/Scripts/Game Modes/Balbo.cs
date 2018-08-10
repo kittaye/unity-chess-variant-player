@@ -20,14 +20,14 @@ namespace ChessGameModes {
     ///           R N B N R   
     ///             Q B K 
     /// </summary>
-    public class Balbo : FIDERuleset {
+    public class Balbo : Chess {
         private new const int BOARD_WIDTH = 11;
         private new const int BOARD_HEIGHT = 10;
         private new const int WHITE_PAWNROW = 2;
         private List<BoardCoord> promotionSquares;
 
         public Balbo() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-            board.RemoveBoardCoordinates(new string[]
+            Board.RemoveBoardCoordinates(new string[]
             { "a1", "a2", "a3", "a4", "a7", "a8", "a9", "a10",
               "b1", "b2", "b3", "b8", "b9", "b10",
               "c1", "c2", "c9", "c10",
@@ -38,7 +38,7 @@ namespace ChessGameModes {
               "k1", "k2", "k3", "k4", "k7", "k8", "k9", "k10",
             });
 
-            BLACK_PAWNROW = board.GetHeight() - 3;
+            BLACK_PAWNROW = Board.GetHeight() - 3;
 
             promotionSquares = new List<BoardCoord>(14);
             AddPromotionSquare("c3");
@@ -63,7 +63,7 @@ namespace ChessGameModes {
 
         private void AddPromotionSquare(string algebraicKeyPosition) {
             BoardCoord coord;
-            if (board.TryGetCoordWithKey(algebraicKeyPosition, out coord)) {
+            if (Board.TryGetCoordWithKey(algebraicKeyPosition, out coord)) {
                 promotionSquares.Add(coord);
             }
         }
@@ -81,7 +81,7 @@ namespace ChessGameModes {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
                 RemovePieceFromBoard(mover);
                 RemovePieceFromActiveTeam(mover);
-                return AddPieceToBoard(ChessPieceFactory.Create(selectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
+                return AddPieceToBoard(ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
             }
             return null;
         }
@@ -104,12 +104,12 @@ namespace ChessGameModes {
                     availableMoves.Add(enPassantMove);
                 }
                 if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    selectedPawnPromotion = Piece.Queen;
+                    SelectedPawnPromotion = Piece.Queen;
                     SetPawnPromotionOptions(new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Queen });
                     for (int i = 0; i < availableMoves.Count; i++) {
                         if (availableMoves[i] == new BoardCoord(2, 2) || availableMoves[i] == new BoardCoord(2, 7)
                             || availableMoves[i] == new BoardCoord(8, 2) || availableMoves[i] == new BoardCoord(8, 7)) {
-                            selectedPawnPromotion = Piece.Bishop;
+                            SelectedPawnPromotion = Piece.Bishop;
                             SetPawnPromotionOptions(new Piece[2] { Piece.Bishop, Piece.Knight });
                             break;
                         }

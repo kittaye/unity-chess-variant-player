@@ -17,7 +17,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     R N B Q K B N R
     /// </summary>
-    public class ReversedRoyals : FIDERuleset {
+    public class ReversedRoyals : Chess {
         public ReversedRoyals() : base() {
         }
 

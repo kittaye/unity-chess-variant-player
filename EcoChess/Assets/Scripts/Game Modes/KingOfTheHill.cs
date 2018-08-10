@@ -17,7 +17,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     R N B Q K B N R
     /// </summary>
-    public class KingOfTheHill : FIDERuleset {
+    public class KingOfTheHill : Chess {
         private readonly BoardCoord CENTER_SQUARE_1 = new BoardCoord(3, 3);
         private readonly BoardCoord CENTER_SQUARE_2 = new BoardCoord(3, 4);
         private readonly BoardCoord CENTER_SQUARE_3 = new BoardCoord(4, 3);

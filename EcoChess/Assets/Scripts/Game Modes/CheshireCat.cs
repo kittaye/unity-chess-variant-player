@@ -10,7 +10,7 @@ namespace ChessGameModes {
     /// Piece rules: No castling, piece can move over - but not onto - removed squares. King's first move moves like a queen.
     /// Board layout: Orthodox.
     /// </summary>
-    public class CheshireCat : FIDERuleset {
+    public class CheshireCat : Chess {
 
         public CheshireCat() : base() {
         }
@@ -33,7 +33,7 @@ namespace ChessGameModes {
             List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
 
             for (int i = 0; i < templateMoves.Length; i++) {
-                if (board.GetCoordInfo(templateMoves[i]).boardChunk.activeInHierarchy 
+                if (Board.GetCoordInfo(templateMoves[i]).boardChunk.activeInHierarchy 
                     && IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
                     availableMoves.Add(templateMoves[i]);
                 }
@@ -57,7 +57,7 @@ namespace ChessGameModes {
 
             // Try make the move
             if (MakeMove(mover, destination)) {
-                board.GetCoordInfo(oldPos).boardChunk.SetActive(false);
+                Board.GetCoordInfo(oldPos).boardChunk.SetActive(false);
 
                 if (mover is Pawn) {
                     ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);

@@ -17,7 +17,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     p p p p p p p p
     /// </summary>
-    public class Horde : FIDERuleset {
+    public class Horde : Chess {
         public Horde() : base() { }
 
         public override string ToString() {

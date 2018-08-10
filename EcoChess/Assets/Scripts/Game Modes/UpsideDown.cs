@@ -16,7 +16,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     r n b q k b n r
     /// </summary>
-    public class UpsideDown : FIDERuleset {
+    public class UpsideDown : Chess {
         public UpsideDown() : base() { }
 
         public override string ToString() {

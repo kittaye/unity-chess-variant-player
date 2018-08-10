@@ -19,7 +19,7 @@ namespace ChessGameModes {
     ///     k r b n N B R K
     ///     q r b n N B R Q
     /// </summary>
-    public class RacingKings : FIDERuleset {
+    public class RacingKings : Chess {
         public RacingKings() : base(BOARD_WIDTH, BOARD_HEIGHT) {
             this.allowBoardFlipping = false;
         }
@@ -103,7 +103,7 @@ namespace ChessGameModes {
         private bool IsAKingInCheckAfterThisMove(ChessPiece mover, BoardCoord dest) {
             if (AssertContainsCoord(dest)) {
                 // Temporarily simulate the move actually happening
-                ChessPiece originalOccupier = board.GetCoordInfo(dest).occupier;
+                ChessPiece originalOccupier = Board.GetCoordInfo(dest).occupier;
                 ChessPiece originalLastMover;
                 BoardCoord oldPos = mover.GetBoardPosition();
                 SimulateMove(mover, dest, originalOccupier, out originalLastMover);

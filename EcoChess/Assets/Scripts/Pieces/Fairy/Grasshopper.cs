@@ -29,8 +29,8 @@ public class Grasshopper : ChessPiece {
             chessGame.GetMoveDirectionModifiers(this, (MoveDirection)i, out xModifier, out yModifier);
             BoardCoord coord = GetBoardPosition() + new BoardCoord(xModifier, yModifier);
 
-            while (chessGame.board.ContainsCoord(coord)) {
-                if(chessGame.board.GetCoordInfo(coord).occupier != null) {
+            while (chessGame.Board.ContainsCoord(coord)) {
+                if(chessGame.Board.GetCoordInfo(coord).occupier != null) {
                     BoardCoord grasshopperMove = chessGame.TryGetSpecificMove(this, coord + new BoardCoord(xModifier, yModifier));
                     if(grasshopperMove != BoardCoord.NULL) {
                         moves.Add(grasshopperMove);

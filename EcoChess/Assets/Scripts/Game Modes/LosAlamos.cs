@@ -16,12 +16,12 @@ namespace ChessGameModes {
     ///     p p p p p p
     ///     R N Q K N R
     /// </summary>
-    public class LosAlamos : FIDERuleset {
+    public class LosAlamos : Chess {
         private new const int BOARD_WIDTH = 6;
         private new const int BOARD_HEIGHT = 6;
 
         public LosAlamos() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-            pawnPromotionOptions = new Piece[3] { Piece.Queen, Piece.Rook, Piece.Knight };
+            PawnPromotionOptions = new Piece[3] { Piece.Queen, Piece.Rook, Piece.Knight };
         }
 
         public override string ToString() {

@@ -17,9 +17,9 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     . Q . Q K Q . .
     /// </summary>
-    public class ChargeOfTheLightBrigade : FIDERuleset {
+    public class ChargeOfTheLightBrigade : Chess {
         public ChargeOfTheLightBrigade() : base() {
-            pawnPromotionOptions = new Piece[0];
+            PawnPromotionOptions = new Piece[0];
         }
 
         public override string ToString() {
@@ -29,9 +29,9 @@ namespace ChessGameModes {
         public override void OnTurnComplete() {
             base.OnTurnComplete();
             if(GetCurrentTeamTurn() == Team.WHITE) {
-                selectedPawnPromotion = Piece.Queen;
+                SelectedPawnPromotion = Piece.Queen;
             } else {
-                selectedPawnPromotion = Piece.Knight;
+                SelectedPawnPromotion = Piece.Knight;
             }
         }
 

@@ -17,7 +17,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     . . . . K . . .
     /// </summary>
-    public class PeasantsRevolt : FIDERuleset {
+    public class PeasantsRevolt : Chess {
         public PeasantsRevolt() : base() { }
 
         public override string ToString() {

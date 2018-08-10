@@ -17,7 +17,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     ? ? ? ? ? ? ? ?
     /// </summary>
-    public class Chess960 : FIDERuleset {
+    public class Chess960 : Chess {
         public Chess960() : base() { }
 
         public override string ToString() {
@@ -139,7 +139,7 @@ namespace ChessGameModes {
             BoardCoord oldPos = mover.GetBoardPosition();
             bool kingCastlingThisMove = false;
 
-            ChessPiece destinationOccupier = board.GetCoordInfo(destination).occupier;
+            ChessPiece destinationOccupier = Board.GetCoordInfo(destination).occupier;
             // If the selected destination has a friendly rook occupying it, the move is a castling move.
             if (mover is King && mover.MoveCount == 0 && destinationOccupier is Rook) {
                 // Switch the destination from the rook's position to the king's final castle position.
@@ -211,8 +211,8 @@ namespace ChessGameModes {
                     bool validCastle = true;
 
                     // Check every square left and right of the king
-                    while (board.ContainsCoord(coord)) {
-                        ChessPiece piece = board.GetCoordInfo(coord).occupier;
+                    while (Board.ContainsCoord(coord)) {
+                        ChessPiece piece = Board.GetCoordInfo(coord).occupier;
                         if (piece != null) {
                             // Count the pieces inbetween the king's starting position to its ending position
                             if((i == LEFT && coord.x >= CASTLE_KINGPOS.x) || (i == RIGHT && coord.x <= CASTLE_KINGPOS.x)) {
@@ -243,8 +243,8 @@ namespace ChessGameModes {
 
                     // There must be only 1 piece obstructor or less and a castling rook found to continue
                     if(castlingRook != null && validCastle) {
-                        ChessPiece currentRookPosOccupier = board.GetCoordInfo(CASTLE_ROOKPOS).occupier;
-                        ChessPiece currentKingPosOccupier = board.GetCoordInfo(CASTLE_KINGPOS).occupier;
+                        ChessPiece currentRookPosOccupier = Board.GetCoordInfo(CASTLE_ROOKPOS).occupier;
+                        ChessPiece currentKingPosOccupier = Board.GetCoordInfo(CASTLE_KINGPOS).occupier;
 
                         // If the final rook and king positions are either null, or occupied by a friendly king or castling rook, the castle is valid.
                         if (IsAlly(currentRookPosOccupier, CASTLE_ROOKPOS) && currentRookPosOccupier != castlingRook && currentRookPosOccupier != king) {

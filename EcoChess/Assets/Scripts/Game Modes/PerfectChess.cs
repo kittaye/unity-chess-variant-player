@@ -17,15 +17,15 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     $ ^ Q A K B N R
     /// </summary>
-    public class PerfectChess : FIDERuleset {
+    public class PerfectChess : Chess {
         private Empress aSideWhiteEmpress;
         private Empress aSideBlackEmpress;
 
         public PerfectChess() : base() {
             aSideWhiteEmpress = aSideBlackEmpress = null;
 
-            selectedPawnPromotion = Piece.Amazon;
-            pawnPromotionOptions = new Piece[7] { Piece.Amazon, Piece.Queen, Piece.Empress, Piece.Princess, Piece.Rook, Piece.Bishop, Piece.Knight };
+            SelectedPawnPromotion = Piece.Amazon;
+            PawnPromotionOptions = new Piece[7] { Piece.Amazon, Piece.Queen, Piece.Empress, Piece.Princess, Piece.Rook, Piece.Bishop, Piece.Knight };
         }
 
         public override string ToString() {
@@ -103,8 +103,8 @@ namespace ChessGameModes {
                     int y = king.GetBoardPosition().y;
                     BoardCoord coord = new BoardCoord(x, y);
 
-                    while (board.ContainsCoord(coord)) {
-                        ChessPiece occupier = board.GetCoordInfo(coord).occupier;
+                    while (Board.ContainsCoord(coord)) {
+                        ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
                         if (occupier != null) {
                             if ((occupier is Rook || occupier is Empress) && occupier.MoveCount == 0) {
                                 if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i, 0)) == false

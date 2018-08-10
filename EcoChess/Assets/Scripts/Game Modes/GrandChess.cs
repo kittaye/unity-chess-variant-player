@@ -20,14 +20,14 @@ namespace ChessGameModes {
     ///     . N B Q K $ ^ B N .
     ///     R . . . . . . . . R
     /// </summary>
-    public class GrandChess : FIDERuleset {
+    public class GrandChess : Chess {
         private new const int BOARD_WIDTH = 10;
         private new const int BOARD_HEIGHT = 10;
         private new const int WHITE_PAWNROW = 2;
 
         public GrandChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-            pawnPromotionOptions = new Piece[6] { Piece.Queen, Piece.Empress, Piece.Princess, Piece.Rook, Piece.Bishop, Piece.Knight };
-            BLACK_PAWNROW = board.GetHeight() - 3;
+            PawnPromotionOptions = new Piece[6] { Piece.Queen, Piece.Empress, Piece.Princess, Piece.Rook, Piece.Bishop, Piece.Knight };
+            BLACK_PAWNROW = Board.GetHeight() - 3;
         }
 
         public override string ToString() {

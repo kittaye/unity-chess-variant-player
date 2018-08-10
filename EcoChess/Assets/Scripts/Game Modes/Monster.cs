@@ -18,7 +18,7 @@ namespace ChessGameModes {
     ///     . . p p p p . .
     ///     . . . . K . . .
     /// </summary>
-    public class Monster : FIDERuleset {
+    public class Monster : Chess {
         private bool isWhiteSecondMove = false;
 
         public Monster() : base() {

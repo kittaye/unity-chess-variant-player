@@ -18,7 +18,7 @@ namespace ChessGameModes {
     ///     . . . . p p Q B
     ///     . . . p R B N K
     /// </summary>
-    public class Legan : FIDERuleset {
+    public class Legan : Chess {
         private List<BoardCoord> promotionSquares;
 
         public Legan() : base() {
@@ -42,7 +42,7 @@ namespace ChessGameModes {
 
         private void AddPromotionSquare(string algebraicKeyPosition) {
             BoardCoord coord;
-            if (board.TryGetCoordWithKey(algebraicKeyPosition, out coord)) {
+            if (Board.TryGetCoordWithKey(algebraicKeyPosition, out coord)) {
                 promotionSquares.Add(coord);
             }
         }
@@ -78,7 +78,7 @@ namespace ChessGameModes {
             AddPieceToBoard(new LeganPawn(Team.WHITE, "g3"));
             AddPieceToBoard(new LeganPawn(Team.WHITE, "e4"));
             BoardCoord coord = new BoardCoord(3, 0);
-            while (board.ContainsCoord(coord)) {
+            while (Board.ContainsCoord(coord)) {
                 AddPieceToBoard(new LeganPawn(Team.WHITE, coord));
                 coord.x++;
                 coord.y++;
@@ -89,7 +89,7 @@ namespace ChessGameModes {
             AddPieceToBoard(new LeganPawn(Team.BLACK, "c7"));
             AddPieceToBoard(new LeganPawn(Team.BLACK, "d5"));
             coord = new BoardCoord(0, 3);
-            while (board.ContainsCoord(coord)) {
+            while (Board.ContainsCoord(coord)) {
                 AddPieceToBoard(new LeganPawn(Team.BLACK, coord));
                 coord.x++;
                 coord.y++;
@@ -109,7 +109,7 @@ namespace ChessGameModes {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
                 RemovePieceFromBoard(mover);
                 RemovePieceFromActiveTeam(mover);
-                return AddPieceToBoard(ChessPieceFactory.Create(selectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
+                return AddPieceToBoard(ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
             }
             return null;
         }
