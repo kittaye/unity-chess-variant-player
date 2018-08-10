@@ -129,14 +129,14 @@ namespace ChessGameModes {
             AddPieceToBoard(new Queen(Team.WHITE, new BoardCoord(3, WHITE_BACKROW)));
             AddPieceToBoard(new Queen(Team.BLACK, new BoardCoord(3, BLACK_BACKROW)));
 
-            for (int x = 0; x < Board.GetWidth(); x++) {
+            for (int x = 0; x < BOARD_WIDTH; x++) {
                 AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, WHITE_PAWNROW)));
                 AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(x, BLACK_PAWNROW)));
 
-                if (x == 1 || x == Board.GetWidth() - 2) {
+                if (x == 1 || x == BOARD_WIDTH - 2) {
                     AddPieceToBoard(new Knight(Team.WHITE, new BoardCoord(x, WHITE_BACKROW)));
                     AddPieceToBoard(new Knight(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
-                } else if (x == 2 || x == Board.GetWidth() - 3) {
+                } else if (x == 2 || x == BOARD_WIDTH - 3) {
                     AddPieceToBoard(new Bishop(Team.WHITE, new BoardCoord(x, WHITE_BACKROW)));
                     AddPieceToBoard(new Bishop(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
                 }
