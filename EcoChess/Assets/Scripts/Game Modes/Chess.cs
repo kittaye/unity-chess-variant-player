@@ -31,22 +31,14 @@ namespace ChessGameModes {
         public Board Board { get; private set; }
         public bool allowBoardFlipping;
 
-
         protected const int BOARD_WIDTH = 8;
         protected const int BOARD_HEIGHT = 8;
         protected const int WHITE_BACKROW = 0;
         protected const int WHITE_PAWNROW = 1;
         protected int BLACK_BACKROW;
         protected int BLACK_PAWNROW;
-
-        protected Team currentTeamTurn;
-        protected Team opposingTeamTurn;
-
-        protected uint numConsecutiveCapturelessMoves { get; private set; }
-
         protected bool checkingForCheck;
         protected List<ChessPiece> opposingTeamCheckThreats;
-
         protected ChessPiece currentRoyalPiece;
         protected ChessPiece opposingRoyalPiece;
         protected Rook aSideWhiteRook;
@@ -54,7 +46,9 @@ namespace ChessGameModes {
         protected Rook aSideBlackRook;
         protected Rook hSideBlackRook;
 
-
+        private uint numConsecutiveCapturelessMoves;
+        private Team currentTeamTurn;
+        private Team opposingTeamTurn;
         private List<ChessPiece> whitePieces;
         private List<ChessPiece> blackPieces;
         private ChessPiece lastMovedWhitePiece;
@@ -98,6 +92,18 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Traditional Chess";
+        }
+
+        public Team GetCurrentTeamTurn() {
+            return currentTeamTurn;
+        }
+
+        public Team GetOpposingTeamTurn() {
+            return opposingTeamTurn;
+        }
+
+        public int GetNumConseqCapturelessMoves() {
+            return (int)numConsecutiveCapturelessMoves;
         }
 
         /// <summary>
@@ -389,14 +395,6 @@ namespace ChessGameModes {
             return BoardCoord.NULL;
         }
 
-        protected ChessPiece LastMovedOpposingPiece(ChessPiece mover) {
-            if (mover.GetTeam() == Team.WHITE) {
-                return GetTeamLastMovedPiece(Team.BLACK);
-            } else {
-                return GetTeamLastMovedPiece(Team.WHITE);
-            }
-        }
-
         /// <summary>
         /// Called in CalculateAvailableMoves. Determines if a castling move can be made for a chess piece.
         /// </summary>
@@ -463,14 +461,6 @@ namespace ChessGameModes {
             return true;
         }
 
-        public Team GetCurrentTeamTurn() {
-            return currentTeamTurn;
-        }
-
-        public Team GetOpposingTeamTurn() {
-            return opposingTeamTurn;
-        }
-
         public ChessPiece GetTeamLastMovedPiece(Team team) {
             if (team == Team.WHITE) {
                 return lastMovedWhitePiece;
@@ -486,6 +476,14 @@ namespace ChessGameModes {
                 } else {
                     lastMovedBlackPiece = piece;
                 }
+            }
+        }
+
+        protected ChessPiece LastMovedOpposingPiece(ChessPiece mover) {
+            if (mover.GetTeam() == Team.WHITE) {
+                return GetTeamLastMovedPiece(Team.BLACK);
+            } else {
+                return GetTeamLastMovedPiece(Team.WHITE);
             }
         }
 
