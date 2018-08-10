@@ -450,23 +450,29 @@ namespace ChessGameModes {
         /// </summary>
         /// <returns>True if a team has won.</returns>
         public virtual bool CheckWinState() {
-            if (numConsecutiveCapturelessMoves == 100) {
-                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
-                return true;
-            }
-
+            bool hasAnyMoves = false;
             foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
                 if (piece.IsAlive) {
-                    if (CalculateAvailableMoves(piece).Count > 0) return false;
+                    if (CalculateAvailableMoves(piece).Count > 0) {
+                        hasAnyMoves = true;
+                        break;
+                    }
                 }
             }
 
-            if (IsPieceInCheck(currentRoyalPiece)) {
-                UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
-            } else {
-                UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+            if (!hasAnyMoves) {
+                if (IsPieceInCheck(currentRoyalPiece)) {
+                    UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                } else {
+                    UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                }
+                return true;
             }
-            return true;
+
+            if (CapturelessMovesLimit()) {
+                return true;
+            }
+            return false;
         }
 
         public ChessPiece GetTeamLastMovedPiece(Team team) {
