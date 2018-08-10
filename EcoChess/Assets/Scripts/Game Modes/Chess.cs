@@ -106,6 +106,14 @@ namespace ChessGameModes {
             return (int)numConsecutiveCapturelessMoves;
         }
 
+        public bool CapturelessMovesLimit() {
+            if (numConsecutiveCapturelessMoves >= 100) {
+                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Is called after the board is instantiated. Used to place the initial chess pieces on the board. 
         /// </summary>
