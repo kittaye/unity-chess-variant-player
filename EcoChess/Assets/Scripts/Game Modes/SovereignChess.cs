@@ -283,6 +283,7 @@ namespace ChessGameModes {
         }
 
         private BoardCoord TryGetValidMove(ChessPiece mover, BoardCoord templateMove, out bool cancelDirectionalSlide) {
+            cancelDirectionalSlide = false;
             BoardCoord[] colourPositions = new BoardCoord[2];
             Color movedToColour = Board.GetCoordInfo(templateMove).boardChunk.GetComponent<MeshRenderer>().material.color;
 
@@ -298,7 +299,6 @@ namespace ChessGameModes {
                 ChessPiece firstOccupier = Board.GetCoordInfo(colourPositions[0]).occupier;
                 ChessPiece secondOccupier = Board.GetCoordInfo(colourPositions[1]).occupier;
 
-                cancelDirectionalSlide = false;
                 // Check if no occupiers OR a threat...
                 if ((firstOccupier == null && secondOccupier == null) || IsThreat(mover, templateMove)) {
                     if (whiteControlledColours.Contains(GetChessPieceColour(mover)) && movedToColour == whiteCurrentOwnedColour
@@ -310,11 +310,8 @@ namespace ChessGameModes {
                     // Check if the mover is occuping one of the squares...
                 } else if (mover.GetBoardPosition() == colourPositions[0] || mover.GetBoardPosition() == colourPositions[1]) {
                     return templateMove;
-
-                    // Check if a threat is occuping the squares of that colour...
-                } else if (IsThreat(mover, colourPositions[0]) || IsThreat(mover, colourPositions[1])) {
-                    cancelDirectionalSlide = true;
                 }
+
                 return BoardCoord.NULL;
 
                 // Else moved to square is not a coloured square...
