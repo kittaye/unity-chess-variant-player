@@ -22,10 +22,6 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            if (CapturelessMovesLimit()) {
-                return true;
-            }
-
             bool hasAnyMoves = false;
             foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
                 if (piece.IsAlive) {
