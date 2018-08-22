@@ -77,7 +77,7 @@ namespace ChessGameModes {
             currentTeamTurn = Team.WHITE;
             opposingTeamTurn = Team.BLACK;
             numConsecutiveCapturelessMoves = 0;
-            allowBoardFlipping = true;
+            allowBoardFlipping = false;
 
             BLACK_BACKROW = Board.GetHeight() - 1;
             BLACK_PAWNROW = Board.GetHeight() - 2;
