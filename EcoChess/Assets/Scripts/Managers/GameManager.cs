@@ -44,8 +44,10 @@ public class GameManager : MonoBehaviour {
     }
 
     public void FlipBoard() {
-        // Makes sure that the board is never flipped such that the current team is at the top.
+        // Makes sure that the board is never flipped such that the current team to move is at the top.
         if(!ChessGame.Board.isFlipped && ChessGame.GetCurrentTeamTurn() == Team.WHITE) {
+            return;
+        } else if(ChessGame.Board.isFlipped && ChessGame.GetCurrentTeamTurn() == Team.BLACK) {
             return;
         }
 
