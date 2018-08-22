@@ -8,6 +8,7 @@ public class UIManager : MonoBehaviour {
     public Canvas mainCanvas;
     public GameObject promotionWindow;
     public GameObject defectionWindow;
+    public GameObject settingsWindow;
     public GameObject spritePrefab;
     public Button nextVariantButton;
     public Button prevVariantButton;
@@ -18,6 +19,7 @@ public class UIManager : MonoBehaviour {
     private Text defectToLbl;
     private Text gameLogLbl;
     private List<GameObject> promotionOptions;
+    private bool settingsVisible;
 
     // Use this for initialization
     void Awake () {
@@ -61,6 +63,7 @@ public class UIManager : MonoBehaviour {
 
         prevVariantButton.gameObject.SetActive(false);
         nextVariantButton.gameObject.SetActive(false);
+        settingsWindow.SetActive(false);
 
         if (GameManager.GetCurrentVariantIndex() != 0) {
             prevVariantButton.gameObject.SetActive(true);
@@ -170,5 +173,14 @@ public class UIManager : MonoBehaviour {
         foreach (GameObject item in promotionOptions) {
             item.GetComponent<Image>().sprite = Resources.Load<Sprite>(newCurrentTeam.ToString() + "_" + item.name);
         }
+    }
+
+    public void OnClickSettingsButton() {
+        settingsVisible = !settingsVisible;
+        settingsWindow.SetActive(settingsVisible);
+    }
+
+    public void OnToggleFlipBoard() {
+        GameManager.Instance.ChessGame.allowBoardFlipping = !GameManager.Instance.ChessGame.allowBoardFlipping;
     }
 }

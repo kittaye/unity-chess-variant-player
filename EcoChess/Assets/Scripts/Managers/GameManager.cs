@@ -10,7 +10,6 @@ public class GameManager : MonoBehaviour {
     public Camera mainCamera;
     public GameObject piecePrefab;
     public GameObject boardChunkPrefab;
-    public bool flipBoardEveryTurn = true;
 
     private static int modeIndex = 0;
     private string lastTurnLabel;
@@ -45,7 +44,13 @@ public class GameManager : MonoBehaviour {
     }
 
     public void FlipBoard() {
+        // Makes sure that the board is never flipped such that the current team is at the top.
+        if(!ChessGame.Board.isFlipped && ChessGame.GetCurrentTeamTurn() == Team.WHITE) {
+            return;
+        }
+
         ChessGame.Board.isFlipped = !ChessGame.Board.isFlipped;
+
         mainCamera.transform.Rotate(new Vector3(0, 0, 180));
         foreach (ChessPiece piece in ChessGame.GetPieces(true)) {
             piece.gameObject.transform.Rotate(new Vector3(0, 0, 180));
@@ -74,7 +79,7 @@ public class GameManager : MonoBehaviour {
             if (_OnGameFinished != null) _OnGameFinished.Invoke();
         }
 
-        if(ChessGame.allowBoardFlipping && flipBoardEveryTurn && ChessGame.GetCurrentTurnLabel().ToString() != lastTurnLabel) {
+        if(ChessGame.allowBoardFlipping && ChessGame.GetCurrentTurnLabel().ToString() != lastTurnLabel) {
             FlipBoard();
         }
         lastTurnLabel = ChessGame.GetCurrentTurnLabel().ToString();
