@@ -35,22 +35,20 @@ namespace ChessGameModes {
                 UIManager.Instance.LogCustom("Team " + GetOpposingTeamTurn().ToString() + " has reached the center! -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
             }
 
+            if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
+                if (IsPieceInCheck(currentRoyalPiece)) {
+                    UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
+                } else {
+                    UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
+                }
+                return true;
+            }
+
             if (CapturelessMovesLimit()) {
                 return true;
             }
 
-            foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
-                if (piece.IsAlive) {
-                    if (CalculateAvailableMoves(piece).Count > 0) return false;
-                }
-            }
-
-            if (IsPieceInCheck(currentRoyalPiece)) {
-                UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
-            } else {
-                UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
-            }
-            return true;
+            return false;
         }
     }
 }

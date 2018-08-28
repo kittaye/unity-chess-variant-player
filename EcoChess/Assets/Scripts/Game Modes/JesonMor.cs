@@ -40,15 +40,15 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            if (CapturelessMovesLimit()) {
-                return true;
-            }
-
             if (gameFinished) {
                 UIManager.Instance.LogCustom("Team " + GetOpposingTeamTurn().ToString() + " has left e5 -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
                 return true;
             } else if (GetPieces(GetCurrentTeamTurn()).TrueForAll((x) => (x.IsAlive == false))) {
                 UIManager.Instance.LogCustom("Team " + GetOpposingTeamTurn().ToString() + " wins by elimination!");
+                return true;
+            }
+
+            if (CapturelessMovesLimit()) {
                 return true;
             }
 

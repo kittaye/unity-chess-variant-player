@@ -25,31 +25,26 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            if (CapturelessMovesLimit()) {
-                return true;
-            }
-
             if (GetCurrentTeamTurn() == Team.WHITE) {
                 if (GetPieces(Team.WHITE).TrueForAll((x) => (x.IsAlive == false))) {
                     UIManager.Instance.LogCustom("Team Black wins by elimination!");
                     return true;
                 }
             } else {
-                foreach (ChessPiece piece in GetPieces(Team.BLACK)) {
-                    if (piece.IsAlive) {
-                        if (CalculateAvailableMoves(piece).Count > 0) {
-                            return false;
-                        }
+                if (!TeamHasAnyMoves(Team.BLACK)) {
+                    if (IsPieceInCheck(currentRoyalPiece)) {
+                        UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
+                    } else {
+                        UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
                     }
+                    return true;
                 }
+            }
 
-                if (IsPieceInCheck(currentRoyalPiece)) {
-                    UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
-                } else {
-                    UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
-                }
+            if (CapturelessMovesLimit()) {
                 return true;
             }
+
             return false;
         }
 

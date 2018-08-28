@@ -60,29 +60,25 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            if (CapturelessMovesLimit()) {
-                return true;
-            }
-
             if (isWhiteSecondMove) {
                 if (IsPieceInCheck(opposingRoyalPiece)) {
-                    UIManager.Instance.LogCustom("Team " + GetOpposingTeamTurn().ToString() + " has been checkmated -- Team " + GetCurrentTeamTurn().ToString() + " wins!");
+                    UIManager.Instance.LogCheckmate(GetCurrentTeamTurn().ToString(), GetOpposingTeamTurn().ToString());
                     return true;
                 }
             }
 
             if(isWhiteSecondMove || GetCurrentTeamTurn() == Team.BLACK) {
-                foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
-                    if (piece.IsAlive) {
-                        if (CalculateAvailableMoves(piece).Count > 0) return false;
+                if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
+                    if (IsPieceInCheck(currentRoyalPiece)) {
+                        UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
+                    } else {
+                        UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
                     }
+                    return true;
                 }
+            }
 
-                if (IsPieceInCheck(currentRoyalPiece)) {
-                    UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
-                } else {
-                    UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
-                }
+            if (CapturelessMovesLimit()) {
                 return true;
             }
 

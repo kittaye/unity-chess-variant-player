@@ -70,25 +70,6 @@ namespace ChessGameModes {
             return false;
         }
 
-        public override bool CheckWinState() {
-            if (CapturelessMovesLimit()) {
-                return true;
-            }
-
-            foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
-                if (piece.IsAlive) {
-                    if (CalculateAvailableMoves(piece).Count > 0) return false;
-                }
-            }
-
-            if (IsPieceInCheck(currentRoyalPiece)) {
-                UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
-            } else {
-                UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
-            }
-            return true;
-        }
-
         public override void PopulateBoard() {
             currentRoyalPiece = (Knight)AddPieceToBoard(new Knight(Team.WHITE, new BoardCoord(4, WHITE_BACKROW)));
             opposingRoyalPiece = (Knight)AddPieceToBoard(new Knight(Team.BLACK, new BoardCoord(4, BLACK_BACKROW)));

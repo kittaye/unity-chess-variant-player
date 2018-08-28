@@ -23,31 +23,25 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            if (CapturelessMovesLimit()) {
-                return true;
-            }
-
             if (GetPieces(GetCurrentTeamTurn()).TrueForAll(x => x.IsAlive == false)) {
                 UIManager.Instance.LogCustom("Team " + GetCurrentTeamTurn().ToString() + " has lost all pieces -- Team " + GetCurrentTeamTurn().ToString() + " wins!");
                 return true;
             }
 
-            canCaptureThisTurn = CanCaptureAPiece();
-
-            if (canCaptureThisTurn) {
+            if (CanCaptureAPiece()) {
                 return false;
-            } else {
-                foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
-                    if (piece.IsAlive) {
-                        if (CalculateAvailableMoves(piece).Count > 0) {
-                            return false;
-                        }
-                    }
-                }
             }
 
-            UIManager.Instance.LogCustom("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move -- Team " + GetCurrentTeamTurn().ToString() + " wins!");
-            return true;
+            if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
+                UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
+                return true;
+            }
+
+            if (CapturelessMovesLimit()) {
+                return true;
+            }
+
+            return false;
         }
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {

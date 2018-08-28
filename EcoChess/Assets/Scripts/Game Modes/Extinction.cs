@@ -31,10 +31,6 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            if (CapturelessMovesLimit()) {
-                return true;
-            }
-
             if (GetCurrentTeamTurn() == Team.WHITE) {
                 for (int i = 0; i < 6; i++) {
                     if(whitePieceCounts[pieces[i]] == 0) {
@@ -51,14 +47,16 @@ namespace ChessGameModes {
                 }
             }
 
-            foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
-                if (piece.IsAlive) {
-                    if (CalculateAvailableMoves(piece).Count > 0) return false;
-                }
+            if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
+                UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
+                return true;
             }
 
-            UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
-            return true;
+            if (CapturelessMovesLimit()) {
+                return true;
+            }
+
+            return false;
         }
 
         public override void PopulateBoard() {
