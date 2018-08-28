@@ -446,33 +446,40 @@ namespace ChessGameModes {
         }
 
         /// <summary>
+        /// Checks whether any piece on the team is able to move.
+        /// </summary>
+        /// <param name="team">Team to check.</param>
+        /// <returns>True if a piece is able to move.</returns>
+        protected bool TeamHasAnyMoves(Team team) {
+            foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
+                if (piece.IsAlive) {
+                    if (CalculateAvailableMoves(piece).Count > 0) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Defines how the chess game is won.
         /// </summary>
         /// <returns>True if a team has won.</returns>
         public virtual bool CheckWinState() {
-            bool hasAnyMoves = false;
-            foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
-                if (piece.IsAlive) {
-                    if (CalculateAvailableMoves(piece).Count > 0) {
-                        hasAnyMoves = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!hasAnyMoves) {
+            if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
                 if (IsPieceInCheck(currentRoyalPiece)) {
                     UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
                 } else {
                     UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
                 }
                 return true;
-            }
 
-            if (CapturelessMovesLimit()) {
+            } else if (CapturelessMovesLimit()) {
                 return true;
+
+            } else {
+                return false;
             }
-            return false;
         }
 
         public ChessPiece GetTeamLastMovedPiece(Team team) {
