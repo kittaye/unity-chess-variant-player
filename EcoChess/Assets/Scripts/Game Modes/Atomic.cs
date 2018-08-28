@@ -17,27 +17,25 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            if (CapturelessMovesLimit()) {
-                return true;
-            }
-
             if (currentRoyalPiece.IsAlive == false) {
                 UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + "'s king has been captured -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
                 return true;
             }
 
-            foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
-                if (piece.IsAlive) {
-                    if (CalculateAvailableMoves(piece).Count > 0) return false;
+            if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
+                if (IsPieceInCheck(currentRoyalPiece)) {
+                    UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                } else {
+                    UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
                 }
-            }
+                return true;
 
-            if (IsPieceInCheck(currentRoyalPiece)) {
-                UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+            } else if (CapturelessMovesLimit()) {
+                return true;
+
             } else {
-                UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                return false;
             }
-            return true;
         }
 
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
