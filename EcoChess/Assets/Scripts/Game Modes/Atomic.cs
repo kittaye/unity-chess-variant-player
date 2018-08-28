@@ -22,20 +22,7 @@ namespace ChessGameModes {
                 return true;
             }
 
-            if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
-                if (IsPieceInCheck(currentRoyalPiece)) {
-                    UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
-                } else {
-                    UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
-                }
-                return true;
-            }
-
-            if (CapturelessMovesLimit()) {
-                return true;
-            }
-
-            return false;
+            return base.CheckWinState();
         }
 
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {

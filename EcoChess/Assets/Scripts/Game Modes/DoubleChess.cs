@@ -76,23 +76,6 @@ namespace ChessGameModes {
             }
         }
 
-        public override bool CheckWinState() {
-            if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
-                if (IsPieceInCheck(currentRoyalPiece) || IsPieceInCheck(secondCurrentKing)) {
-                    UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
-                } else {
-                    UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
-                }
-                return true;
-            }
-
-            if (CapturelessMovesLimit()) {
-                return true;
-            }
-
-            return false;
-        }
-
         protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
             if (mover.GetBoardPosition().x == 2) {
                 if (mover.GetTeam() == Team.WHITE) {
