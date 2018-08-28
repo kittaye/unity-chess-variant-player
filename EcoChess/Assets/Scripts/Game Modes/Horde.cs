@@ -29,23 +29,17 @@ namespace ChessGameModes {
                 if (GetPieces(Team.WHITE).TrueForAll((x) => (x.IsAlive == false))) {
                     UIManager.Instance.LogCustom("Team Black wins by elimination!");
                     return true;
+
+                } else if(!TeamHasAnyMoves(Team.WHITE)) {
+                    UIManager.Instance.LogStalemate(Team.WHITE.ToString());
+                    return true;
+
+                } else {
+                    return false;
                 }
             } else {
-                if (!TeamHasAnyMoves(Team.BLACK)) {
-                    if (IsPieceInCheck(currentRoyalPiece)) {
-                        UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
-                    } else {
-                        UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
-                    }
-                    return true;
-                }
+                return base.CheckWinState();
             }
-
-            if (CapturelessMovesLimit()) {
-                return true;
-            }
-
-            return false;
         }
 
         public override void PopulateBoard() {
