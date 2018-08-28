@@ -28,7 +28,7 @@ namespace ChessGameModes {
             }
 
             if (GetPieces(GetCurrentTeamTurn()).TrueForAll(x => x.IsAlive == false)) {
-                UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has lost all pieces -- Team " + GetCurrentTeamTurn().ToString() + " wins!");
+                UIManager.Instance.LogCustom("Team " + GetCurrentTeamTurn().ToString() + " has lost all pieces -- Team " + GetCurrentTeamTurn().ToString() + " wins!");
                 return true;
             }
 
@@ -46,7 +46,7 @@ namespace ChessGameModes {
                 }
             }
 
-            UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move -- Team " + GetCurrentTeamTurn().ToString() + " wins!");
+            UIManager.Instance.LogCustom("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move -- Team " + GetCurrentTeamTurn().ToString() + " wins!");
             return true;
         }
 

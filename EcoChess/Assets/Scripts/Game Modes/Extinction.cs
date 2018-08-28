@@ -38,14 +38,14 @@ namespace ChessGameModes {
             if (GetCurrentTeamTurn() == Team.WHITE) {
                 for (int i = 0; i < 6; i++) {
                     if(whitePieceCounts[pieces[i]] == 0) {
-                        UIManager.Instance.Log("Team WHITE's " + pieces[i].ToString().ToLower() + "s have all been eliminated -- Team BLACK wins!");
+                        UIManager.Instance.LogCustom("Team WHITE's " + pieces[i].ToString().ToLower() + "s have all been eliminated -- Team BLACK wins!");
                         return true;
                     }
                 }
             } else {
                 for (int i = 0; i < 6; i++) {
                     if (blackPieceCounts[pieces[i]] == 0) {
-                        UIManager.Instance.Log("Team BLACK's " + pieces[i].ToString().ToLower() + "s have all been eliminated -- Team WHITE wins!");
+                        UIManager.Instance.LogCustom("Team BLACK's " + pieces[i].ToString().ToLower() + "s have all been eliminated -- Team WHITE wins!");
                         return true;
                     }
                 }
@@ -57,7 +57,7 @@ namespace ChessGameModes {
                 }
             }
 
-            UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+            UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
             return true;
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum GameResults { Checkmate, Stalemate };
 public class UIManager : MonoBehaviour {
     public static UIManager Instance;
     public Canvas mainCanvas;
@@ -91,7 +92,19 @@ public class UIManager : MonoBehaviour {
         teamTurnLbl.color = Color.yellow;
     }
 
-    public void Log(string message) {
+    public void LogCheckmate(string winningTeamName, string losingTeamName) {
+        gameLogLbl.text = string.Format("Team {0} has been checkmated -- Team {1} wins!", winningTeamName, losingTeamName);
+    }
+
+    public void LogStalemate(string stalematerTeamName) {
+        gameLogLbl.text = string.Format("Stalemate on {0}'s move!", stalematerTeamName);
+    }
+
+    public void LogCapturelessLimit(string stalematerTeamName) {
+        gameLogLbl.text = string.Format("No captures or pawn moves in 50 turns. Stalemate on {0}'s move!", stalematerTeamName);
+    }
+
+    public void LogCustom(string message) {
         gameLogLbl.text = message;
     }
 

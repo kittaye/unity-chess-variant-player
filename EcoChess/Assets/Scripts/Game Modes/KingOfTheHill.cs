@@ -32,7 +32,7 @@ namespace ChessGameModes {
         public override bool CheckWinState() {
             if (opposingRoyalPiece.GetBoardPosition() == CENTER_SQUARE_1 || opposingRoyalPiece.GetBoardPosition() == CENTER_SQUARE_2
                 || opposingRoyalPiece.GetBoardPosition() == CENTER_SQUARE_3 || opposingRoyalPiece.GetBoardPosition() == CENTER_SQUARE_4) {
-                UIManager.Instance.Log("Team " + GetOpposingTeamTurn().ToString() + " has reached the center! -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                UIManager.Instance.LogCustom("Team " + GetOpposingTeamTurn().ToString() + " has reached the center! -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
             }
 
             if (CapturelessMovesLimit()) {
@@ -46,9 +46,9 @@ namespace ChessGameModes {
             }
 
             if (IsPieceInCheck(currentRoyalPiece)) {
-                UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
             } else {
-                UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
             }
             return true;
         }

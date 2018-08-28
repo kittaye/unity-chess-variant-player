@@ -134,10 +134,10 @@ namespace ChessGameModes {
 
             if (!hasAnyMoves) {
                 if (IsPieceInCheck(currentRoyalPiece)) {
-                    UIManager.Instance.Log("Team " + SovereignExtensions.GetColourName(GetChessPieceColour(currentRoyalPiece))
-                        + " has been checkmated -- Team " + SovereignExtensions.GetColourName(GetChessPieceColour(opposingRoyalPiece)) + " wins!");
+                    UIManager.Instance.LogCheckmate(SovereignExtensions.GetColourName(GetChessPieceColour(opposingRoyalPiece)).ToString(),
+                        SovereignExtensions.GetColourName(GetChessPieceColour(currentRoyalPiece)).ToString());
                 } else {
-                    UIManager.Instance.Log("Stalemate on " + SovereignExtensions.GetColourName(GetChessPieceColour(currentRoyalPiece)) + "'s move!");
+                    UIManager.Instance.LogStalemate(SovereignExtensions.GetColourName(GetChessPieceColour(currentRoyalPiece)).ToString());
                 }
                 return true;
             }

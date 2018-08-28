@@ -59,18 +59,18 @@ namespace ChessGameModes {
 
                 List<BoardCoord> kingMoves = CalculateAvailableMoves(currentRoyalPiece);
                 if (kingMoves.Contains(stalemateSquare1) || kingMoves.Contains(stalemateSquare2) || kingMoves.Contains(stalemateSquare3)) {
-                    UIManager.Instance.Log("Stalemate after team " + GetOpposingTeamTurn().ToString() + "'s move! (Team " + GetCurrentTeamTurn().ToString()
+                    UIManager.Instance.LogCustom("Stalemate after team " + GetOpposingTeamTurn().ToString() + "'s move! (Team " + GetCurrentTeamTurn().ToString()
                         + " is able to reach the eighth rank on this turn)  -- Draw!");
                     return true;
                 } else {
-                    UIManager.Instance.Log("Team " + GetOpposingTeamTurn().ToString() + "'s king has reached the eighth rank -- Team "
+                    UIManager.Instance.LogCustom("Team " + GetOpposingTeamTurn().ToString() + "'s king has reached the eighth rank -- Team "
                         + GetOpposingTeamTurn().ToString() + "wins!");
                     return true;
                 }
             }
 
             if(!TeamHasAnyMoves(GetCurrentTeamTurn())) {
-                UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
                 return true;
             }
 

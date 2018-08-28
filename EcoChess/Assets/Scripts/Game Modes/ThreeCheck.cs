@@ -30,11 +30,11 @@ namespace ChessGameModes {
                 }
 
                 if (numOfChecksWHITE == 3 || numOfChecksBLACK == 3) {
-                    UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checked 3 times -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                    UIManager.Instance.LogCustom("Team " + GetCurrentTeamTurn().ToString() + " has been checked 3 times -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
                     return true;
 
                 } else if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
-                    UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                    UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
                     return true;
                 }
             }

@@ -45,10 +45,10 @@ namespace ChessGameModes {
             }
 
             if (gameFinished) {
-                UIManager.Instance.Log("Team " + GetOpposingTeamTurn().ToString() + " has left e5 -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                UIManager.Instance.LogCustom("Team " + GetOpposingTeamTurn().ToString() + " has left e5 -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
                 return true;
             } else if (GetPieces(GetCurrentTeamTurn()).TrueForAll((x) => (x.IsAlive == false))) {
-                UIManager.Instance.Log("Team " + GetOpposingTeamTurn().ToString() + " wins by elimination!");
+                UIManager.Instance.LogCustom("Team " + GetOpposingTeamTurn().ToString() + " wins by elimination!");
                 return true;
             }
 

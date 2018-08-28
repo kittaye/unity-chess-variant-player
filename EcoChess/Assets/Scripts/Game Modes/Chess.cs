@@ -108,7 +108,7 @@ namespace ChessGameModes {
 
         public bool CapturelessMovesLimit() {
             if (numConsecutiveCapturelessMoves >= 100) {
-                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate!");
+                UIManager.Instance.LogCapturelessLimit(GetCurrentTeamTurn().ToString());
                 return true;
             }
             return false;
@@ -468,9 +468,9 @@ namespace ChessGameModes {
         public virtual bool CheckWinState() {
             if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
                 if (IsPieceInCheck(currentRoyalPiece)) {
-                    UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                    UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
                 } else {
-                    UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                    UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
                 }
                 return true;
             }

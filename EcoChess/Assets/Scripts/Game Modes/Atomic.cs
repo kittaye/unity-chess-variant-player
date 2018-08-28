@@ -18,15 +18,15 @@ namespace ChessGameModes {
 
         public override bool CheckWinState() {
             if (currentRoyalPiece.IsAlive == false) {
-                UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + "'s king has been captured -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                UIManager.Instance.LogCustom("Team " + GetCurrentTeamTurn().ToString() + "'s king has been captured -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
                 return true;
             }
 
             if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
                 if (IsPieceInCheck(currentRoyalPiece)) {
-                    UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                    UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
                 } else {
-                    UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                    UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
                 }
                 return true;
             }

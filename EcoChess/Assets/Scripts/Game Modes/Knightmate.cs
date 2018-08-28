@@ -82,9 +82,9 @@ namespace ChessGameModes {
             }
 
             if (IsPieceInCheck(currentRoyalPiece)) {
-                UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
+                UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
             } else {
-                UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
             }
             return true;
         }
