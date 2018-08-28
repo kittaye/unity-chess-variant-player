@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System;
 
@@ -473,13 +473,13 @@ namespace ChessGameModes {
                     UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
                 }
                 return true;
-
-            } else if (CapturelessMovesLimit()) {
-                return true;
-
-            } else {
-                return false;
             }
+
+            if (CapturelessMovesLimit()) {
+                return true;
+            }
+
+            return false;
         }
 
         public ChessPiece GetTeamLastMovedPiece(Team team) {

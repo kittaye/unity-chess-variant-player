@@ -22,16 +22,6 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            bool hasAnyMoves = false;
-            foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
-                if (piece.IsAlive) {
-                    if (CalculateAvailableMoves(piece).Count > 0) {
-                        hasAnyMoves = true;
-                        break;
-                    }
-                }
-            }
-
             if (IsPieceInCheck(currentRoyalPiece)) {
                 if (currentRoyalPiece.GetTeam() == Team.WHITE) {
                     numOfChecksWHITE++;
@@ -42,9 +32,8 @@ namespace ChessGameModes {
                 if (numOfChecksWHITE == 3 || numOfChecksBLACK == 3) {
                     UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checked 3 times -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
                     return true;
-                }
 
-                if (hasAnyMoves == false) {
+                } else if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
                     UIManager.Instance.Log("Team " + GetCurrentTeamTurn().ToString() + " has been checkmated -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
                     return true;
                 }
@@ -53,6 +42,7 @@ namespace ChessGameModes {
             if (CapturelessMovesLimit()) {
                 return true;
             }
+
             return false;
         }
     }

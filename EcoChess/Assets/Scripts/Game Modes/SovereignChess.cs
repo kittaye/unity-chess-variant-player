@@ -113,31 +113,40 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            if (GetNumConseqCapturelessMoves() >= 100) {
-                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " 
-                    + SovereignExtensions.GetColourName(GetChessPieceColour(currentRoyalPiece)) + "'s move!");
-                return true;
-            }
-
+            bool hasAnyMoves = false;
             foreach (ChessPiece piece in GetPieces()) {
                 if (GetCurrentTeamTurn() == Team.WHITE) {
                     if (whiteControlledColours.Contains(GetChessPieceColour(piece))) {
-                        if (CalculateAvailableMoves(piece).Count > 0) return false;
+                        if (CalculateAvailableMoves(piece).Count > 0) {
+                            hasAnyMoves = true;
+                            break;
+                        }
                     }
                 } else {
                     if (blackControlledColours.Contains(GetChessPieceColour(piece))) {
-                        if (CalculateAvailableMoves(piece).Count > 0) return false;
+                        if (CalculateAvailableMoves(piece).Count > 0) {
+                            hasAnyMoves = true;
+                            break;
+                        }
                     }
                 }
             }
 
-            if (IsPieceInCheck(currentRoyalPiece)) {
-                UIManager.Instance.Log("Team " + SovereignExtensions.GetColourName(GetChessPieceColour(currentRoyalPiece)) 
-                    + " has been checkmated -- Team " + SovereignExtensions.GetColourName(GetChessPieceColour(opposingRoyalPiece)) + " wins!");
-            } else {
-                UIManager.Instance.Log("Stalemate on " + SovereignExtensions.GetColourName(GetChessPieceColour(currentRoyalPiece)) + "'s move!");
+            if (!hasAnyMoves) {
+                if (IsPieceInCheck(currentRoyalPiece)) {
+                    UIManager.Instance.Log("Team " + SovereignExtensions.GetColourName(GetChessPieceColour(currentRoyalPiece))
+                        + " has been checkmated -- Team " + SovereignExtensions.GetColourName(GetChessPieceColour(opposingRoyalPiece)) + " wins!");
+                } else {
+                    UIManager.Instance.Log("Stalemate on " + SovereignExtensions.GetColourName(GetChessPieceColour(currentRoyalPiece)) + "'s move!");
+                }
+                return true;
             }
-            return true;
+
+            if (CapturelessMovesLimit()) {
+                return true;
+            }
+
+            return false;
         }
 
         protected override bool IsThreat(ChessPiece mover, BoardCoord coord) {

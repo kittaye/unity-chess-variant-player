@@ -29,13 +29,13 @@ namespace ChessGameModes {
                     UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
                 }
                 return true;
-
-            } else if (CapturelessMovesLimit()) {
-                return true;
-
-            } else {
-                return false;
             }
+
+            if (CapturelessMovesLimit()) {
+                return true;
+            }
+
+            return false;
         }
 
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {

@@ -69,18 +69,16 @@ namespace ChessGameModes {
                 }
             }
 
+            if(!TeamHasAnyMoves(GetCurrentTeamTurn())) {
+                UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                return true;
+            }
+
             if (CapturelessMovesLimit()) {
                 return true;
             }
 
-            foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
-                if (piece.IsAlive) {
-                    if (CalculateAvailableMoves(piece).Count > 0) return false;
-                }
-            }
-
-            UIManager.Instance.Log("Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
-            return true;
+            return false;
         }
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
