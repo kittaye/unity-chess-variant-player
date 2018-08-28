@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using System;
 
@@ -108,7 +108,7 @@ namespace ChessGameModes {
 
         public bool CapturelessMovesLimit() {
             if (numConsecutiveCapturelessMoves >= 100) {
-                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate on " + GetCurrentTeamTurn().ToString() + "'s move!");
+                UIManager.Instance.Log("No captures or pawn moves in 50 turns. Stalemate!");
                 return true;
             }
             return false;
