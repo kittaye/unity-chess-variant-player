@@ -39,7 +39,7 @@ namespace ChessGameModes {
             }
 
             if (mover is Knight && mover.MoveCount == 0) {
-                availableMoves.AddRange(TryAddAvailableCastleMoves(mover));
+                availableMoves.AddRange(TryAddAvailableCastleMoves(mover, castlingDistance));
             } else if (mover is Pawn) {
                 BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
                 if (enPassantMove != BoardCoord.NULL) {
@@ -94,40 +94,6 @@ namespace ChessGameModes {
                     AddPieceToBoard(new Bishop(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
                 }
             }
-        }
-
-        protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece knight, bool canCastleLeftward = true, bool canCastleRightward = true) {
-            const int LEFT = -1;
-            const int RIGHT = 1;
-
-            if (IsPieceInCheck(knight) == false) {
-                List<BoardCoord> castleMoves = new List<BoardCoord>(2);
-
-                for (int i = LEFT; i <= RIGHT; i += 2) {
-                    if (!canCastleLeftward && i == LEFT) continue;
-                    if (!canCastleRightward && i == RIGHT) break;
-
-                    int x = knight.GetBoardPosition().x + i;
-                    int y = knight.GetBoardPosition().y;
-                    BoardCoord coord = new BoardCoord(x, y);
-
-                    while (Board.ContainsCoord(coord)) {
-                        ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
-                        if (occupier != null) {
-                            if (occupier is Rook && occupier.MoveCount == 0) {
-                                if (IsPieceInCheckAfterThisMove(knight, knight, knight.GetBoardPosition() + new BoardCoord(i * 2, 0)) == false) {
-                                    castleMoves.Add(TryGetSpecificMove(knight, knight.GetBoardPosition() + new BoardCoord(i * 2, 0)));
-                                }
-                            }
-                            break;
-                        }
-                        x += i;
-                        coord = new BoardCoord(x, y);
-                    }
-                }
-                return castleMoves.ToArray();
-            }
-            return new BoardCoord[0];
         }
     }
 }

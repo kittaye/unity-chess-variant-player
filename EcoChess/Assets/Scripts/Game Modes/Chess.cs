@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System;
 
@@ -37,6 +37,7 @@ namespace ChessGameModes {
         protected const int WHITE_PAWNROW = 1;
         protected int BLACK_BACKROW;
         protected int BLACK_PAWNROW;
+        protected int castlingDistance;
         protected bool checkingForCheck;
         protected List<ChessPiece> opposingTeamCheckThreats;
         protected ChessPiece currentRoyalPiece;
@@ -81,6 +82,7 @@ namespace ChessGameModes {
 
             BLACK_BACKROW = Board.GetHeight() - 1;
             BLACK_PAWNROW = Board.GetHeight() - 2;
+            castlingDistance = 2;
             currentRoyalPiece = opposingRoyalPiece = null;
             aSideWhiteRook = hSideWhiteRook = null;
             aSideBlackRook = hSideWhiteRook = null;
@@ -159,7 +161,7 @@ namespace ChessGameModes {
             }
 
             if (mover is King && mover.MoveCount == 0) {
-                availableMoves.AddRange(TryAddAvailableCastleMoves(mover));
+                availableMoves.AddRange(TryAddAvailableCastleMoves(mover, castlingDistance));
             } else if (mover is Pawn) {
                 BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
                 if (enPassantMove != BoardCoord.NULL) {
@@ -343,6 +345,7 @@ namespace ChessGameModes {
                 }
             }
             checkingForCheck = false;
+
             return false;
         }
 
@@ -407,10 +410,11 @@ namespace ChessGameModes {
         /// Called in CalculateAvailableMoves. Determines if a castling move can be made for a chess piece.
         /// </summary>
         /// <param name="king">Moving piece.</param>
+        /// <param name="castlingDistance">How many squares should the piece move when castling?</param>
         /// <param name="canCastleLeftward">Can the piece castle leftwards?</param>
         /// <param name="canCastleRightward">Can the piece castle rightwards?</param>
         /// <returns>A list of board coordinates for available castle moves.</returns>
-        protected virtual BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, bool canCastleLeftward = true, bool canCastleRightward = true) {
+        protected virtual BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, int castlingDistance = 2, bool canCastleLeftward = true, bool canCastleRightward = true) {
             const int LEFT = -1;
             const int RIGHT = 1;
 
@@ -429,10 +433,12 @@ namespace ChessGameModes {
                         ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
                         if (occupier != null) {
                             if (occupier is Rook && occupier.MoveCount == 0) {
-                                if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i, 0)) == false
-                                    && IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i * 2, 0)) == false) {
-                                    castleMoves.Add(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * 2, 0)));
+                                for (int j = 1; j <= castlingDistance; j++) {
+                                    if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i * j, 0))) {
+                                        break;
+                                    }
                                 }
+                                castleMoves.Add(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * castlingDistance, 0)));
                             }
                             break;
                         }
@@ -451,7 +457,7 @@ namespace ChessGameModes {
         /// <param name="team">Team to check.</param>
         /// <returns>True if a piece is able to move.</returns>
         protected bool TeamHasAnyMoves(Team team) {
-            foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
+            foreach (ChessPiece piece in GetPieces(team)) {
                 if (piece.IsAlive) {
                     if (CalculateAvailableMoves(piece).Count > 0) {
                         return true;

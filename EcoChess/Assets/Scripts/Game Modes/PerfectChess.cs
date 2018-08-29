@@ -88,7 +88,7 @@ namespace ChessGameModes {
             }
         }
 
-        protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, bool canCastleLeftward = true, bool canCastleRightward = true) {
+        protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, int castlingDistance, bool canCastleLeftward = true, bool canCastleRightward = true) {
             const int LEFT = -1;
             const int RIGHT = 1;
 
@@ -107,10 +107,12 @@ namespace ChessGameModes {
                         ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
                         if (occupier != null) {
                             if ((occupier is Rook || occupier is Empress) && occupier.MoveCount == 0) {
-                                if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i, 0)) == false
-                                    && IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i * 2, 0)) == false) {
-                                    castleMoves.Add(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * 2, 0)));
+                                for (int j = 1; j <= castlingDistance; j++) {
+                                    if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i * j, 0))) {
+                                        break;
+                                    }
                                 }
+                                castleMoves.Add(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * castlingDistance, 0)));
                             }
                             break;
                         }

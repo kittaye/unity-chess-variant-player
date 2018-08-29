@@ -24,6 +24,7 @@ namespace ChessGameModes {
 
         public Capablanca() : base(BOARD_WIDTH, BOARD_HEIGHT) {
             PawnPromotionOptions = new Piece[6]{ Piece.Queen, Piece.Empress, Piece.Princess, Piece.Rook, Piece.Bishop, Piece.Knight };
+            castlingDistance = 3;
         }
 
         public override string ToString() {
@@ -85,42 +86,6 @@ namespace ChessGameModes {
                     hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(7, mover.GetBoardPosition().y));
                 }
             }
-        }
-
-        protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, bool canCastleLeftward = true, bool canCastleRightward = true) {
-            const int LEFT = -1;
-            const int RIGHT = 1;
-
-            if (IsPieceInCheck(king) == false) {
-                List<BoardCoord> castleMoves = new List<BoardCoord>(2);
-
-                for (int i = LEFT; i <= RIGHT; i += 2) {
-                    if (!canCastleLeftward && i == LEFT) continue;
-                    if (!canCastleRightward && i == RIGHT) break;
-
-                    int x = king.GetBoardPosition().x + i;
-                    int y = king.GetBoardPosition().y;
-                    BoardCoord coord = new BoardCoord(x, y);
-
-                    while (Board.ContainsCoord(coord)) {
-                        ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
-                        if (occupier != null) {
-                            if (occupier is Rook && occupier.MoveCount == 0) {
-                                if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i, 0)) == false
-                                    && IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i * 2, 0)) == false
-                                    && IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i * 3, 0)) == false) {
-                                    castleMoves.Add(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * 3, 0)));
-                                }
-                            }
-                            break;
-                        }
-                        x += i;
-                        coord = new BoardCoord(x, y);
-                    }
-                }
-                return castleMoves.ToArray();
-            }
-            return new BoardCoord[0];
         }
     }
 }

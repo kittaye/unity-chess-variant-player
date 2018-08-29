@@ -176,7 +176,7 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, bool canCastleLeftward = true, bool canCastleRightward = true) {
+        protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, int castlingDistance, bool canCastleLeftward = true, bool canCastleRightward = true) {
             const int LEFT = -1;
             const int RIGHT = 1;
 

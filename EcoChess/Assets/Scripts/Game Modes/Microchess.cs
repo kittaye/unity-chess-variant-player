@@ -75,9 +75,9 @@ namespace ChessGameModes {
 
             if (mover is King && mover.MoveCount == 0) {
                 if (mover.GetTeam() == Team.WHITE) {
-                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, true, false));
+                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, canCastleRightward: false));
                 } else {
-                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, false, true));
+                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, canCastleLeftward: false));
                 }
             }
             return availableMoves;
