@@ -17,7 +17,7 @@ namespace ChessGameModes {
         private new const int BOARD_HEIGHT = 4;
 
         public HalfChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-            this.allowBoardFlipping = false;
+
         }
 
         public override string ToString() {

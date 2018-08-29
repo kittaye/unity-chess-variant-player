@@ -194,6 +194,6 @@ public class UIManager : MonoBehaviour {
     }
 
     public void OnToggleFlipBoard() {
-        GameManager.Instance.ChessGame.allowBoardFlipping = !GameManager.Instance.ChessGame.allowBoardFlipping;
+        GameManager.Instance.ChessGame.Board.allowFlipping = !GameManager.Instance.ChessGame.Board.allowFlipping;
     }
 }

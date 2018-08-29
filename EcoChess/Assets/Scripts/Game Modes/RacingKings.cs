@@ -21,7 +21,6 @@ namespace ChessGameModes {
     /// </summary>
     public class RacingKings : Chess {
         public RacingKings() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-            this.allowBoardFlipping = false;
         }
 
         public override string ToString() {

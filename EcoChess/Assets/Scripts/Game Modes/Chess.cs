@@ -26,10 +26,11 @@ namespace ChessGameModes {
 
         public static event Action<bool> _DisplayPromotionUI;
         public static event Action<Piece[]> _OnPawnPromotionsChanged;
+
         public Piece[] PawnPromotionOptions { get; protected set; }
         public Piece SelectedPawnPromotion { get; protected set; }
         public Board Board { get; private set; }
-        public bool allowBoardFlipping;
+        public bool AllowCastling { get; protected set; }
 
         protected const int BOARD_WIDTH = 8;
         protected const int BOARD_HEIGHT = 8;
@@ -78,7 +79,7 @@ namespace ChessGameModes {
             currentTeamTurn = Team.WHITE;
             opposingTeamTurn = Team.BLACK;
             numConsecutiveCapturelessMoves = 0;
-            allowBoardFlipping = false;
+            Board.allowFlipping = false;
 
             BLACK_BACKROW = Board.GetHeight() - 1;
             BLACK_PAWNROW = Board.GetHeight() - 2;
