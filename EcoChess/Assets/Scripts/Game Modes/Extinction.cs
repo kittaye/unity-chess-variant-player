@@ -94,7 +94,7 @@ namespace ChessGameModes {
             }
 
             if (mover is King && mover.MoveCount == 0) {
-                availableMoves.AddRange(TryAddAvailableCastleMoves(mover));
+                availableMoves.AddRange(TryAddAvailableCastleMoves(mover, castlingDistance));
             } else if (mover is Pawn) {
                 BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
                 if (enPassantMove != BoardCoord.NULL) {
@@ -147,7 +147,7 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, bool canCastleLeftward = true, bool canCastleRightward = true) {
+        protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, int castlingDistance, bool canCastleLeftward = true, bool canCastleRightward = true) {
             const int LEFT = -1;
             const int RIGHT = 1;
 
@@ -165,10 +165,7 @@ namespace ChessGameModes {
                     ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
                     if (occupier != null) {
                         if (occupier is Rook && occupier.MoveCount == 0) {
-                            if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i, 0)) == false
-                                && IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i * 2, 0)) == false) {
-                                castleMoves.Add(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * 2, 0)));
-                            }
+                            castleMoves.Add(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * castlingDistance, 0)));
                         }
                         break;
                     }
