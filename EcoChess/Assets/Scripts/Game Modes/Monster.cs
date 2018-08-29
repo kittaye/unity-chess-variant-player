@@ -29,7 +29,7 @@ namespace ChessGameModes {
         }
 
         public override void OnTurnComplete() {
-            if (isWhiteSecondMove == false && GetCurrentTeamTurn() == Team.WHITE) {
+            if (!isWhiteSecondMove && GetCurrentTeamTurn() == Team.WHITE) {
                 isWhiteSecondMove = true;
             } else {
                 base.OnTurnComplete();
@@ -60,29 +60,16 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            if (isWhiteSecondMove) {
-                if (IsPieceInCheck(opposingRoyalPiece)) {
-                    UIManager.Instance.LogCheckmate(GetCurrentTeamTurn().ToString(), GetOpposingTeamTurn().ToString());
-                    return true;
-                }
+            if (!isWhiteSecondMove) {
+                return false;
             }
 
-            if(isWhiteSecondMove || GetCurrentTeamTurn() == Team.BLACK) {
-                if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
-                    if (IsPieceInCheck(currentRoyalPiece)) {
-                        UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
-                    } else {
-                        UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
-                    }
-                    return true;
-                }
-            }
-
-            if (CapturelessMovesLimit()) {
+            if (isWhiteSecondMove && IsPieceInCheck(opposingRoyalPiece)) {
+                UIManager.Instance.LogCheckmate(GetCurrentTeamTurn().ToString(), GetOpposingTeamTurn().ToString());
                 return true;
             }
 
-            return false;
+            return base.CheckWinState();
         }
 
         protected override bool IsPieceInCheck(ChessPiece pieceToCheck) {
