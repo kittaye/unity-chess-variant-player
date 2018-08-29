@@ -28,48 +28,6 @@ namespace ChessGameModes {
             return "Knightmate";
         }
 
-        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
-
-            for (int i = 0; i < templateMoves.Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
-                }
-            }
-
-            if (mover is Knight && mover.MoveCount == 0) {
-                availableMoves.AddRange(TryAddAvailableCastleMoves(mover, castlingDistance));
-            } else if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    OnDisplayPromotionUI(true);
-                }
-            }
-            return availableMoves;
-        }
-
-        public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            BoardCoord oldPos = mover.GetBoardPosition();
-
-            // Try make the move
-            if (MakeMove(mover, destination)) {
-                // Check castling moves
-                if (mover is Knight && mover.MoveCount == 1) {
-                    TryPerformCastlingRookMoves(mover);
-                } else if (mover is Pawn) {
-                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
-                    CheckPawnEnPassantCapture((Pawn)mover);
-                    CheckPawnPromotion((Pawn)mover);
-                }
-                return true;
-            }
-            return false;
-        }
-
         public override void PopulateBoard() {
             currentRoyalPiece = (Knight)AddPieceToBoard(new Knight(Team.WHITE, new BoardCoord(4, WHITE_BACKROW)));
             opposingRoyalPiece = (Knight)AddPieceToBoard(new Knight(Team.BLACK, new BoardCoord(4, BLACK_BACKROW)));
