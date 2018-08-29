@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using System;
 
@@ -741,9 +741,11 @@ namespace ChessGameModes {
             currentTeamTurn = (currentTeamTurn == Team.WHITE) ? Team.BLACK : Team.WHITE;
             opposingTeamTurn = (currentTeamTurn == Team.WHITE) ? Team.BLACK : Team.WHITE;
 
-            ChessPiece temp = currentRoyalPiece;
-            currentRoyalPiece = opposingRoyalPiece;
-            opposingRoyalPiece = temp;
+            if (currentRoyalPiece != null && opposingRoyalPiece != null) {
+                ChessPiece temp = currentRoyalPiece;
+                currentRoyalPiece = opposingRoyalPiece;
+                opposingRoyalPiece = temp;
+            }
 
             SelectedPawnPromotion = Piece.Queen;
         }
