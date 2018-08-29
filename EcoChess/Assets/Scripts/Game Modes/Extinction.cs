@@ -85,27 +85,8 @@ namespace ChessGameModes {
             }
         }
 
-        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
-
-            for (int i = 0; i < templateMoves.Length; i++) {
-                availableMoves.Add(templateMoves[i]);
-            }
-
-            if (mover is King && mover.MoveCount == 0) {
-                availableMoves.AddRange(TryAddAvailableCastleMoves(mover, castlingDistance));
-            } else if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    OnDisplayPromotionUI(true);
-                }
-            }
-
-            return availableMoves;
+        protected override bool IsPieceInCheckAfterThisMove(ChessPiece pieceToCheck, ChessPiece mover, BoardCoord dest) {
+            return false;
         }
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
@@ -145,35 +126,6 @@ namespace ChessGameModes {
                 return true;
             }
             return false;
-        }
-
-        protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, int castlingDistance, bool canCastleLeftward = true, bool canCastleRightward = true) {
-            const int LEFT = -1;
-            const int RIGHT = 1;
-
-            List<BoardCoord> castleMoves = new List<BoardCoord>(2);
-
-            for (int i = LEFT; i <= RIGHT; i += 2) {
-                if (!canCastleLeftward && i == LEFT) continue;
-                if (!canCastleRightward && i == RIGHT) break;
-
-                int x = king.GetBoardPosition().x + i;
-                int y = king.GetBoardPosition().y;
-                BoardCoord coord = new BoardCoord(x, y);
-
-                while (Board.ContainsCoord(coord)) {
-                    ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
-                    if (occupier != null) {
-                        if (occupier is Rook && occupier.MoveCount == 0) {
-                            castleMoves.Add(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * castlingDistance, 0)));
-                        }
-                        break;
-                    }
-                    x += i;
-                    coord = new BoardCoord(x, y);
-                }
-            }
-            return castleMoves.ToArray();
         }
     }
 }
