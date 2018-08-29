@@ -16,6 +16,7 @@ namespace ChessGameModes {
 
         public LosingChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {
             canCaptureThisTurn = false;
+            AllowCastling = false;
         }
 
         public override string ToString() {
@@ -41,21 +42,6 @@ namespace ChessGameModes {
                 return true;
             }
 
-            return false;
-        }
-
-        public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            BoardCoord oldPos = mover.GetBoardPosition();
-
-            // Try make the move
-            if (MakeMove(mover, destination)) {
-                if (mover is Pawn) {
-                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
-                    CheckPawnEnPassantCapture((Pawn)mover);
-                    CheckPawnPromotion((Pawn)mover);
-                }
-                return true;
-            }
             return false;
         }
 
