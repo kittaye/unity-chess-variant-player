@@ -29,17 +29,16 @@ namespace ChessGameModes {
                 if (GetPieces(Team.WHITE).TrueForAll((x) => (x.IsAlive == false))) {
                     UIManager.Instance.LogCustom("Team Black wins by elimination!");
                     return true;
-
-                } else if(!TeamHasAnyMoves(Team.WHITE)) {
-                    UIManager.Instance.LogStalemate(Team.WHITE.ToString());
-                    return true;
-
-                } else {
-                    return false;
                 }
             } else {
                 return base.CheckWinState();
             }
+
+            if (CapturelessMovesLimit()) {
+                return true;
+            }
+
+            return false;
         }
 
         public override void PopulateBoard() {
@@ -69,31 +68,11 @@ namespace ChessGameModes {
         }
 
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
-
-            if (GetCurrentTeamTurn() == Team.WHITE) {
-                availableMoves.AddRange(templateMoves);
-            } else {
-                for (int i = 0; i < templateMoves.Length; i++) {
-                    if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                        availableMoves.Add(templateMoves[i]);
-                    }
-                }
-
-                if (mover is King && mover.MoveCount == 0) {
-                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover));
-                } else if (mover is Pawn) {
-                    BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                    if (enPassantMove != BoardCoord.NULL) {
-                        availableMoves.Add(enPassantMove);
-                    }
-                    if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                        OnDisplayPromotionUI(true);
-                    }
-                }
+            if(GetCurrentTeamTurn() == Team.WHITE) {
+                return mover.CalculateTemplateMoves();
             }
-            return availableMoves;
+
+            return base.CalculateAvailableMoves(mover);
         }
     }
 }
