@@ -56,14 +56,7 @@ namespace ChessGameModes {
         }
 
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
-
-            for (int i = 0; i < templateMoves.Length; i++) {
-                availableMoves.Add(templateMoves[i]);
-            }
-
-            return availableMoves;
+            return mover.CalculateTemplateMoves();
         }
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
