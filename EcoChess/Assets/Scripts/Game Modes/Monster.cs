@@ -33,6 +33,7 @@ namespace ChessGameModes {
                 isWhiteSecondMove = true;
             } else {
                 base.OnTurnComplete();
+                isWhiteSecondMove = false;
             }
         }
 
@@ -60,7 +61,7 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            if (!isWhiteSecondMove) {
+            if (GetCurrentTeamTurn() == Team.WHITE && !isWhiteSecondMove) {
                 return false;
             }
 
