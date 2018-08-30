@@ -19,7 +19,12 @@ namespace ChessGameModes {
     ///     R N N $ K N N R
     /// </summary>
     public class Chigorin : Chess {
+        private Piece[] whitePromotionOptions;
+        private Piece[] blackPromotionOptions;
+
         public Chigorin() : base() {
+            whitePromotionOptions = new Piece[] { Piece.Empress, Piece.Knight };
+            blackPromotionOptions = new Piece[] { Piece.Queen, Piece.Bishop };
         }
 
         public override string ToString() {
@@ -30,10 +35,10 @@ namespace ChessGameModes {
             base.OnTurnComplete();
             if (GetCurrentTeamTurn() == Team.WHITE) {
                 SelectedPawnPromotion = Piece.Empress;
-                SetPawnPromotionOptions(new Piece[2] { Piece.Empress, Piece.Knight });
+                PawnPromotionOptions = whitePromotionOptions;
             } else {
                 SelectedPawnPromotion = Piece.Queen;
-                SetPawnPromotionOptions(new Piece[2] { Piece.Queen, Piece.Bishop });
+                PawnPromotionOptions = blackPromotionOptions;
             }
         }
 

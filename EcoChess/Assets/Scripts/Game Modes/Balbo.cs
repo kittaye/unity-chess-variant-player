@@ -25,6 +25,8 @@ namespace ChessGameModes {
         private new const int BOARD_HEIGHT = 10;
         private new const int WHITE_PAWNROW = 2;
         private List<BoardCoord> promotionSquares;
+        private Piece[] allPromotionOptions;
+        private Piece[] limitedPromotionOptions;
 
         public Balbo() : base(BOARD_WIDTH, BOARD_HEIGHT) {
             Board.RemoveBoardCoordinates(new string[]
@@ -55,6 +57,9 @@ namespace ChessGameModes {
             AddPromotionSquare("h9");
             AddPromotionSquare("i3");
             AddPromotionSquare("i8");
+
+            allPromotionOptions = PawnPromotionOptions;
+            limitedPromotionOptions = new Piece[] { Piece.Bishop, Piece.Knight };
         }
 
         public override string ToString() {
@@ -106,12 +111,12 @@ namespace ChessGameModes {
                 if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
                     // This is where the code differs from the base method. More specific pawn promotion mechanics.
                     SelectedPawnPromotion = Piece.Queen;
-                    PawnPromotionOptions = new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight };
+                    PawnPromotionOptions = allPromotionOptions;
                     for (int i = 0; i < availableMoves.Count; i++) {
                         if (availableMoves[i] == new BoardCoord(2, 2) || availableMoves[i] == new BoardCoord(2, 7)
                             || availableMoves[i] == new BoardCoord(8, 2) || availableMoves[i] == new BoardCoord(8, 7)) {
                             SelectedPawnPromotion = Piece.Bishop;
-                            PawnPromotionOptions = new Piece[2] { Piece.Bishop, Piece.Knight };
+                            PawnPromotionOptions = limitedPromotionOptions;
                             break;
                         }
                     }

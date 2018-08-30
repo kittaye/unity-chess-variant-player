@@ -7,6 +7,7 @@ namespace ChessGameModes {
     /// 
     /// Winstate: Checkmate.
     /// Piece types: Orthodox.
+    /// Piece rules: White may only promote to a queen, Black may only promote to a knight.
     /// Board layout:
     ///     n n n n k n n n
     ///     p p p p p p p p

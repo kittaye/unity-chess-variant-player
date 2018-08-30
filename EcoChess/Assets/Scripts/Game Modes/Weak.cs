@@ -7,6 +7,7 @@ namespace ChessGameModes {
     /// 
     /// Winstate: Checkmate.
     /// Piece types: Orthodox.
+    /// Piece rules: Black may only promote to a knight.
     /// Board layout:
     ///     n n n n k n n n
     ///     p p p p p p p p
@@ -18,7 +19,12 @@ namespace ChessGameModes {
     ///     R N B Q K B N R
     /// </summary>
     public class Weak : Chess {
+        private Piece[] whitePromotionOptions;
+        private Piece[] blackPromotionOptions;
+
         public Weak() : base() {
+            whitePromotionOptions = PawnPromotionOptions;
+            blackPromotionOptions = new Piece[0];
         }
 
         public override string ToString() {
@@ -29,8 +35,10 @@ namespace ChessGameModes {
             base.OnTurnComplete();
             if(GetCurrentTeamTurn() == Team.WHITE) {
                 SelectedPawnPromotion = Piece.Queen;
+                PawnPromotionOptions = whitePromotionOptions;
             } else {
                 SelectedPawnPromotion = Piece.Knight;
+                PawnPromotionOptions = blackPromotionOptions;
             }
         }
 
@@ -60,31 +68,6 @@ namespace ChessGameModes {
                     AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(x, BLACK_PAWNROW - 2), initialMoveLimit: 1));
                 }
             }
-        }
-
-        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
-
-            for (int i = 0; i < templateMoves.Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
-                }
-            }
-
-            if (mover is King && mover.MoveCount == 0) {
-                availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions));
-            } else if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
-                if (checkingForCheck == false && GetCurrentTeamTurn() == Team.WHITE && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    OnDisplayPromotionUI(true);
-                }
-            }
-
-            return availableMoves;
         }
     }
 }
