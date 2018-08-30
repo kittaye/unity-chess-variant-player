@@ -97,7 +97,7 @@ namespace ChessGameModes {
             }
 
             if (mover is King && mover.MoveCount == 0) {
-                availableMoves.AddRange(TryAddAvailableCastleMoves(mover));
+                availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions));
             } else if (mover is Pawn) {
                 BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
                 if (enPassantMove != BoardCoord.NULL) {

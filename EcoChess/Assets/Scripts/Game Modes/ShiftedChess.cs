@@ -108,9 +108,9 @@ namespace ChessGameModes {
 
             if (mover is King && mover.MoveCount == 0) {
                 if (mover.GetTeam() == Team.WHITE) {
-                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, canCastleLeftward: false));
+                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions, canCastleLeftward: false));
                 } else {
-                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, canCastleRightward: false));
+                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions, canCastleRightward: false));
                 }
             } else if (mover is Pawn) {
                 BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
