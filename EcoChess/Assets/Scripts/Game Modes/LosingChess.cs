@@ -29,7 +29,9 @@ namespace ChessGameModes {
                 return true;
             }
 
-            if (CanCaptureAPiece()) {
+            canCaptureThisTurn = CanCaptureAPiece();
+
+            if (canCaptureThisTurn) {
                 return false;
             }
 
