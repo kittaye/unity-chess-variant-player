@@ -24,7 +24,6 @@ namespace ChessGameModes {
     /// </summary>
     public class Chess {
         public static event Action<bool> _DisplayPromotionUI;
-        public static event Action<Piece[]> _OnPawnPromotionsChanged;
 
         public Board Board { get; private set; }
 
@@ -557,15 +556,6 @@ namespace ChessGameModes {
             } else {
                 return GetTeamLastMovedPiece(Team.WHITE);
             }
-        }
-
-        /// <summary>
-        /// Used to update the pawn promotion options at any point during the game.
-        /// </summary>
-        /// <param name="pieces">Set of pieces to change the pawn promotion options to.</param>
-        protected void SetPawnPromotionOptions(Piece[] pieces) {
-            PawnPromotionOptions = pieces;
-            if (_OnPawnPromotionsChanged != null) _OnPawnPromotionsChanged.Invoke(PawnPromotionOptions);
         }
 
         /// <summary>

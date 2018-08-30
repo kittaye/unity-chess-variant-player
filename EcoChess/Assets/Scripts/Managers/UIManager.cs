@@ -33,7 +33,6 @@ public class UIManager : MonoBehaviour {
         promotionOptions = new List<GameObject>();
         GameManager._OnGameFinished += OnGameFinished;
         ChessGameModes.Chess._DisplayPromotionUI += OnDisplayPromotionOptions;
-        ChessGameModes.Chess._OnPawnPromotionsChanged += OnPawnPromotionOptionsChanged;
 
         foreach (Text aText in mainCanvas.GetComponentsInChildren<Text>()) {
             if (aText.name.Equals("TeamTurn_lbl")) {
@@ -80,7 +79,6 @@ public class UIManager : MonoBehaviour {
     void OnDestroy() {
         GameManager._OnGameFinished -= OnGameFinished;
         ChessGameModes.Chess._DisplayPromotionUI -= OnDisplayPromotionOptions;
-        ChessGameModes.Chess._OnPawnPromotionsChanged -= OnPawnPromotionOptionsChanged;
         if (GameManager.Instance.ChessGame is ChessGameModes.SovereignChess) {
             ChessGameModes.SovereignChess._DisplayDefectionUI -= OnDisplayDefectionOptions;
             ChessGameModes.SovereignChess._SetDefectionOptions -= OnSetDefectionOptions;
@@ -132,6 +130,7 @@ public class UIManager : MonoBehaviour {
             return;
         }
 
+        CreatePawnPromotionOptions(GameManager.Instance.ChessGame.PawnPromotionOptions);
         promoteToLbl.text = "<color=white>Promote to:\n</color><b>" + (GameManager.Instance.ChessGame.SelectedPawnPromotion.ToString()) + "</b>";
         promotionWindow.SetActive(value);
     }
@@ -162,10 +161,6 @@ public class UIManager : MonoBehaviour {
             int j = i;
             go.GetComponent<Button>().onClick.AddListener(() => SelectDefectOption(clrs[j]));
         }
-    }
-
-    public void OnPawnPromotionOptionsChanged(Piece[] pieces) {
-        CreatePawnPromotionOptions(pieces);
     }
 
     public void SelectPawnPromotion(Piece value) {
