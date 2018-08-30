@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using System;
 
@@ -434,12 +434,17 @@ namespace ChessGameModes {
                         ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
                         if (occupier != null) {
                             if (occupier is Rook && occupier.MoveCount == 0) {
+                                bool inCheck = false;
                                 for (int j = 1; j <= castlingDistance; j++) {
                                     if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i * j, 0))) {
+                                        inCheck = true;
                                         break;
                                     }
                                 }
-                                castleMoves.Add(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * castlingDistance, 0)));
+
+                                if (!inCheck) {
+                                    castleMoves.Add(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * castlingDistance, 0)));
+                                }
                             }
                             break;
                         }
