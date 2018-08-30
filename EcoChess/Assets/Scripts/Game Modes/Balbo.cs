@@ -96,7 +96,7 @@ namespace ChessGameModes {
                 }
             }
 
-            if (mover is King && mover.MoveCount == 0) {
+            if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 0) {
                 availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions));
             } else if (mover is Pawn) {
                 BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
@@ -104,13 +104,14 @@ namespace ChessGameModes {
                     availableMoves.Add(enPassantMove);
                 }
                 if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
+                    // This is where the code differs from the base method. More specific pawn promotion mechanics.
                     SelectedPawnPromotion = Piece.Queen;
-                    SetPawnPromotionOptions(new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Queen });
+                    PawnPromotionOptions = new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight };
                     for (int i = 0; i < availableMoves.Count; i++) {
                         if (availableMoves[i] == new BoardCoord(2, 2) || availableMoves[i] == new BoardCoord(2, 7)
                             || availableMoves[i] == new BoardCoord(8, 2) || availableMoves[i] == new BoardCoord(8, 7)) {
                             SelectedPawnPromotion = Piece.Bishop;
-                            SetPawnPromotionOptions(new Piece[2] { Piece.Bishop, Piece.Knight });
+                            PawnPromotionOptions = new Piece[2] { Piece.Bishop, Piece.Knight };
                             break;
                         }
                     }
