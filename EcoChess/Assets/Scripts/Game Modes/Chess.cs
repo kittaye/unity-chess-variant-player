@@ -31,6 +31,7 @@ namespace ChessGameModes {
         public Piece SelectedPawnPromotion { get; protected set; }
         public Board Board { get; private set; }
         public bool AllowCastling { get; protected set; }
+        public Piece[] CastlerOptions { get; protected set; }
 
         protected const int BOARD_WIDTH = 8;
         protected const int BOARD_HEIGHT = 8;
@@ -81,6 +82,7 @@ namespace ChessGameModes {
             numConsecutiveCapturelessMoves = 0;
             Board.allowFlipping = false;
 
+            CastlerOptions = new Piece[] { Piece.Rook };
             BLACK_BACKROW = Board.GetHeight() - 1;
             BLACK_PAWNROW = Board.GetHeight() - 2;
             castlingDistance = 2;
@@ -162,7 +164,7 @@ namespace ChessGameModes {
             }
 
             if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 0) {
-                availableMoves.AddRange(TryAddAvailableCastleMoves(mover, castlingDistance));
+                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions, castlingDistance));
             } else if (mover is Pawn) {
                 BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
                 if (enPassantMove != BoardCoord.NULL) {
@@ -411,13 +413,18 @@ namespace ChessGameModes {
         /// Called in CalculateAvailableMoves. Determines if a castling move can be made for a chess piece.
         /// </summary>
         /// <param name="king">Moving piece.</param>
+        /// <param name="castleTypes">Which types of pieces can the moving piece castle with?</param>
         /// <param name="castlingDistance">How many squares should the piece move when castling?</param>
         /// <param name="canCastleLeftward">Can the piece castle leftwards?</param>
         /// <param name="canCastleRightward">Can the piece castle rightwards?</param>
         /// <returns>A list of board coordinates for available castle moves.</returns>
-        protected virtual BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, int castlingDistance = 2, bool canCastleLeftward = true, bool canCastleRightward = true) {
+        protected virtual BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, Piece[] castlerOptions, int castlingDistance = 2, bool canCastleLeftward = true, bool canCastleRightward = true) {
             const int LEFT = -1;
             const int RIGHT = 1;
+
+            if(castlerOptions.Length == 0) {
+                return new BoardCoord[0];
+            }
 
             if (IsPieceInCheck(king) == false) {
                 List<BoardCoord> castleMoves = new List<BoardCoord>(2);
@@ -433,10 +440,18 @@ namespace ChessGameModes {
                     while (Board.ContainsCoord(coord)) {
                         ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
                         if (occupier != null) {
-                            if (occupier is Rook && occupier.MoveCount == 0) {
+                            bool validCastler = false;
+                            for (int j = 0; j < castlerOptions.Length; j++) {
+                                if(occupier.GetPieceType() == castlerOptions[j]) {
+                                    validCastler = true;
+                                    break;
+                                }
+                            }
+
+                            if (validCastler && occupier.MoveCount == 0) {
                                 bool inCheck = false;
-                                for (int j = 1; j <= castlingDistance; j++) {
-                                    if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i * j, 0))) {
+                                for (int k = 1; k <= castlingDistance; k++) {
+                                    if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i * k, 0))) {
                                         inCheck = true;
                                         break;
                                     }
