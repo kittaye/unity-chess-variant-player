@@ -19,7 +19,11 @@ namespace ChessGameModes {
         private new const uint BOARD_WIDTH = 4;
         private new const uint BOARD_HEIGHT = 5;
 
-        public Silverman4x5() : base(BOARD_WIDTH, BOARD_HEIGHT) { }
+        public Silverman4x5() : base(BOARD_WIDTH, BOARD_HEIGHT) {
+            PawnPromotionOptions = new Piece[] { Piece.Queen, Piece.Rook };
+            AllowCastling = false;
+            AllowEnpassantCapture = false;
+        }
 
         public override string ToString() {
             return "Silverman 4x5";
@@ -41,18 +45,6 @@ namespace ChessGameModes {
                 AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, WHITE_PAWNROW), initialMoveLimit: 1));
                 AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(x, BLACK_PAWNROW), initialMoveLimit: 1));
             }
-        }
-
-        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
-
-            for (int i = 0; i < templateMoves.Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
-                }
-            }
-            return availableMoves;
         }
     }
 }
