@@ -29,14 +29,20 @@ namespace ChessGameModes {
                     numOfChecksBLACK++;
                 }
 
-                if (numOfChecksWHITE == 3 || numOfChecksBLACK == 3) {
+                if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
+                    UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
+                    return true;
+
+                } else if (numOfChecksWHITE == 3 || numOfChecksBLACK == 3) {
                     UIManager.Instance.LogCustom("Team " + GetCurrentTeamTurn().ToString() + " has been checked 3 times -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
                     return true;
 
-                } else if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
-                    UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
-                    return true;
                 }
+            }
+
+            if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
+                UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
+                return true;
             }
 
             if (CapturelessMovesLimit()) {
