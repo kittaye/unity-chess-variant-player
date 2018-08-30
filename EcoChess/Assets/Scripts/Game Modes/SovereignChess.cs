@@ -258,7 +258,7 @@ namespace ChessGameModes {
 
             if (mover is King) {
                 if (mover.MoveCount == 0) {
-                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, castlingDistance));
+                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions, castlingDistance));
                 }
 
                 if (checkingForCheck == false) {
@@ -584,7 +584,7 @@ namespace ChessGameModes {
             }
         }
 
-        protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, int castlingDistance, bool canCastleLeftward = true, bool canCastleRightward = true) {
+        protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, Piece[] castlerOptions, int castlingDistance, bool canCastleLeftward = true, bool canCastleRightward = true) {
             const int LEFT = -1;
             const int RIGHT = 1;
 

@@ -22,6 +22,8 @@ namespace ChessGameModes {
 
         public LosAlamos() : base(BOARD_WIDTH, BOARD_HEIGHT) {
             PawnPromotionOptions = new Piece[3] { Piece.Queen, Piece.Rook, Piece.Knight };
+            AllowCastling = false;
+            AllowEnpassantCapture = false;
         }
 
         public override string ToString() {
@@ -49,39 +51,6 @@ namespace ChessGameModes {
                     AddPieceToBoard(new Knight(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
                 }
             }
-        }
-
-        public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            // Try make the move
-            if (MakeMove(mover, destination)) {
-                if (mover is Pawn) {
-                    ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
-                    if (promotedPiece != null) {
-                        mover = promotedPiece;
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-
-        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
-
-            for (int i = 0; i < templateMoves.Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
-                }
-            }
-
-            if (mover is Pawn) {
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    OnDisplayPromotionUI(true);
-                }
-            }
-
-            return availableMoves;
         }
     }
 }

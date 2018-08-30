@@ -13,6 +13,7 @@ namespace ChessGameModes {
     public class Cylinder : Chess {
 
         public Cylinder() : base() {
+            AllowCastling = false;
         }
 
         public override string ToString() {
@@ -43,48 +44,6 @@ namespace ChessGameModes {
                     AddPieceToBoard(new Bishop(Team.BLACK, new BoardCoord(x, BLACK_BACKROW), true, false));
                 }
             }
-        }
-
-        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
-
-            for (int i = 0; i < templateMoves.Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
-                }
-            }
-
-            if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
-                
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    OnDisplayPromotionUI(true);
-                }
-            }
-
-            return availableMoves;
-        }
-
-        public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            BoardCoord oldPos = mover.GetBoardPosition();
-
-            // Try make the move
-            if (MakeMove(mover, destination)) {
-                if (mover is Pawn) {
-                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
-                    CheckPawnEnPassantCapture((Pawn)mover);
-                    ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
-                    if (promotedPiece != null) {
-                        mover = promotedPiece;
-                    }
-                }
-                return true;
-            }
-            return false;
         }
 
         protected override List<ChessPiece> GetAllPossibleCheckThreats(ChessPiece pieceToCheck) {

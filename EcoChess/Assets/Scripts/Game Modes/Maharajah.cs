@@ -21,6 +21,7 @@ namespace ChessGameModes {
     public class Maharajah : Chess {
 
         public Maharajah() : base() {
+            AllowPawnPromotion = false;
         }
 
         public override string ToString() {
@@ -44,45 +45,6 @@ namespace ChessGameModes {
                     AddPieceToBoard(new Bishop(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
                 }
             }
-        }
-
-        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
-
-            for (int i = 0; i < templateMoves.Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
-                }
-            }
-
-            if (mover is King && mover.MoveCount == 0) {
-                availableMoves.AddRange(TryAddAvailableCastleMoves(mover));
-            } else if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
-            }
-
-            return availableMoves;
-        }
-
-        public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            BoardCoord oldPos = mover.GetBoardPosition();
-
-            // Try make the move
-            if (MakeMove(mover, destination)) {
-                // Check castling moves
-                if (mover is King && mover.MoveCount == 1) {
-                    TryPerformCastlingRookMoves(mover);
-                } else if (mover is Pawn) {
-                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
-                    CheckPawnEnPassantCapture((Pawn)mover);
-                }
-                return true;
-            }
-            return false;
         }
 
         protected override List<ChessPiece> GetAllPossibleCheckThreats(ChessPiece pieceToCheck) {

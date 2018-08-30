@@ -7,7 +7,7 @@ namespace ChessGameModes {
     /// 
     /// Winstate: Checkmate.
     /// Piece types: Orthodox.
-    /// Piece rules: No castling, no pawn double moves, no enpassant.
+    /// Piece rules: No pawn double moves, no enpassant.
     /// Board layout:
     ///     k n b r
     ///     p . . .
@@ -19,7 +19,9 @@ namespace ChessGameModes {
         private new const int BOARD_WIDTH = 4;
         private new const int BOARD_HEIGHT = 5;
 
-        public Microchess() : base(BOARD_WIDTH, BOARD_HEIGHT) { }
+        public Microchess() : base(BOARD_WIDTH, BOARD_HEIGHT) {
+            AllowEnpassantCapture = false;
+        }
 
         public override string ToString() {
             return "Microchess";
@@ -42,27 +44,6 @@ namespace ChessGameModes {
             hSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(3, BLACK_BACKROW)));
         }
 
-        public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            // Try make the move
-            if (MakeMove(mover, destination)) {
-                // Check castling moves
-                if (mover is King && mover.MoveCount == 1) {
-                    if (mover.GetBoardPosition() == new BoardCoord(1, WHITE_BACKROW)) {
-                        aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(2, WHITE_BACKROW));
-                    } else if (mover.GetBoardPosition() == new BoardCoord(2, BLACK_BACKROW)) {
-                        hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(1, BLACK_BACKROW));
-                    }
-                } else if (mover is Pawn) {
-                    ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
-                    if (promotedPiece != null) {
-                        mover = promotedPiece;
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
             BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
             List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
@@ -75,12 +56,20 @@ namespace ChessGameModes {
 
             if (mover is King && mover.MoveCount == 0) {
                 if (mover.GetTeam() == Team.WHITE) {
-                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, canCastleRightward: false));
+                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions, canCastleRightward: false));
                 } else {
-                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, canCastleLeftward: false));
+                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions, canCastleLeftward: false));
                 }
             }
             return availableMoves;
+        }
+
+        protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
+            if (mover.GetBoardPosition() == new BoardCoord(1, WHITE_BACKROW)) {
+                aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(2, WHITE_BACKROW));
+            } else if (mover.GetBoardPosition() == new BoardCoord(2, BLACK_BACKROW)) {
+                hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(1, BLACK_BACKROW));
+            }
         }
     }
 }

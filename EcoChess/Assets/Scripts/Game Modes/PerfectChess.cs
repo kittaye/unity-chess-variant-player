@@ -26,6 +26,7 @@ namespace ChessGameModes {
 
             SelectedPawnPromotion = Piece.Amazon;
             PawnPromotionOptions = new Piece[7] { Piece.Amazon, Piece.Queen, Piece.Empress, Piece.Princess, Piece.Rook, Piece.Bishop, Piece.Knight };
+            CastlerOptions = new Piece[] { Piece.Rook, Piece.Empress };
         }
 
         public override string ToString() {
@@ -86,43 +87,6 @@ namespace ChessGameModes {
                     hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(5, mover.GetBoardPosition().y));
                 }
             }
-        }
-
-        protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, int castlingDistance, bool canCastleLeftward = true, bool canCastleRightward = true) {
-            const int LEFT = -1;
-            const int RIGHT = 1;
-
-            if (IsPieceInCheck(king) == false) {
-                List<BoardCoord> castleMoves = new List<BoardCoord>(2);
-
-                for (int i = LEFT; i <= RIGHT; i += 2) {
-                    if (!canCastleLeftward && i == LEFT) continue;
-                    if (!canCastleRightward && i == RIGHT) break;
-
-                    int x = king.GetBoardPosition().x + i;
-                    int y = king.GetBoardPosition().y;
-                    BoardCoord coord = new BoardCoord(x, y);
-
-                    while (Board.ContainsCoord(coord)) {
-                        ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
-                        if (occupier != null) {
-                            if ((occupier is Rook || occupier is Empress) && occupier.MoveCount == 0) {
-                                for (int j = 1; j <= castlingDistance; j++) {
-                                    if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i * j, 0))) {
-                                        break;
-                                    }
-                                }
-                                castleMoves.Add(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * castlingDistance, 0)));
-                            }
-                            break;
-                        }
-                        x += i;
-                        coord = new BoardCoord(x, y);
-                    }
-                }
-                return castleMoves.ToArray();
-            }
-            return new BoardCoord[0];
         }
     }
 }

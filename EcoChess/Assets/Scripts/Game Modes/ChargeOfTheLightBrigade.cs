@@ -20,6 +20,7 @@ namespace ChessGameModes {
     public class ChargeOfTheLightBrigade : Chess {
         public ChargeOfTheLightBrigade() : base() {
             PawnPromotionOptions = new Piece[0];
+            AllowCastling = false;
         }
 
         public override string ToString() {
@@ -51,26 +52,6 @@ namespace ChessGameModes {
                     AddPieceToBoard(new Queen(Team.WHITE, new BoardCoord(x, WHITE_BACKROW)));
                 }
             }
-        }
-
-        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
-
-            for (int i = 0; i < templateMoves.Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
-                }
-            }
-
-            if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
-            }
-
-            return availableMoves;
         }
     }
 }

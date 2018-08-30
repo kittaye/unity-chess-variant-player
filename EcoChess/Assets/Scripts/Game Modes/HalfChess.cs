@@ -17,7 +17,8 @@ namespace ChessGameModes {
         private new const int BOARD_HEIGHT = 4;
 
         public HalfChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-
+            AllowCastling = false;
+            AllowEnpassantCapture = false;
         }
 
         public override string ToString() {
@@ -45,19 +46,6 @@ namespace ChessGameModes {
             AddPieceToBoard(new Bishop(Team.WHITE, "g3"));
             AddPieceToBoard(new Bishop(Team.BLACK, "b2"));
             AddPieceToBoard(new Bishop(Team.BLACK, "b3"));
-        }
-
-        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
-
-            for (int i = 0; i < templateMoves.Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
-                }
-            }
-
-            return availableMoves;
         }
     }
 }

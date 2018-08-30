@@ -50,6 +50,8 @@ namespace ChessGameModes {
             AddPromotionSquare("c10");
             AddPromotionSquare("d11");
             AddPromotionSquare("e12");
+
+            AllowCastling = false;
         }
 
         public override string ToString() {
@@ -79,29 +81,6 @@ namespace ChessGameModes {
                 return AddPieceToBoard(ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
             }
             return null;
-        }
-
-        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
-
-            for (int i = 0; i < templateMoves.Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
-                }
-            }
-
-            if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    OnDisplayPromotionUI(true);
-                }
-            }
-
-            return availableMoves;
         }
 
         public override void PopulateBoard() {

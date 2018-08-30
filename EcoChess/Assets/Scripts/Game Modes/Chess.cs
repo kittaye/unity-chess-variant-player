@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System;
 
@@ -30,7 +30,10 @@ namespace ChessGameModes {
         public Piece[] PawnPromotionOptions { get; protected set; }
         public Piece SelectedPawnPromotion { get; protected set; }
         public Board Board { get; private set; }
+
         public bool AllowCastling { get; protected set; }
+        public bool AllowEnpassantCapture { get; protected set; }
+        public bool AllowPawnPromotion { get; protected set; }
         public Piece[] CastlerOptions { get; protected set; }
 
         protected const int BOARD_WIDTH = 8;
@@ -82,7 +85,11 @@ namespace ChessGameModes {
             numConsecutiveCapturelessMoves = 0;
             Board.allowFlipping = false;
 
+            AllowCastling = true;
+            AllowEnpassantCapture = true;
+            AllowPawnPromotion = true;
             CastlerOptions = new Piece[] { Piece.Rook };
+
             BLACK_BACKROW = Board.GetHeight() - 1;
             BLACK_PAWNROW = Board.GetHeight() - 2;
             castlingDistance = 2;
@@ -163,15 +170,24 @@ namespace ChessGameModes {
                 }
             }
 
-            if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 0) {
+            if (AllowCastling) {
+                if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 0) {
                     availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions, castlingDistance));
-            } else if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
                 }
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    OnDisplayPromotionUI(true);
+            }
+
+            if (mover is Pawn) {
+                if (AllowEnpassantCapture) {
+                    BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
+                    if (enPassantMove != BoardCoord.NULL) {
+                        availableMoves.Add(enPassantMove);
+                    }
+                }
+
+                if (AllowPawnPromotion) {
+                    if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
+                        OnDisplayPromotionUI(true);
+                    }
                 }
             }
 
@@ -190,14 +206,23 @@ namespace ChessGameModes {
             // Try make the move
             if (MakeMove(mover, destination)) {
                 // Check castling moves
-                if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 1) {
-                    TryPerformCastlingRookMoves(mover);
-                } else if (mover is Pawn) {
-                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
-                    CheckPawnEnPassantCapture((Pawn)mover);
-                    ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
-                    if (promotedPiece != null) {
-                        mover = promotedPiece;
+                if (AllowCastling) {
+                    if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 1) {
+                        TryPerformCastlingRookMoves(mover);
+                    }
+                }
+
+                if (mover is Pawn) {
+                    if (AllowEnpassantCapture) {
+                        ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
+                        CheckPawnEnPassantCapture((Pawn)mover);
+                    }
+
+                    if (AllowPawnPromotion) {
+                        ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
+                        if (promotedPiece != null) {
+                            mover = promotedPiece;
+                        }
                     }
                 }
                 return true;

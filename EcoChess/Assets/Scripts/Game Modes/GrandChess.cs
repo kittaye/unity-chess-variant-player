@@ -8,6 +8,7 @@ namespace ChessGameModes {
     /// 
     /// Winstate: Checkmate.
     /// Piece types: Orthodox + Empresses, Princesses.
+    /// Piece rules: No Castling.
     /// Board layout: 
     ///     r . . . . . . . . r
     ///     . n b q k $ ^ b n .
@@ -28,6 +29,7 @@ namespace ChessGameModes {
         public GrandChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {
             PawnPromotionOptions = new Piece[6] { Piece.Queen, Piece.Empress, Piece.Princess, Piece.Rook, Piece.Bishop, Piece.Knight };
             BLACK_PAWNROW = Board.GetHeight() - 3;
+            AllowCastling = false;
         }
 
         public override string ToString() {
@@ -64,28 +66,6 @@ namespace ChessGameModes {
                     AddPieceToBoard(new Bishop(Team.BLACK, new BoardCoord(x, BLACK_BACKROW - 1)));
                 }
             }
-        }
-
-        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
-
-            for (int i = 0; i < templateMoves.Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
-                }
-            }
-
-            if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    OnDisplayPromotionUI(true);
-                }
-            }
-            return availableMoves;
         }
 
         protected override List<ChessPiece> GetAllPossibleCheckThreats(ChessPiece pieceToCheck) {

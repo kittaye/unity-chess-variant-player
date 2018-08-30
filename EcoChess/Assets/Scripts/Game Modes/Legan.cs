@@ -7,7 +7,7 @@ namespace ChessGameModes {
     /// 
     /// Winstate: Checkmate.
     /// Piece types: Orthodox.
-    /// Piece rules: Pawns move/attack options are switched. Pawns promote on custom squares.
+    /// Piece rules: Pawns move/attack options are switched. Pawns promote on custom squares. No castling. No enpassant capture.
     /// Board layout: 
     ///     k n b r p . . .
     ///     b q p p . . . .
@@ -38,6 +38,9 @@ namespace ChessGameModes {
             AddPromotionSquare("h2");
             AddPromotionSquare("h3");
             AddPromotionSquare("h4");
+
+            AllowCastling = false;
+            AllowEnpassantCapture = false;
         }
 
         private void AddPromotionSquare(string algebraicKeyPosition) {
@@ -112,40 +115,6 @@ namespace ChessGameModes {
                 return AddPieceToBoard(ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
             }
             return null;
-        }
-
-
-        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
-
-            for (int i = 0; i < templateMoves.Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
-                }
-            }
-
-            if (mover is Pawn) {
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    OnDisplayPromotionUI(true);
-                }
-            }
-
-            return availableMoves;
-        }
-
-        public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            // Try make the move
-            if (MakeMove(mover, destination)) {
-                if (mover is Pawn) {
-                    ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
-                    if (promotedPiece != null) {
-                        mover = promotedPiece;
-                    }
-                }
-                return true;
-            }
-            return false;
         }
     }
 }
