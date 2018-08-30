@@ -127,6 +127,11 @@ public class UIManager : MonoBehaviour {
     }
 
     public void OnDisplayPromotionOptions(bool value) {
+        // Do not display options if there are 0 or 1 options to choose from.
+        if(value && GameManager.Instance.ChessGame.PawnPromotionOptions.Length <= 1) {
+            return;
+        }
+
         promoteToLbl.text = "<color=white>Promote to:\n</color><b>" + (GameManager.Instance.ChessGame.SelectedPawnPromotion.ToString()) + "</b>";
         promotionWindow.SetActive(value);
     }
