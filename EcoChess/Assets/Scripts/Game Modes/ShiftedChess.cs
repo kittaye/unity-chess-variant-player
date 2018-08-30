@@ -106,7 +106,7 @@ namespace ChessGameModes {
                 }
             }
 
-            if (mover is King && mover.MoveCount == 0) {
+            if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 0) {
                 if (mover.GetTeam() == Team.WHITE) {
                     availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions, canCastleLeftward: false));
                 } else {

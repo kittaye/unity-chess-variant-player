@@ -23,18 +23,17 @@ namespace ChessGameModes {
     ///     R N B Q K B N R
     /// </summary>
     public class Chess {
-
         public static event Action<bool> _DisplayPromotionUI;
         public static event Action<Piece[]> _OnPawnPromotionsChanged;
 
-        public Piece[] PawnPromotionOptions { get; protected set; }
-        public Piece SelectedPawnPromotion { get; protected set; }
         public Board Board { get; private set; }
 
-        public bool AllowCastling { get; protected set; }
-        public bool AllowEnpassantCapture { get; protected set; }
         public bool AllowPawnPromotion { get; protected set; }
+        public Piece[] PawnPromotionOptions { get; protected set; }
+        public Piece SelectedPawnPromotion { get; protected set; }
+        public bool AllowCastling { get; protected set; }
         public Piece[] CastlerOptions { get; protected set; }
+        public bool AllowEnpassantCapture { get; protected set; }
 
         protected const int BOARD_WIDTH = 8;
         protected const int BOARD_HEIGHT = 8;
@@ -89,6 +88,8 @@ namespace ChessGameModes {
             AllowEnpassantCapture = true;
             AllowPawnPromotion = true;
             CastlerOptions = new Piece[] { Piece.Rook };
+            PawnPromotionOptions = new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight };
+            SelectedPawnPromotion = Piece.Queen;
 
             BLACK_BACKROW = Board.GetHeight() - 1;
             BLACK_PAWNROW = Board.GetHeight() - 2;
@@ -98,8 +99,6 @@ namespace ChessGameModes {
             aSideBlackRook = hSideWhiteRook = null;
             opposingTeamCheckThreats = null;
             checkingForCheck = false;
-            PawnPromotionOptions = new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight };
-            SelectedPawnPromotion = Piece.Queen;
         }
 
         public override string ToString() {

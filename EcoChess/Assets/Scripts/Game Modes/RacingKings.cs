@@ -21,6 +21,9 @@ namespace ChessGameModes {
     /// </summary>
     public class RacingKings : Chess {
         public RacingKings() : base(BOARD_WIDTH, BOARD_HEIGHT) {
+            AllowCastling = false;
+            AllowEnpassantCapture = false;
+            AllowPawnPromotion = false;
         }
 
         public override string ToString() {
