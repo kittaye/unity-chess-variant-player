@@ -24,6 +24,7 @@ namespace ChessGameModes {
             BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
             List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
 
+            // This is where the code differs from the base method. Disallows moves that place the opposing king in check, except checkmate.
             for (int i = 0; i < templateMoves.Length; i++) {
                 if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
                     if (IsPieceInCheckAfterThisMove(opposingRoyalPiece, mover, templateMoves[i]) == false) {
@@ -34,7 +35,7 @@ namespace ChessGameModes {
                 }
             }
 
-            if (mover is King && mover.MoveCount == 0) {
+            if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 0) {
                 availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions));
             } else if (mover is Pawn) {
                 BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
