@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour {
     public GameObject piecePrefab;
     public GameObject boardChunkPrefab;
 
-    private static int modeIndex = 0;
+    private static int modeIndex = (int)GameMode.Weak;
     private string lastTurnLabel;
     private UIManager ui;
 

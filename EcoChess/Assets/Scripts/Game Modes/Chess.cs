@@ -27,6 +27,8 @@ namespace ChessGameModes {
 
         public Board Board { get; private set; }
 
+        // Use these properties to change the behaviour of base virtual methods without needing to override them.
+        // Useful when the chess variant is only slightly different from base chess rules.
         public bool AllowPawnPromotion { get; protected set; }
         public Piece[] PawnPromotionOptions { get; protected set; }
         public Piece SelectedPawnPromotion { get; protected set; }
@@ -73,6 +75,9 @@ namespace ChessGameModes {
             Init();
         }
 
+        /// <summary>
+        /// Initialise all variables to match basic chess rules.
+        /// </summary>
         private void Init() {
             whitePieces = new List<ChessPiece>();
             blackPieces = new List<ChessPiece>();
@@ -116,6 +121,10 @@ namespace ChessGameModes {
             return (int)numConsecutiveCapturelessMoves;
         }
 
+        /// <summary>
+        /// Module function for the captureless move limit rule end condition.
+        /// </summary>
+        /// <returns>True if 50 turns (100 moves) passes without a single capture.</returns>
         public bool CapturelessMovesLimit() {
             if (numConsecutiveCapturelessMoves >= 100) {
                 UIManager.Instance.LogCapturelessLimit(GetCurrentTeamTurn().ToString());
@@ -203,7 +212,6 @@ namespace ChessGameModes {
 
             // Try make the move
             if (MakeMove(mover, destination)) {
-                // Check castling moves
                 if (AllowCastling) {
                     if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 1) {
                         TryPerformCastlingRookMoves(mover);
@@ -275,7 +283,7 @@ namespace ChessGameModes {
         protected virtual Pawn CheckPawnEnPassantCapture(Pawn mover) {
             if (Board.ContainsCoord(mover.GetRelativeBoardCoord(0, -1)) && IsThreat(mover, mover.GetRelativeBoardCoord(0, -1))) {
                 ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(0, -1)).occupier;
-                if (occupier != null && occupier is Pawn && occupier == LastMovedOpposingPiece(mover) && ((Pawn)occupier).validEnPassant) {
+                if (occupier != null && occupier is Pawn && occupier == GetLastMovedOpposingPiece(mover) && ((Pawn)occupier).validEnPassant) {
                     mover.CaptureCount++;
                     RemovePieceFromBoard(occupier);
                     return (Pawn)occupier;
@@ -421,7 +429,7 @@ namespace ChessGameModes {
                     BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
                     if (Board.ContainsCoord(coord)) {
                         ChessPiece piece = Board.GetCoordInfo(coord).occupier;
-                        if (piece is Pawn && piece == LastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
+                        if (piece is Pawn && piece == GetLastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
                             if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
                                 return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1));
                             }
@@ -532,7 +540,12 @@ namespace ChessGameModes {
             return false;
         }
 
-        public ChessPiece GetTeamLastMovedPiece(Team team) {
+        /// <summary>
+        /// Module function to get the last moved piece from a specific team.
+        /// </summary>
+        /// <param name="team">Team to get the last mover from.</param>
+        /// <returns>The last moved chess piece from the team.</returns>
+        public ChessPiece GetLastMovedPiece(Team team) {
             if (team == Team.WHITE) {
                 return lastMovedWhitePiece;
             } else {
@@ -540,7 +553,11 @@ namespace ChessGameModes {
             }
         }
 
-        public void SetTeamLastMovedPiece(ChessPiece piece) {
+        /// <summary>
+        /// Module function to set the last moved piece. This will update the last mover of the piece's team.
+        /// </summary>
+        /// <param name="piece">Piece to set to.</param>
+        public void SetLastMovedPiece(ChessPiece piece) {
             if (piece != null) {
                 if (piece.GetTeam() == Team.WHITE) {
                     lastMovedWhitePiece = piece;
@@ -550,11 +567,16 @@ namespace ChessGameModes {
             }
         }
 
-        protected ChessPiece LastMovedOpposingPiece(ChessPiece mover) {
+        /// <summary>
+        /// Module function to get the last moved opposing team's piece based on the mover's team.
+        /// </summary>
+        /// <param name="mover">Piece to determine the opposing team.</param>
+        /// <returns>The last moved piece from the opposing team based on the mover's team.</returns>
+        protected ChessPiece GetLastMovedOpposingPiece(ChessPiece mover) {
             if (mover.GetTeam() == Team.WHITE) {
-                return GetTeamLastMovedPiece(Team.BLACK);
+                return GetLastMovedPiece(Team.BLACK);
             } else {
-                return GetTeamLastMovedPiece(Team.WHITE);
+                return GetLastMovedPiece(Team.WHITE);
             }
         }
 
@@ -768,7 +790,7 @@ namespace ChessGameModes {
                 if (wasThreat) mover.CaptureCount++;
                 numConsecutiveCapturelessMoves = (wasThreat == false && (mover is Pawn) == false) ? numConsecutiveCapturelessMoves + 1 : 0;
                 UpdateSquareOccupiers(previousPosition, mover.GetBoardPosition());
-                SetTeamLastMovedPiece(mover);
+                SetLastMovedPiece(mover);
                 return true;
             }
             return false;
@@ -876,8 +898,8 @@ namespace ChessGameModes {
         protected void SimulateMove(ChessPiece mover, BoardCoord dest, ChessPiece originalOccupier, out ChessPiece originalLastMover) {
             originalLastMover = null;
             if (AssertContainsCoord(dest)) {
-                originalLastMover = GetTeamLastMovedPiece(mover.GetTeam());
-                SetTeamLastMovedPiece(mover);
+                originalLastMover = GetLastMovedPiece(mover.GetTeam());
+                SetLastMovedPiece(mover);
 
                 if (originalOccupier != null) {
                     originalOccupier.IsAlive = false;
@@ -909,7 +931,7 @@ namespace ChessGameModes {
                     Board.GetCoordInfo(dest).occupier = null;
                 }
 
-                SetTeamLastMovedPiece(originalLastMover);
+                SetLastMovedPiece(originalLastMover);
             }
         }
 
