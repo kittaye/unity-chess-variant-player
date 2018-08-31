@@ -225,10 +225,7 @@ namespace ChessGameModes {
                     }
 
                     if (AllowPawnPromotion) {
-                        ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
-                        if (promotedPiece != null) {
-                            mover = promotedPiece;
-                        }
+                        CheckPawnPromotion((Pawn)mover);
                     }
                 }
                 return true;
@@ -279,7 +276,7 @@ namespace ChessGameModes {
         /// Called in MovePiece. If an enpassant move was made, enpassant capture is performed.
         /// </summary>
         /// <param name="mover">Moving piece.</param>
-        /// <returns></returns>
+        /// <returns>The piece that was removed.</returns>
         protected virtual Pawn CheckPawnEnPassantCapture(Pawn mover) {
             if (Board.ContainsCoord(mover.GetRelativeBoardCoord(0, -1)) && IsThreat(mover, mover.GetRelativeBoardCoord(0, -1))) {
                 ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(0, -1)).occupier;
