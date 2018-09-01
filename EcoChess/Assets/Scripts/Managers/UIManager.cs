@@ -91,7 +91,7 @@ public class UIManager : MonoBehaviour {
     }
 
     public void LogCheckmate(string winningTeamName, string losingTeamName) {
-        gameLogLbl.text = string.Format("Team {0} has been checkmated -- Team {1} wins!", winningTeamName, losingTeamName);
+        gameLogLbl.text = string.Format("Team {0} has been checkmated -- Team {1} wins!", losingTeamName, winningTeamName);
     }
 
     public void LogStalemate(string stalematerTeamName) {
