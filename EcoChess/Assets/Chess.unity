@@ -155,6 +155,7 @@ MonoBehaviour:
   boardLayer:
     serializedVersion: 2
     m_Bits: 256
+  spriteMoverPrefab: {fileID: 173496, guid: 5f8cfefe9184da24a90f4947748ea72a, type: 2}
 --- !u!114 &61218722
 MonoBehaviour:
   m_ObjectHideFlags: 0
