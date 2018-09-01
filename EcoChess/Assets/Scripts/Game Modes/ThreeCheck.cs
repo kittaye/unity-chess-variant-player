@@ -22,7 +22,7 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            bool hasAnyMoves = false;
+            bool hasAnyMoves = TeamHasAnyMoves(GetCurrentTeamTurn());
 
             if (IsPieceInCheck(currentRoyalPiece)) {
                 if (currentRoyalPiece.GetTeam() == Team.WHITE) {
@@ -31,7 +31,6 @@ namespace ChessGameModes {
                     numOfChecksBLACK++;
                 }
 
-                hasAnyMoves = TeamHasAnyMoves(GetCurrentTeamTurn());
                 if (!hasAnyMoves) {
                     UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
                     return true;
