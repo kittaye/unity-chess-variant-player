@@ -22,7 +22,7 @@ namespace ChessGameModes {
             int currentCaptures = mover.CaptureCount;
 
             if(base.MovePiece(mover, destination)) {
-                if (((mover is King) == false) && mover.CaptureCount != currentCaptures) {
+                if (mover != currentRoyalPiece && mover.CaptureCount != currentCaptures) {
                     RemovePieceFromBoard(mover);
                     RemovePieceFromActiveTeam(mover);
                     if(mover is Pawn) {

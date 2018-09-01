@@ -141,7 +141,7 @@ namespace ChessGameModes {
 
             ChessPiece destinationOccupier = Board.GetCoordInfo(destination).occupier;
             // If the selected destination has a friendly rook occupying it, the move is a castling move.
-            if (mover is King && mover.MoveCount == 0 && destinationOccupier is Rook) {
+            if (mover == currentRoyalPiece && mover.MoveCount == 0 && destinationOccupier is Rook) {
                 // Switch the destination from the rook's position to the king's final castle position.
                 kingCastlingThisMove = true;
 

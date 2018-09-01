@@ -13,6 +13,7 @@ namespace ChessGameModes {
     public class CheshireCat : Chess {
 
         public CheshireCat() : base() {
+            AllowCastling = false;
         }
 
         public override string ToString() {
@@ -21,6 +22,7 @@ namespace ChessGameModes {
 
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
             BoardCoord[] templateMoves;
+
             if (mover is King && mover.MoveCount == 0) {
                 List<BoardCoord> kingFirstMoves = new List<BoardCoord>();
                 for (int i = 0; i <= 7; i++) {
@@ -30,6 +32,7 @@ namespace ChessGameModes {
             } else {
                 templateMoves = mover.CalculateTemplateMoves().ToArray();
             }
+
             List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
 
             for (int i = 0; i < templateMoves.Length; i++) {
@@ -39,6 +42,7 @@ namespace ChessGameModes {
                 }
             }
 
+            // This code remains the same from the base method.
             if (mover is Pawn) {
                 BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
                 if (enPassantMove != BoardCoord.NULL) {
@@ -55,20 +59,11 @@ namespace ChessGameModes {
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
             BoardCoord oldPos = mover.GetBoardPosition();
 
-            // Try make the move
-            if (MakeMove(mover, destination)) {
+            if (base.MovePiece(mover, destination)) {
                 Board.GetCoordInfo(oldPos).boardChunk.SetActive(false);
-
-                if (mover is Pawn) {
-                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
-                    CheckPawnEnPassantCapture((Pawn)mover);
-                    ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
-                    if (promotedPiece != null) {
-                        mover = promotedPiece;
-                    }
-                }
                 return true;
             }
+
             return false;
         }
     }

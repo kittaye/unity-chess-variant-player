@@ -213,7 +213,7 @@ namespace ChessGameModes {
             // Try make the move
             if (MakeMove(mover, destination)) {
                 if (AllowCastling) {
-                    if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 1) {
+                    if (mover == currentRoyalPiece && mover.MoveCount == 1) {
                         TryPerformCastlingRookMoves(mover);
                     }
                 }
