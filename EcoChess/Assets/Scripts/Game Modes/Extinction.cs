@@ -108,7 +108,7 @@ namespace ChessGameModes {
                             whitePieceCounts[promotedPiece.GetPieceType()]++;
                         } else {
                             blackPieceCounts[Piece.Pawn]--;
-                            blackPieceCounts[capturedPiece.GetPieceType()]++;
+                            blackPieceCounts[promotedPiece.GetPieceType()]++;
                         }
 
                         mover = promotedPiece;
