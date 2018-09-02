@@ -9,7 +9,7 @@ public class MouseController : MonoBehaviour {
     public ChessPiece lastSelectedOccupier { get; private set; }
 
     private bool hasSelection;
-    private GameObject spriteMover;
+    private GameObject selectedObject;
     private bool gameFinished = false;
     private Collider hoveredObj = null;
     private List<BoardCoord> lastSelectedOccupierAvailableMoves = new List<BoardCoord>();
@@ -30,7 +30,7 @@ public class MouseController : MonoBehaviour {
 
     private void Start() {
         chessGame = GameManager.Instance.ChessGame;
-        spriteMover = Instantiate(spriteMoverPrefab);
+        selectedObject = Instantiate(spriteMoverPrefab);
     }
 
     private void OnDestroy() {
@@ -43,56 +43,63 @@ public class MouseController : MonoBehaviour {
 
     void Update () {
         UpdateHoveredObj();
-        if (gameFinished) return;
 
-        if (hasSelection) {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mousePos.z = -2;
-            spriteMover.transform.position = mousePos;
+        if (gameFinished) {
+            return;
         }
 
+        if (hasSelection) {
+            UpdateSelectedObjPosition();
+        }
+
+        // On left-mouse click.
         if (Input.GetMouseButtonDown(0)) {
-            if (hoveredObj != null) {
-                CoordInfo selectedCoord = chessGame.Board.GetCoordInfo(GetHoveredBoardCoord());
 
-                if (hasSelection && lastSelectedOccupierAvailableMoves.Contains(GetHoveredBoardCoord())) {
-                    if (chessGame.MovePiece(lastSelectedOccupier, GetHoveredBoardCoord())) {
-                        GameManager.Instance.OnTurnComplete();
-                    }
-                    DeSelect();
-                    return;
-
-                } else if (selectedCoord.occupier == null || !selectedCoord.occupier.gameObject.activeInHierarchy) {
-                    DeSelect();
-                    return;
-
-                } else if (chessGame.IsMoversTurn(selectedCoord.occupier)) {
-                    List<BoardCoord> selectedOccupierMoves = chessGame.CalculateAvailableMoves(selectedCoord.occupier);
-                    if (selectedOccupierMoves.Count > 0) {
-                        DeSelect();
-
-                        hasSelection = true;
-
-                        lastSelectedOccupier = selectedCoord.occupier;
-                        lastSelectedOccupierAvailableMoves = selectedOccupierMoves;
-                        lastSelectedOccupier.gameObject.SetActive(false);
-
-                        spriteMover.GetComponent<SpriteRenderer>().sprite = lastSelectedOccupier.gameObject.GetComponent<SpriteRenderer>().sprite;
-                        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                        mousePos.z = -2;
-                        spriteMover.transform.position = mousePos;
-                        spriteMover.SetActive(true);
-
-                        UIManager.Instance.OnDisplayPromotionOptions(false);
-                        UIManager.Instance.OnDisplayDefectionOptions(false);
-
-                        chessGame.Board.HighlightCoordinates(selectedOccupierMoves.ToArray());
-                    }
-                    return;
-                }
+            // If clicked on nothing, do nothing to current state.
+            if(hoveredObj == null) {
+                return;
             }
-            DeSelect();
 
+            // Otherwise, get the square that we clicked on.
+            CoordInfo selectedCoord = chessGame.Board.GetCoordInfo(GetHoveredBoardCoord());
+
+            // If we have already selected a piece, and it is placed down on a valid square, move it.
+            if (hasSelection && lastSelectedOccupierAvailableMoves.Contains(GetHoveredBoardCoord())) {
+                if (chessGame.MovePiece(lastSelectedOccupier, GetHoveredBoardCoord())) {
+                    GameManager.Instance.OnTurnComplete();
+                }
+                DeSelect();
+                return;
+            }
+
+            // If we clicked on an empty square or on a piece that is inactive, deselect.
+            if (selectedCoord.occupier == null || !selectedCoord.occupier.gameObject.activeInHierarchy) {
+                DeSelect();
+                return;
+            }
+
+            // Otherwise, check if the selected piece is on the current mover's team.
+            if (chessGame.IsMoversTurn(selectedCoord.occupier)) {
+                DeSelect();
+
+                List<BoardCoord> selectedOccupierMoves = chessGame.CalculateAvailableMoves(selectedCoord.occupier);
+                if (selectedOccupierMoves.Count > 0) {
+                    hasSelection = true;
+                    lastSelectedOccupier = selectedCoord.occupier;
+                    lastSelectedOccupierAvailableMoves = selectedOccupierMoves;
+                    lastSelectedOccupier.gameObject.SetActive(false);
+
+                    selectedObject.GetComponent<SpriteRenderer>().sprite = lastSelectedOccupier.gameObject.GetComponent<SpriteRenderer>().sprite;
+                    selectedObject.GetComponent<SpriteRenderer>().material.color = lastSelectedOccupier.gameObject.GetComponent<SpriteRenderer>().material.color;
+                    UpdateSelectedObjPosition();
+                    selectedObject.SetActive(true);
+
+                    chessGame.Board.HighlightCoordinates(selectedOccupierMoves.ToArray());
+                }
+                return;
+            }
+
+            // Else if we right-clicked with a selection, deselect.
         } else if (Input.GetMouseButtonDown(1)) {
             if (hasSelection) {
                 DeSelect();
@@ -125,12 +132,18 @@ public class MouseController : MonoBehaviour {
         }
     }
 
+    private void UpdateSelectedObjPosition() {
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePos.z = -2;
+        selectedObject.transform.position = mousePos;
+    }
+
     private void DeSelect() {
         hasSelection = false;
 
-        spriteMover.SetActive(false);
+        selectedObject.SetActive(false);
 
-        if (lastSelectedOccupier != null) {
+        if (lastSelectedOccupier != null && lastSelectedOccupier.IsAlive) {
             lastSelectedOccupier.gameObject.SetActive(true);
             lastSelectedOccupierAvailableMoves.Clear();
         }
