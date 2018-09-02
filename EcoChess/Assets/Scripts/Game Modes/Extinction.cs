@@ -105,10 +105,10 @@ namespace ChessGameModes {
                     if (promotedPiece != null) {
                         if (GetCurrentTeamTurn() == Team.WHITE) {
                             whitePieceCounts[Piece.Pawn]--;
-                            whitePieceCounts[promotedPiece.GetPieceType()]++;
+                            whitePieceCounts[SelectedPawnPromotion]++;
                         } else {
                             blackPieceCounts[Piece.Pawn]--;
-                            blackPieceCounts[promotedPiece.GetPieceType()]++;
+                            blackPieceCounts[SelectedPawnPromotion]++;
                         }
 
                         mover = promotedPiece;
