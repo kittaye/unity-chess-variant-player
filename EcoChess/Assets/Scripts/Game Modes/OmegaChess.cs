@@ -84,10 +84,10 @@ namespace ChessGameModes {
 
         protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
             if (mover.GetBoardPosition().x == 4) {
-                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
+                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(2, mover.GetBoardPosition().y)).occupier;
                 MakeDirectMove(castlingPiece, new BoardCoord(5, mover.GetBoardPosition().y), false);
             } else if (mover.GetBoardPosition().x == 8) {
-                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).occupier;
+                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(9, mover.GetBoardPosition().y)).occupier;
                 MakeDirectMove(castlingPiece, new BoardCoord(7, mover.GetBoardPosition().y), false);
             }
         }
