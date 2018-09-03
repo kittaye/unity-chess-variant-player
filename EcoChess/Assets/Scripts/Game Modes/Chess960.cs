@@ -18,7 +18,11 @@ namespace ChessGameModes {
     ///     ? ? ? ? ? ? ? ?
     /// </summary>
     public class Chess960 : Chess {
-        public Chess960() : base() { }
+        private Rook castlingRook;
+
+        public Chess960() : base() {
+            castlingRook = null;
+        }
 
         public override string ToString() {
             return "Chess960";
@@ -144,26 +148,17 @@ namespace ChessGameModes {
             if (mover == currentRoyalPiece && mover.MoveCount == 0 && destinationOccupier is Rook) {
                 // Switch the destination from the rook's position to the king's final castle position.
                 kingCastlingThisMove = true;
+                castlingRook = (Rook)destinationOccupier;
 
                 if (destination.x < mover.GetBoardPosition().x) {
-                    if (destinationOccupier.GetTeam() == Team.WHITE) {
-                        aSideWhiteRook = (Rook)destinationOccupier;
-                    } else {
-                        aSideBlackRook = (Rook)destinationOccupier;
-                    }
                     destination = new BoardCoord(2, destination.y);
                 } else {
-                    if (destinationOccupier.GetTeam() == Team.WHITE) {
-                        hSideWhiteRook = (Rook)destinationOccupier;
-                    } else {
-                        hSideBlackRook = (Rook)destinationOccupier;
-                    }
                     destination = new BoardCoord(6, destination.y);
                 }
             }
 
             // Try make the move
-            if (MakeMove(mover, destination)) {
+            if (MakeDirectMove(mover, destination)) {
                 if (kingCastlingThisMove) {
                     TryPerformCastlingRookMoves((King)mover);
                 } else if (mover is Pawn) {
@@ -174,6 +169,14 @@ namespace ChessGameModes {
                 return true;
             }
             return false;
+        }
+
+        protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
+            if (mover.GetBoardPosition().x == 2) {
+                MakeDirectMove(castlingRook, new BoardCoord(3, mover.GetBoardPosition().y), false);
+            } else if (mover.GetBoardPosition().x == 6) {
+                MakeDirectMove(castlingRook, new BoardCoord(5, mover.GetBoardPosition().y), false);
+            }
         }
 
         protected override BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, Piece[] castlerOptions, int castlingDistance, bool canCastleLeftward = true, bool canCastleRightward = true) {
