@@ -82,6 +82,7 @@ public class MouseController : MonoBehaviour {
             if (chessGame.IsMoversTurn(selectedCoord.occupier)) {
                 DeSelect();
 
+                // If so, calculate it's moves and display visual graphics for moving it around.
                 List<BoardCoord> selectedOccupierMoves = chessGame.CalculateAvailableMoves(selectedCoord.occupier);
                 if (selectedOccupierMoves.Count > 0) {
                     hasSelection = true;
@@ -92,6 +93,10 @@ public class MouseController : MonoBehaviour {
                     selectedObject.GetComponent<SpriteRenderer>().sprite = lastSelectedOccupier.gameObject.GetComponent<SpriteRenderer>().sprite;
                     selectedObject.GetComponent<SpriteRenderer>().material.color = lastSelectedOccupier.gameObject.GetComponent<SpriteRenderer>().material.color;
                     UpdateSelectedObjPosition();
+                    selectedObject.gameObject.transform.rotation = Quaternion.identity;
+                    if (chessGame.Board.isFlipped) {
+                        selectedObject.gameObject.transform.Rotate(new Vector3(0, 0, 180));
+                    }
                     selectedObject.SetActive(true);
 
                     chessGame.Board.HighlightCoordinates(selectedOccupierMoves.ToArray());
