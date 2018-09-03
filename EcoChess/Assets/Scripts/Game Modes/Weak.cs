@@ -51,8 +51,8 @@ namespace ChessGameModes {
             AddPieceToBoard(new Bishop(Team.WHITE, "f1"));
             AddPieceToBoard(new Knight(Team.WHITE, "b1"));
             AddPieceToBoard(new Knight(Team.WHITE, "g1"));
-            aSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, "a1"));
-            hSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, "h1"));
+            AddPieceToBoard(new Rook(Team.WHITE, "a1"));
+            AddPieceToBoard(new Rook(Team.WHITE, "h1"));
 
             AddPieceToBoard(new Pawn(Team.BLACK, "c6", initialMoveLimit: 1));
             AddPieceToBoard(new Pawn(Team.BLACK, "f6", initialMoveLimit: 1));

@@ -18,12 +18,8 @@ namespace ChessGameModes {
     ///     $ ^ Q A K B N R
     /// </summary>
     public class PerfectChess : Chess {
-        private Empress aSideWhiteEmpress;
-        private Empress aSideBlackEmpress;
 
         public PerfectChess() : base() {
-            aSideWhiteEmpress = aSideBlackEmpress = null;
-
             SelectedPawnPromotion = Piece.Amazon;
             PawnPromotionOptions = new Piece[7] { Piece.Amazon, Piece.Queen, Piece.Empress, Piece.Princess, Piece.Rook, Piece.Bishop, Piece.Knight };
             CastlerOptions = new Piece[] { Piece.Rook, Piece.Empress };
@@ -37,10 +33,10 @@ namespace ChessGameModes {
             currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, "e1"));
             opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, "e8"));
 
-            aSideWhiteEmpress = (Empress)AddPieceToBoard(new Empress(Team.WHITE, "a1"));
-            aSideBlackEmpress = (Empress)AddPieceToBoard(new Empress(Team.BLACK, "a8"));
-            hSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, "h1"));
-            hSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, "h8"));
+            AddPieceToBoard(new Empress(Team.WHITE, "a1"));
+            AddPieceToBoard(new Empress(Team.BLACK, "a8"));
+            AddPieceToBoard(new Rook(Team.WHITE, "h1"));
+            AddPieceToBoard(new Rook(Team.BLACK, "h8"));
 
             AddPieceToBoard(new Princess(Team.WHITE, "b1"));
             AddPieceToBoard(new Princess(Team.BLACK, "b8"));
@@ -75,17 +71,11 @@ namespace ChessGameModes {
 
         protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
             if (mover.GetBoardPosition().x == 2) {
-                if (mover.GetTeam() == Team.WHITE) {
-                    aSideWhiteEmpress = (Empress)PerformCastle(aSideWhiteEmpress, new BoardCoord(3, mover.GetBoardPosition().y));
-                } else {
-                    aSideBlackEmpress = (Empress)PerformCastle(aSideBlackEmpress, new BoardCoord(3, mover.GetBoardPosition().y));
-                }
+                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
+                MakeDirectMove(castlingPiece, new BoardCoord(3, mover.GetBoardPosition().y), false);
             } else if (mover.GetBoardPosition().x == 6) {
-                if (mover.GetTeam() == Team.WHITE) {
-                    hSideWhiteRook = (Rook)PerformCastle(hSideWhiteRook, new BoardCoord(5, mover.GetBoardPosition().y));
-                } else {
-                    hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(5, mover.GetBoardPosition().y));
-                }
+                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).occupier;
+                MakeDirectMove(castlingPiece, new BoardCoord(5, mover.GetBoardPosition().y), false);
             }
         }
     }

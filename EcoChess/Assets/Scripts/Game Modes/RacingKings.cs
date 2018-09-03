@@ -84,7 +84,7 @@ namespace ChessGameModes {
         }
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            return MakeMove(mover, destination);
+            return MakeDirectMove(mover, destination);
         }
 
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {

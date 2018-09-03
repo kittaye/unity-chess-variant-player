@@ -55,10 +55,10 @@ namespace ChessGameModes {
             AddPieceToBoard(new Queen(Team.WHITE, "e1"));
             AddPieceToBoard(new Queen(Team.BLACK, "e10"));
 
-            aSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, "b1"));
-            hSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, "i1"));
-            aSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, "b10"));
-            hSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, "i10"));
+            AddPieceToBoard(new Rook(Team.WHITE, "b1"));
+            AddPieceToBoard(new Rook(Team.WHITE, "i1"));
+            AddPieceToBoard(new Rook(Team.BLACK, "b10"));
+            AddPieceToBoard(new Rook(Team.BLACK, "i10"));
 
             AddPieceToBoard(new Wizard(Team.WHITE, "W1"));
             AddPieceToBoard(new Wizard(Team.WHITE, "W2"));
@@ -84,17 +84,11 @@ namespace ChessGameModes {
 
         protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
             if (mover.GetBoardPosition().x == 4) {
-                if (mover.GetTeam() == Team.WHITE) {
-                    aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(5, mover.GetBoardPosition().y));
-                } else {
-                    aSideBlackRook = (Rook)PerformCastle(aSideBlackRook, new BoardCoord(5, mover.GetBoardPosition().y));
-                }
+                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
+                MakeDirectMove(castlingPiece, new BoardCoord(5, mover.GetBoardPosition().y), false);
             } else if (mover.GetBoardPosition().x == 8) {
-                if (mover.GetTeam() == Team.WHITE) {
-                    hSideWhiteRook = (Rook)PerformCastle(hSideWhiteRook, new BoardCoord(7, mover.GetBoardPosition().y));
-                } else {
-                    hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(7, mover.GetBoardPosition().y));
-                }
+                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).occupier;
+                MakeDirectMove(castlingPiece, new BoardCoord(7, mover.GetBoardPosition().y), false);
             }
         }
 

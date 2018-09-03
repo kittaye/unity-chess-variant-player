@@ -51,10 +51,10 @@ namespace ChessGameModes {
             secondCurrentKing = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(12, WHITE_BACKROW)));
             secondOpposingKing = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(12, BLACK_BACKROW)));
 
-            aSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(0, WHITE_BACKROW)));
-            aSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(0, BLACK_BACKROW)));
-            hSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(15, WHITE_BACKROW)));
-            hSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(15, BLACK_BACKROW)));
+            AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(0, WHITE_BACKROW)));
+            AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(0, BLACK_BACKROW)));
+            AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(15, WHITE_BACKROW)));
+            AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(15, BLACK_BACKROW)));
 
             for (int x = 0; x < BOARD_WIDTH; x++) {
                 AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, WHITE_PAWNROW), initialMoveLimit: 4));
@@ -78,17 +78,11 @@ namespace ChessGameModes {
 
         protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
             if (mover.GetBoardPosition().x == 2) {
-                if (mover.GetTeam() == Team.WHITE) {
-                    aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(3, mover.GetBoardPosition().y));
-                } else {
-                    aSideBlackRook = (Rook)PerformCastle(aSideBlackRook, new BoardCoord(3, mover.GetBoardPosition().y));
-                }
+                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
+                MakeDirectMove(castlingPiece, new BoardCoord(3, mover.GetBoardPosition().y), false);
             } else if (mover.GetBoardPosition().x == 14) {
-                if (mover.GetTeam() == Team.WHITE) {
-                    hSideWhiteRook = (Rook)PerformCastle(hSideWhiteRook, new BoardCoord(13, mover.GetBoardPosition().y));
-                } else {
-                    hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(13, mover.GetBoardPosition().y));
-                }
+                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).occupier;
+                MakeDirectMove(castlingPiece, new BoardCoord(13, mover.GetBoardPosition().y), false);
             }
         }
 

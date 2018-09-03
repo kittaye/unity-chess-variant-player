@@ -7,7 +7,7 @@ public abstract class ChessPiece {
 
     protected Piece m_pieceType;
     public GameObject gameObject;
-    public int MoveCount { get; private set; }
+    public int MoveCount { get; set; }
     public int CaptureCount { get; set; }
     public bool IsAlive { get; set; }
     public bool hasXWrapping { get; set; }
@@ -73,16 +73,6 @@ public abstract class ChessPiece {
 
     public Piece GetPieceType() {
         return m_pieceType;
-    }
-
-    public bool MakeMoveTo(BoardCoord destination) {
-        if (chessGame.AssertContainsCoord(destination)) {
-            SetBoardPosition(destination);
-            gameObject.transform.position = destination;
-            MoveCount++;
-            return true;
-        }
-        return false;
     }
 
     public Team GetTeam() {

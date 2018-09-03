@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using System;
 
@@ -47,10 +47,6 @@ namespace ChessGameModes {
         protected List<ChessPiece> opposingTeamCheckThreats;
         protected ChessPiece currentRoyalPiece;
         protected ChessPiece opposingRoyalPiece;
-        protected Rook aSideWhiteRook;
-        protected Rook hSideWhiteRook;
-        protected Rook aSideBlackRook;
-        protected Rook hSideBlackRook;
 
         private uint numConsecutiveCapturelessMoves;
         private Team currentTeamTurn;
@@ -81,12 +77,10 @@ namespace ChessGameModes {
         private void Init() {
             whitePieces = new List<ChessPiece>();
             blackPieces = new List<ChessPiece>();
-            lastMovedWhitePiece = null;
-            lastMovedBlackPiece = null;
-            currentTeamTurn = Team.WHITE;
-            opposingTeamTurn = Team.BLACK;
             numConsecutiveCapturelessMoves = 0;
+            castlingDistance = 2;
             Board.allowFlipping = false;
+            checkingForCheck = false;
 
             AllowCastling = true;
             AllowEnpassantCapture = true;
@@ -97,12 +91,14 @@ namespace ChessGameModes {
 
             BLACK_BACKROW = Board.GetHeight() - 1;
             BLACK_PAWNROW = Board.GetHeight() - 2;
-            castlingDistance = 2;
-            currentRoyalPiece = opposingRoyalPiece = null;
-            aSideWhiteRook = hSideWhiteRook = null;
-            aSideBlackRook = hSideWhiteRook = null;
+
+            currentTeamTurn = Team.WHITE;
+            opposingTeamTurn = Team.BLACK;
+            currentRoyalPiece = null;
+            opposingRoyalPiece = null;
+            lastMovedWhitePiece = null;
+            lastMovedBlackPiece = null;
             opposingTeamCheckThreats = null;
-            checkingForCheck = false;
         }
 
         public override string ToString() {
@@ -140,10 +136,10 @@ namespace ChessGameModes {
             currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(4, WHITE_BACKROW)));
             opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(4, BLACK_BACKROW)));
 
-            aSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(0, WHITE_BACKROW)));
-            aSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(0, BLACK_BACKROW)));
-            hSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(7, WHITE_BACKROW)));
-            hSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(7, BLACK_BACKROW)));
+            AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(0, WHITE_BACKROW)));
+            AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(0, BLACK_BACKROW)));
+            AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(7, WHITE_BACKROW)));
+            AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(7, BLACK_BACKROW)));
 
             AddPieceToBoard(new Queen(Team.WHITE, new BoardCoord(3, WHITE_BACKROW)));
             AddPieceToBoard(new Queen(Team.BLACK, new BoardCoord(3, BLACK_BACKROW)));
@@ -211,7 +207,7 @@ namespace ChessGameModes {
             BoardCoord oldPos = mover.GetBoardPosition();
 
             // Try make the move
-            if (MakeMove(mover, destination)) {
+            if (MakeDirectMove(mover, destination)) {
                 if (AllowCastling) {
                     if (mover == currentRoyalPiece && mover.MoveCount == 1) {
                         TryPerformCastlingRookMoves(mover);
@@ -238,38 +234,16 @@ namespace ChessGameModes {
         /// </summary>
         /// <param name="mover">Piece to perform the castling move.</param>
         protected virtual void TryPerformCastlingRookMoves(ChessPiece mover) {
+            // If the king moved to the left to castle, grab the rook on the left-side of the board to castle with and move it.
             if (mover.GetBoardPosition().x == 2) {
-                if (mover.GetTeam() == Team.WHITE) {
-                    aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(3, mover.GetBoardPosition().y));
-                } else {
-                    aSideBlackRook = (Rook)PerformCastle(aSideBlackRook, new BoardCoord(3, mover.GetBoardPosition().y));
-                }
-            } else if (mover.GetBoardPosition().x == 6) {
-                if (mover.GetTeam() == Team.WHITE) {
-                    hSideWhiteRook = (Rook)PerformCastle(hSideWhiteRook, new BoardCoord(5, mover.GetBoardPosition().y));
-                } else {
-                    hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(5, mover.GetBoardPosition().y));
-                }
-            }
-        }
+                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
+                MakeDirectMove(castlingPiece, new BoardCoord(3, mover.GetBoardPosition().y), false);
 
-        /// <summary>
-        /// Performs the castling move. Should be called within TryPerformCastlingRookMoves.
-        /// </summary>
-        /// <param name="castlingPiece">Piece to castle with.</param>
-        /// <param name="castlingPieceNewPos">Castling piece's final position.</param>
-        /// <returns></returns>
-        protected virtual ChessPiece PerformCastle(ChessPiece castlingPiece, BoardCoord castlingPieceNewPos) {
-            if (AssertContainsCoord(castlingPieceNewPos)) {
-                if (castlingPiece != null) {
-                    RemovePieceFromBoard(castlingPiece);
-                    RemovePieceFromActiveTeam(castlingPiece);
-                    return AddPieceToBoard(ChessPieceFactory.Create(castlingPiece.GetPieceType(), castlingPiece.GetTeam(), castlingPieceNewPos));
-                } else {
-                    Debug.LogError("Reference to the castling piece should not be null! Ensure references were made when the piece was first created.");
-                }
+            // Else the king moved right, so grab the right rook instead.
+            } else if (mover.GetBoardPosition().x == 6) {
+                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).occupier;
+                MakeDirectMove(castlingPiece, new BoardCoord(5, mover.GetBoardPosition().y), false);
             }
-            return null;
         }
 
         /// <summary>
@@ -774,20 +748,33 @@ namespace ChessGameModes {
         }
 
         /// <summary>
-        /// Moves a chess piece from it's current position to the destination.
+        /// Directly moves a chess piece from it's current position to the destination. Ignores promotions, enpassant, and castling rules. 
+        /// If rules are desired, use the virtual method MovePiece for more flexible behaviour.
         /// </summary>
         /// <param name="mover"></param>
         /// <param name="destination"></param>
+        /// <param name="isLastMover"></param>
         /// <returns>Returns true if the move was successful.</returns>
-        protected bool MakeMove(ChessPiece mover, BoardCoord destination) {
-            BoardCoord previousPosition = mover.GetBoardPosition();
-            bool wasThreat = IsThreat(mover, destination);
+        protected bool MakeDirectMove(ChessPiece mover, BoardCoord destination, bool isLastMover = true) {
+            if (AssertContainsCoord(destination)) {
+                BoardCoord previousPosition = mover.GetBoardPosition();
 
-            if (mover.MakeMoveTo(destination)) {
-                if (wasThreat) mover.CaptureCount++;
-                numConsecutiveCapturelessMoves = (wasThreat == false && (mover is Pawn) == false) ? numConsecutiveCapturelessMoves + 1 : 0;
+                mover.SetBoardPosition(destination);
+                mover.gameObject.transform.position = destination;
+
                 UpdateSquareOccupiers(previousPosition, mover.GetBoardPosition());
-                SetLastMovedPiece(mover);
+
+                if (isLastMover) {
+                    bool attackingThreat = IsThreat(mover, previousPosition);
+
+                    if (attackingThreat) {
+                        mover.CaptureCount++;
+                    }
+                    mover.MoveCount++;
+                    numConsecutiveCapturelessMoves = (attackingThreat == false && (mover is Pawn) == false) ? numConsecutiveCapturelessMoves + 1 : 0;
+                    SetLastMovedPiece(mover);
+                }
+
                 return true;
             }
             return false;

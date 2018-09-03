@@ -54,8 +54,8 @@ namespace ChessGameModes {
             AddPieceToBoard(new Knight(Team.BLACK, "g9"));
 
             AddPieceToBoard(new Rook(Team.WHITE, "b1"));
-            aSideBlackRook = (Rook)AddPieceToBoard(new Rook(Team.BLACK, "a8"));
-            hSideWhiteRook = (Rook)AddPieceToBoard(new Rook(Team.WHITE, "i2"));
+            AddPieceToBoard(new Rook(Team.BLACK, "a8"));
+            AddPieceToBoard(new Rook(Team.WHITE, "i2"));
             AddPieceToBoard(new Rook(Team.BLACK, "h9"));
 
             AddPieceToBoard(new Pawn(Team.WHITE, "b2"));
@@ -127,9 +127,11 @@ namespace ChessGameModes {
 
         protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
             if (mover.GetBoardPosition().x == 1) {
-                aSideBlackRook = (Rook)PerformCastle(aSideBlackRook, new BoardCoord(2, mover.GetBoardPosition().y));
+                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
+                MakeDirectMove(castlingPiece, new BoardCoord(2, mover.GetBoardPosition().y), false);
             } else if (mover.GetBoardPosition().x == 7) {
-                hSideWhiteRook = (Rook)PerformCastle(hSideWhiteRook, new BoardCoord(6, mover.GetBoardPosition().y));
+                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).occupier;
+                MakeDirectMove(castlingPiece, new BoardCoord(6, mover.GetBoardPosition().y), false);
             }
         }
     }
