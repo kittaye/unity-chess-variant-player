@@ -35,6 +35,11 @@ namespace ChessGameModes {
         public List<Color> defectionOptions { get; protected set; }
         public Color selectedDefection { get; protected set; }
 
+        private Rook aSideWhiteRook;
+        private Rook aSideBlackRook;
+        private Rook hSideWhiteRook;
+        private Rook hSideBlackRook;
+
         private new const int BOARD_WIDTH = 16;
         private new const int BOARD_HEIGHT = 16;
 
@@ -58,6 +63,9 @@ namespace ChessGameModes {
 
             whiteControlledColours.Add(Color.white);
             blackControlledColours.Add(Color.black);
+
+            aSideWhiteRook = aSideBlackRook = null;
+            hSideWhiteRook = hSideBlackRook = null;
 
             //Colour control squares
             AddColourControlSquares("e12", "l5", ColourName.Red);
@@ -469,7 +477,7 @@ namespace ChessGameModes {
             Color movedFromColour = Board.GetCoordInfo(oldPos).boardChunk.GetComponent<MeshRenderer>().material.color;
 
             // Try make the move
-            if (MakeMove(mover, destination)) {
+            if (MakeDirectMove(mover, destination)) {
                 if (mover is King) {
                     if (kingHasDoubleMoveDefection) kingHasDoubleMoveDefection = false;
 
@@ -647,32 +655,24 @@ namespace ChessGameModes {
         }
 
         protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
+            ChessPiece castlingPiece = null;
+
             if (mover.GetBoardPosition().x < 7) {
                 if (GetTeamOwnedColour(mover) == whiteCurrentOwnedColour) {
-                    aSideWhiteRook = (Rook)PerformCastle(aSideWhiteRook, new BoardCoord(mover.GetBoardPosition().x + 1, mover.GetBoardPosition().y));
+                    castlingPiece = aSideWhiteRook;
                 } else {
-                    aSideBlackRook = (Rook)PerformCastle(aSideBlackRook, new BoardCoord(mover.GetBoardPosition().x + 1, mover.GetBoardPosition().y));
+                    castlingPiece = aSideBlackRook;
                 }
+                MakeDirectMove(castlingPiece, new BoardCoord(mover.GetBoardPosition().x + 1, mover.GetBoardPosition().y), false);
+
             } else if (mover.GetBoardPosition().x > 9) {
                 if (GetTeamOwnedColour(mover) == whiteCurrentOwnedColour) {
-                    hSideWhiteRook = (Rook)PerformCastle(hSideWhiteRook, new BoardCoord(mover.GetBoardPosition().x - 1, mover.GetBoardPosition().y));
+                    castlingPiece = hSideWhiteRook;
                 } else {
-                    hSideBlackRook = (Rook)PerformCastle(hSideBlackRook, new BoardCoord(mover.GetBoardPosition().x - 1, mover.GetBoardPosition().y));
+                    castlingPiece = hSideBlackRook;
                 }
+                MakeDirectMove(castlingPiece, new BoardCoord(mover.GetBoardPosition().x - 1, mover.GetBoardPosition().y), false);
             }
-        }
-
-        protected override ChessPiece PerformCastle(ChessPiece castlingPiece, BoardCoord castlingPieceNewPos) {
-            if (AssertContainsCoord(castlingPieceNewPos)) {
-                if (castlingPiece != null) {
-                    RemovePieceFromBoard(castlingPiece);
-                    RemovePieceFromActiveTeam(castlingPiece);
-                    return AddSovereignChessPiece(Piece.Rook, castlingPieceNewPos, SovereignExtensions.GetColourName(GetChessPieceColour(castlingPiece)));
-                } else {
-                    Debug.LogError("Reference to the castling piece should not be null! Ensure references were made when the piece was first created.");
-                }
-            }
-            return null;
         }
 
         #region Helper Functions
