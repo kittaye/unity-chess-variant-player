@@ -94,7 +94,8 @@ namespace ChessGameModes {
             ChessPiece capturedPiece = Board.GetCoordInfo(destination).occupier;
 
             // Try make the move
-            if (MakeDirectMove(mover, destination)) {
+            string moveNotation = MakeDirectMove(mover, destination);
+            if (moveNotation != null) {
                 // Check castling moves
                 if (mover == currentRoyalPiece && mover.MoveCount == 1) {
                     TryPerformCastlingRookMoves(mover);
@@ -123,6 +124,7 @@ namespace ChessGameModes {
                     }
                 }
 
+                GetMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;

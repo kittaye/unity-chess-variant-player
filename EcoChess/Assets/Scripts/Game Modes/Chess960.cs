@@ -158,7 +158,8 @@ namespace ChessGameModes {
             }
 
             // Try make the move
-            if (MakeDirectMove(mover, destination)) {
+            string moveNotation = MakeDirectMove(mover, destination);
+            if (moveNotation != null) {
                 if (kingCastlingThisMove) {
                     TryPerformCastlingRookMoves((King)mover);
                 } else if (mover is Pawn) {
@@ -166,6 +167,7 @@ namespace ChessGameModes {
                     CheckPawnEnPassantCapture((Pawn)mover);
                     CheckPawnPromotion((Pawn)mover);
                 }
+                GetMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;

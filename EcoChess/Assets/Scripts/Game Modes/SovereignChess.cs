@@ -477,7 +477,8 @@ namespace ChessGameModes {
             Color movedFromColour = Board.GetCoordInfo(oldPos).boardChunk.GetComponent<MeshRenderer>().material.color;
 
             // Try make the move
-            if (MakeDirectMove(mover, destination)) {
+            string moveNotation = MakeDirectMove(mover, destination);
+            if (moveNotation != null) {
                 if (mover is King) {
                     if (kingHasDoubleMoveDefection) kingHasDoubleMoveDefection = false;
 
@@ -528,6 +529,8 @@ namespace ChessGameModes {
                         }
                     }
                 }
+
+                GetMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;

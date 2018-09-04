@@ -36,6 +36,8 @@ namespace ChessGameModes {
         public Piece[] CastlerOptions { get; protected set; }
         public bool AllowEnpassantCapture { get; protected set; }
 
+        public Stack<string> GetMoveNotations { get; protected set; }
+
         protected const int BOARD_WIDTH = 8;
         protected const int BOARD_HEIGHT = 8;
         protected const int WHITE_BACKROW = 0;
@@ -88,6 +90,8 @@ namespace ChessGameModes {
             CastlerOptions = new Piece[] { Piece.Rook };
             PawnPromotionOptions = new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight };
             SelectedPawnPromotion = Piece.Queen;
+
+            GetMoveNotations = new Stack<string>(30);
 
             BLACK_BACKROW = Board.GetHeight() - 1;
             BLACK_PAWNROW = Board.GetHeight() - 2;
@@ -207,7 +211,8 @@ namespace ChessGameModes {
             BoardCoord oldPos = mover.GetBoardPosition();
 
             // Try make the move
-            if (MakeDirectMove(mover, destination)) {
+            string moveNotation = MakeDirectMove(mover, destination);
+            if (moveNotation != null) {
                 if (AllowCastling) {
                     if (mover == currentRoyalPiece && mover.MoveCount == 1) {
                         TryPerformCastlingRookMoves(mover);
@@ -224,6 +229,9 @@ namespace ChessGameModes {
                         CheckPawnPromotion((Pawn)mover);
                     }
                 }
+
+                GetMoveNotations.Push(moveNotation);
+                Debug.Log(moveNotation);
                 return true;
             }
             return false;
@@ -749,13 +757,16 @@ namespace ChessGameModes {
 
         /// <summary>
         /// Directly moves a chess piece from it's current position to the destination. Ignores promotions, enpassant, and castling rules. 
-        /// If rules are desired, use the virtual method MovePiece for more flexible behaviour.
+        /// If rules are desired, use the virtual method MovePiece for more flexible behaviour. 
+        /// Ensure that this method is always called for moving pieces.
         /// </summary>
         /// <param name="mover"></param>
         /// <param name="destination"></param>
         /// <param name="isLastMover"></param>
         /// <returns>Returns true if the move was successful.</returns>
-        protected bool MakeDirectMove(ChessPiece mover, BoardCoord destination, bool isLastMover = true) {
+        protected string MakeDirectMove(ChessPiece mover, BoardCoord destination, bool isLastMover = true) {
+            string moveNotation = null;
+
             if (AssertContainsCoord(destination)) {
                 BoardCoord previousPosition = mover.GetBoardPosition();
                 bool attackingThreat = IsThreat(mover, destination);
@@ -763,22 +774,27 @@ namespace ChessGameModes {
                 mover.SetBoardPosition(destination);
                 mover.gameObject.transform.position = destination;
 
-                UpdateSquareOccupiers(previousPosition, mover.GetBoardPosition());
+                UpdateSquareOccupiers(previousPosition, mover.GetBoardPosition()); 
 
                 if (isLastMover) {
                     string notation_attack = string.Empty;
 
                     if (attackingThreat) {
+                        if(mover is Pawn) {
+                            notation_attack = Board.GetCoordInfo(previousPosition).algebraicKey[0].ToString() + 'x';
+                        } else {
+                            notation_attack = "x";
+                        }
                         mover.CaptureCount++;
                     }
                     mover.MoveCount++;
                     numConsecutiveCapturelessMoves = (attackingThreat == false && (mover is Pawn) == false) ? numConsecutiveCapturelessMoves + 1 : 0;
                     SetLastMovedPiece(mover);
-                }
 
-                return true;
+                    moveNotation =  mover.GetLetterNotation() + notation_attack + Board.GetCoordInfo(destination).algebraicKey;
+                }
             }
-            return false;
+            return moveNotation;
         }
 
         /// <summary>

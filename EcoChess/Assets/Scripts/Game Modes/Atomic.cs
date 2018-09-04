@@ -69,7 +69,8 @@ namespace ChessGameModes {
             BoardCoord oldPos = mover.GetBoardPosition();
             bool pieceCaptured = IsThreat(mover, destination);
 
-            if (MakeDirectMove(mover, destination)) {
+            string moveNotation = MakeDirectMove(mover, destination);
+            if (moveNotation != null) {
                 if (pieceCaptured) {
                     for (int x = -1; x <= 1; x++) {
                         for (int y = -1; y <= 1; y++) {
@@ -89,6 +90,7 @@ namespace ChessGameModes {
                         CheckPawnPromotion((Pawn)mover);
                     }
                 }
+                GetMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;
