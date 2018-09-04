@@ -758,6 +758,7 @@ namespace ChessGameModes {
         protected bool MakeDirectMove(ChessPiece mover, BoardCoord destination, bool isLastMover = true) {
             if (AssertContainsCoord(destination)) {
                 BoardCoord previousPosition = mover.GetBoardPosition();
+                bool attackingThreat = IsThreat(mover, destination);
 
                 mover.SetBoardPosition(destination);
                 mover.gameObject.transform.position = destination;
@@ -765,7 +766,7 @@ namespace ChessGameModes {
                 UpdateSquareOccupiers(previousPosition, mover.GetBoardPosition());
 
                 if (isLastMover) {
-                    bool attackingThreat = IsThreat(mover, previousPosition);
+                    string notation_attack = string.Empty;
 
                     if (attackingThreat) {
                         mover.CaptureCount++;
