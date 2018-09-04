@@ -87,7 +87,7 @@ namespace ChessGameModes {
                     } else if (mover is Pawn) {
                         ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
                         CheckPawnEnPassantCapture((Pawn)mover);
-                        CheckPawnPromotion((Pawn)mover);
+                        CheckPawnPromotion((Pawn)mover, ref moveNotation);
                     }
                 }
                 GetMoveNotations.Push(moveNotation);

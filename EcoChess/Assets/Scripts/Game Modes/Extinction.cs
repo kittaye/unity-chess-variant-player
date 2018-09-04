@@ -102,7 +102,7 @@ namespace ChessGameModes {
                 } else if (mover is Pawn) {
                     ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
                     CheckPawnEnPassantCapture((Pawn)mover);
-                    ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
+                    ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover, ref moveNotation);
                     if (promotedPiece != null) {
                         if (GetCurrentTeamTurn() == Team.WHITE) {
                             whitePieceCounts[Piece.Pawn]--;

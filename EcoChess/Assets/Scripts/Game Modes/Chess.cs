@@ -227,7 +227,7 @@ namespace ChessGameModes {
                     }
 
                     if (AllowPawnPromotion) {
-                        CheckPawnPromotion((Pawn)mover);
+                        CheckPawnPromotion((Pawn)mover, ref moveNotation);
                     }
                 }
 
@@ -298,11 +298,15 @@ namespace ChessGameModes {
         /// </summary>
         /// <param name="mover">Moving pawn.</param>
         /// <returns></returns>
-        protected virtual ChessPiece CheckPawnPromotion(Pawn mover) {
+        protected virtual ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
             if (mover.GetRelativeBoardCoord(0, 1).y < WHITE_BACKROW || mover.GetRelativeBoardCoord(0, 1).y > BLACK_BACKROW) {
                 RemovePieceFromBoard(mover);
                 RemovePieceFromActiveTeam(mover);
-                return AddPieceToBoard(ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
+
+                ChessPiece newPromotedPiece = ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition());
+                moveNotation += string.Format("={0}", newPromotedPiece.GetLetterNotation());
+
+                return AddPieceToBoard(newPromotedPiece);
             }
             return null;
         }

@@ -74,11 +74,15 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override ChessPiece CheckPawnPromotion(Pawn mover) {
+        protected override ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
                 RemovePieceFromBoard(mover);
                 RemovePieceFromActiveTeam(mover);
-                return AddPieceToBoard(ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition()));
+
+                ChessPiece newPromotedPiece = ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition());
+                moveNotation += string.Format("={0}", newPromotedPiece.GetLetterNotation());
+
+                return AddPieceToBoard(newPromotedPiece);
             }
             return null;
         }

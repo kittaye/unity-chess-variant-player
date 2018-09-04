@@ -218,12 +218,18 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override ChessPiece CheckPawnPromotion(Pawn mover) {
+        protected override ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
                 RemovePieceFromBoard(mover);
                 RemovePieceFromActiveTeam(mover);
-                return AddSovereignChessPiece(SelectedPawnPromotion, mover.GetBoardPosition(), mover.gameObject.GetComponent<SovereignColour>().colour);
+
+                ChessPiece newPromotedPiece = AddSovereignChessPiece(
+                    SelectedPawnPromotion, mover.GetBoardPosition(), mover.gameObject.GetComponent<SovereignColour>().colour);
+                moveNotation += string.Format("={0}", newPromotedPiece.GetLetterNotation());
+                
+                return newPromotedPiece;
             }
+
             return null;
         }
 
@@ -496,7 +502,7 @@ namespace ChessGameModes {
                     } 
                 } else if (mover is Pawn) {
                     if (mover is SovereignPawn) UpdatePawnQuadrant((SovereignPawn)mover);
-                    ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover);
+                    ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover, ref moveNotation);
                     if (promotedPiece != null) {
                         mover = promotedPiece;
                         if(mover is King) {
