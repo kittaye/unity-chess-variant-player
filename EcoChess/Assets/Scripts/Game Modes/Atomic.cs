@@ -83,7 +83,7 @@ namespace ChessGameModes {
                     RemovePieceFromBoard(mover);
                 } else {
                     if (mover == currentRoyalPiece && mover.MoveCount == 1) {
-                        TryPerformCastlingRookMoves((King)mover);
+                        TryPerformCastlingRookMoves((King)mover, ref moveNotation);
                     } else if (mover is Pawn) {
                         ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
                         CheckPawnEnPassantCapture((Pawn)mover);

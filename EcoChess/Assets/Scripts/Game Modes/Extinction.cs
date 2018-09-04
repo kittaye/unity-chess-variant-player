@@ -98,7 +98,7 @@ namespace ChessGameModes {
             if (moveNotation != null) {
                 // Check castling moves
                 if (mover == currentRoyalPiece && mover.MoveCount == 1) {
-                    TryPerformCastlingRookMoves(mover);
+                    TryPerformCastlingRookMoves(mover, ref moveNotation);
                 } else if (mover is Pawn) {
                     ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
                     CheckPawnEnPassantCapture((Pawn)mover);

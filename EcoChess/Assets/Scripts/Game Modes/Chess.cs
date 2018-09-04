@@ -215,8 +215,8 @@ namespace ChessGameModes {
             string moveNotation = MakeDirectMove(mover, destination);
             if (moveNotation != null) {
                 if (AllowCastling) {
-                    if (mover == currentRoyalPiece && mover.MoveCount == 1) {
-                        TryPerformCastlingRookMoves(mover);
+                    if (mover.MoveCount == 1 && mover == currentRoyalPiece) {
+                        TryPerformCastlingRookMoves(mover, ref moveNotation);
                     }
                 }
 
@@ -241,17 +241,24 @@ namespace ChessGameModes {
         /// Called in MovePiece. If a castling move was played, this method will perform the castle.
         /// </summary>
         /// <param name="mover">Piece to perform the castling move.</param>
-        protected virtual void TryPerformCastlingRookMoves(ChessPiece mover) {
+        /// <param name="moveNotation">A reference to the current move notation.</param>
+        /// <returns>True if the castle is successful.</returns>
+        protected virtual bool TryPerformCastlingRookMoves(ChessPiece mover, ref string moveNotation) {
             // If the king moved to the left to castle, grab the rook on the left-side of the board to castle with and move it.
             if (mover.GetBoardPosition().x == 2) {
                 ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
                 MakeDirectMove(castlingPiece, new BoardCoord(3, mover.GetBoardPosition().y), false);
+                moveNotation = "O-O-O";
+                return true;
 
-            // Else the king moved right, so grab the right rook instead.
+                // Else the king moved right, so grab the right rook instead.
             } else if (mover.GetBoardPosition().x == 6) {
                 ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).occupier;
                 MakeDirectMove(castlingPiece, new BoardCoord(5, mover.GetBoardPosition().y), false);
+                moveNotation = "O-O";
+                return true;
             }
+            return false;
         }
 
         /// <summary>

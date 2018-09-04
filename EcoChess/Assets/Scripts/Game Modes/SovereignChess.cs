@@ -492,7 +492,7 @@ namespace ChessGameModes {
 
                         // Else try perform castling move.
                     } else if (mover.MoveCount == 1) {
-                        TryPerformCastlingRookMoves(mover);
+                        TryPerformCastlingRookMoves(mover, ref moveNotation);
                     } 
                 } else if (mover is Pawn) {
                     if (mover is SovereignPawn) UpdatePawnQuadrant((SovereignPawn)mover);
@@ -657,7 +657,7 @@ namespace ChessGameModes {
             return new BoardCoord[0];
         }
 
-        protected override void TryPerformCastlingRookMoves(ChessPiece mover) {
+        protected override bool TryPerformCastlingRookMoves(ChessPiece mover, ref string moveNotation) {
             ChessPiece castlingPiece = null;
 
             if (mover.GetBoardPosition().x < 7) {
@@ -667,6 +667,8 @@ namespace ChessGameModes {
                     castlingPiece = aSideBlackRook;
                 }
                 MakeDirectMove(castlingPiece, new BoardCoord(mover.GetBoardPosition().x + 1, mover.GetBoardPosition().y), false);
+                moveNotation = "O-O-O";
+                return true;
 
             } else if (mover.GetBoardPosition().x > 9) {
                 if (GetTeamOwnedColour(mover) == whiteCurrentOwnedColour) {
@@ -675,7 +677,10 @@ namespace ChessGameModes {
                     castlingPiece = hSideBlackRook;
                 }
                 MakeDirectMove(castlingPiece, new BoardCoord(mover.GetBoardPosition().x - 1, mover.GetBoardPosition().y), false);
+                moveNotation = "O-O";
+                return true;
             }
+            return false;
         }
 
         #region Helper Functions
