@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Text;
 
 public enum Team { WHITE, BLACK }
 public enum MoveDirection { Up, Down, Left, Right, UpLeft, UpRight, DownLeft, DownRight }
@@ -231,7 +232,6 @@ namespace ChessGameModes {
                 }
 
                 GetMoveNotations.Push(moveNotation);
-                Debug.Log(moveNotation);
                 return true;
             }
             return false;
@@ -763,9 +763,9 @@ namespace ChessGameModes {
         /// <param name="mover"></param>
         /// <param name="destination"></param>
         /// <param name="isLastMover"></param>
-        /// <returns>Returns true if the move was successful.</returns>
+        /// <returns>The basic algebraic notation describing this move. Returns null if invalid or not last mover.</returns>
         protected string MakeDirectMove(ChessPiece mover, BoardCoord destination, bool isLastMover = true) {
-            string moveNotation = null;
+            StringBuilder moveNotation = new StringBuilder(null, 4);
 
             if (AssertContainsCoord(destination)) {
                 BoardCoord previousPosition = mover.GetBoardPosition();
@@ -777,24 +777,24 @@ namespace ChessGameModes {
                 UpdateSquareOccupiers(previousPosition, mover.GetBoardPosition()); 
 
                 if (isLastMover) {
-                    string notation_attack = string.Empty;
+                    moveNotation.Append(mover.GetLetterNotation());
 
                     if (attackingThreat) {
                         if(mover is Pawn) {
-                            notation_attack = Board.GetCoordInfo(previousPosition).algebraicKey[0].ToString() + 'x';
-                        } else {
-                            notation_attack = "x";
+                            moveNotation.Append(Board.GetCoordInfo(previousPosition).algebraicKey[0]);
                         }
+                        moveNotation.Append('x');
                         mover.CaptureCount++;
                     }
                     mover.MoveCount++;
                     numConsecutiveCapturelessMoves = (attackingThreat == false && (mover is Pawn) == false) ? numConsecutiveCapturelessMoves + 1 : 0;
                     SetLastMovedPiece(mover);
 
-                    moveNotation =  mover.GetLetterNotation() + notation_attack + Board.GetCoordInfo(destination).algebraicKey;
+                    moveNotation.Append(Board.GetCoordInfo(destination).algebraicKey);
                 }
             }
-            return moveNotation;
+
+            return moveNotation.ToString();
         }
 
         /// <summary>
