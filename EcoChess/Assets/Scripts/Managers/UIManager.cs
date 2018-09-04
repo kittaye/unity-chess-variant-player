@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public enum GameResults { Checkmate, Stalemate };
 public class UIManager : MonoBehaviour {
     public static UIManager Instance;
+
     public Canvas mainCanvas;
     public GameObject promotionWindow;
     public GameObject defectionWindow;
@@ -13,6 +14,8 @@ public class UIManager : MonoBehaviour {
     public GameObject spritePrefab;
     public Button nextVariantButton;
     public Button prevVariantButton;
+
+    private ChessGameModes.Chess chessGame;
 
     private Text teamTurnLbl;
     private Text gameModeLbl;
@@ -54,9 +57,11 @@ public class UIManager : MonoBehaviour {
     }
 
     void Start() {
+        chessGame = GameManager.Instance.ChessGame;
+
         UpdateGameModeText();
 
-        if (GameManager.Instance.ChessGame is ChessGameModes.SovereignChess) {
+        if (chessGame is ChessGameModes.SovereignChess) {
             ChessGameModes.SovereignChess._DisplayDefectionUI += OnDisplayDefectionOptions;
             ChessGameModes.SovereignChess._SetDefectionOptions += OnSetDefectionOptions;
         }
@@ -79,7 +84,8 @@ public class UIManager : MonoBehaviour {
     void OnDestroy() {
         GameManager._OnGameFinished -= OnGameFinished;
         ChessGameModes.Chess._DisplayPromotionUI -= OnDisplayPromotionOptions;
-        if (GameManager.Instance.ChessGame is ChessGameModes.SovereignChess) {
+
+        if (chessGame is ChessGameModes.SovereignChess) {
             ChessGameModes.SovereignChess._DisplayDefectionUI -= OnDisplayDefectionOptions;
             ChessGameModes.SovereignChess._SetDefectionOptions -= OnSetDefectionOptions;
         }
@@ -117,7 +123,7 @@ public class UIManager : MonoBehaviour {
         for (int i = 0; i < pieces.Length; i++) {
             GameObject go = Instantiate(spritePrefab, promotionWindow.transform);
             go.name = pieces[i].ToString();
-            go.GetComponent<Image>().sprite = Resources.Load<Sprite>(GameManager.Instance.ChessGame.GetCurrentTeamTurn().ToString() + "_" + go.name);
+            go.GetComponent<Image>().sprite = Resources.Load<Sprite>(chessGame.GetCurrentTeamTurn().ToString() + "_" + go.name);
             int j = i;
             go.GetComponent<Button>().onClick.AddListener(() => SelectPawnPromotion(pieces[j]));
             promotionOptions.Add(go);
@@ -126,18 +132,19 @@ public class UIManager : MonoBehaviour {
 
     public void OnDisplayPromotionOptions(bool value) {
         // Do not display options if there are 0 or 1 options to choose from.
-        if(value && GameManager.Instance.ChessGame.PawnPromotionOptions.Length <= 1) {
+        if(value && chessGame.PawnPromotionOptions.Length <= 1) {
             return;
         }
 
-        CreatePawnPromotionOptions(GameManager.Instance.ChessGame.PawnPromotionOptions);
-        promoteToLbl.text = "<color=white>Promote to:\n</color><b>" + (GameManager.Instance.ChessGame.SelectedPawnPromotion.ToString()) + "</b>";
+        CreatePawnPromotionOptions(chessGame.PawnPromotionOptions);
+        promoteToLbl.text = "<color=white>Promote to:\n</color><b>" + (chessGame.SelectedPawnPromotion.ToString()) + "</b>";
         promotionWindow.SetActive(value);
     }
 
     public void OnDisplayDefectionOptions(bool value) {
-        if (GameManager.Instance.ChessGame is ChessGameModes.SovereignChess) {
-            defectToLbl.text = "Click the king again to defect to team\n<b>" + SovereignExtensions.GetColourName(((ChessGameModes.SovereignChess)GameManager.Instance.ChessGame).selectedDefection).ToString() + "</b>";
+        if (chessGame is ChessGameModes.SovereignChess) {
+            defectToLbl.text = "Click the king again to defect to team\n<b>" + 
+                SovereignExtensions.GetColourName(((ChessGameModes.SovereignChess)chessGame).selectedDefection).ToString() + "</b>";
         } else {
             if (value == true) {
                 Debug.LogError("Wrong game mode! Do not use this method in any game mode other than Sovereign Chess.");
@@ -165,27 +172,29 @@ public class UIManager : MonoBehaviour {
 
     public void SelectPawnPromotion(Piece value) {
         promoteToLbl.text = "<color=white>Promote to:\n</color><b>" + value.ToString() + "</b>";
-        GameManager.Instance.ChessGame.SetPawnPromotionTo(value);
+        chessGame.SetPawnPromotionTo(value);
     }
 
     public void SelectDefectOption(Color value) {
         if (GameManager.Instance.ChessGame is ChessGameModes.SovereignChess) {
             defectToLbl.text = "Click the king again to defect to team\n<b>" + SovereignExtensions.GetColourName(value) + "</b>";
-            ((ChessGameModes.SovereignChess)GameManager.Instance.ChessGame).SetDefectOptionTo(value);
+            ((ChessGameModes.SovereignChess)chessGame).SetDefectOptionTo(value);
         }
     }
 
     public void UpdateGameModeText() {
-        gameModeLbl.text = "<color=white><b>Playing: </b></color>" + GameManager.Instance.ChessGame.ToString();
+        gameModeLbl.text = "<color=white><b>Playing: </b></color>" + chessGame.ToString();
     }
 
     public void OnTurnComplete() {
-        teamTurnLbl.text = GameManager.Instance.ChessGame.GetCurrentTurnLabel();
-        Team newCurrentTeam = GameManager.Instance.ChessGame.GetCurrentTeamTurn();
+        teamTurnLbl.text = chessGame.GetCurrentTurnLabel();
+        Team newCurrentTeam = chessGame.GetCurrentTeamTurn();
 
         foreach (GameObject item in promotionOptions) {
             item.GetComponent<Image>().sprite = Resources.Load<Sprite>(newCurrentTeam.ToString() + "_" + item.name);
         }
+
+        Debug.Log(chessGame.GetMoveNotations.Peek());
     }
 
     public void OnClickSettingsButton() {
