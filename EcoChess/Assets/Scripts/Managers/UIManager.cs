@@ -92,8 +92,7 @@ public class UIManager : MonoBehaviour {
     }
 
     private void OnGameFinished() {
-        teamTurnLbl.text = "Finished";
-        teamTurnLbl.color = Color.yellow;
+        gameLogLbl.color = Color.yellow;
     }
 
     public void LogCheckmate(string winningTeamName, string losingTeamName) {

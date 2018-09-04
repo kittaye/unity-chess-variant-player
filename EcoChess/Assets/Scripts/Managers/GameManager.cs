@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour {
     public GameObject piecePrefab;
     public GameObject boardChunkPrefab;
 
-    private static int modeIndex = (int)GameMode.Weak;
+    private static int modeIndex = (int)GameMode.Chess960;
     private string lastTurnLabel;
     private UIManager ui;
 
@@ -75,15 +75,17 @@ public class GameManager : MonoBehaviour {
 
     public void OnTurnComplete() {
         ChessGame.OnTurnComplete();
-        ui.OnTurnComplete();
 
         if (ChessGame.CheckWinState()) {
             if (_OnGameFinished != null) _OnGameFinished.Invoke();
         }
 
-        if(ChessGame.Board.allowFlipping && ChessGame.GetCurrentTurnLabel().ToString() != lastTurnLabel) {
+        ui.OnTurnComplete();
+
+        if (ChessGame.Board.allowFlipping && ChessGame.GetCurrentTurnLabel().ToString() != lastTurnLabel) {
             FlipBoard();
         }
+
         lastTurnLabel = ChessGame.GetCurrentTurnLabel().ToString();
     }
 

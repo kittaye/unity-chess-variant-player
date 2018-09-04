@@ -509,18 +509,36 @@ namespace ChessGameModes {
             return false;
         }
 
+        protected void AddCheckToLastMoveNotation() {
+            string moveNotation = GetMoveNotations.Pop();
+            moveNotation += "+";
+            GetMoveNotations.Push(moveNotation);
+        }
+
+        protected void AddCheckmateToLastMoveNotation() {
+            string moveNotation = GetMoveNotations.Pop();
+            moveNotation += "#";
+            GetMoveNotations.Push(moveNotation);
+        }
+
         /// <summary>
         /// Defines how the chess game is won.
         /// </summary>
         /// <returns>True if a team has won.</returns>
         public virtual bool CheckWinState() {
+            bool isThreateningCheck = IsPieceInCheck(currentRoyalPiece);
+
             if (!TeamHasAnyMoves(GetCurrentTeamTurn())) {
-                if (IsPieceInCheck(currentRoyalPiece)) {
+                if (isThreateningCheck) {
+                    AddCheckmateToLastMoveNotation();
                     UIManager.Instance.LogCheckmate(GetOpposingTeamTurn().ToString(), GetCurrentTeamTurn().ToString());
                 } else {
                     UIManager.Instance.LogStalemate(GetCurrentTeamTurn().ToString());
                 }
                 return true;
+
+            } else if (isThreateningCheck) {
+                AddCheckToLastMoveNotation();
             }
 
             if (CapturelessMovesLimit()) {
