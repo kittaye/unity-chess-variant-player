@@ -11,8 +11,7 @@ public class GameManager : MonoBehaviour {
     public GameObject piecePrefab;
     public GameObject boardChunkPrefab;
 
-    private static int modeIndex = (int)GameMode.Chess960;
-    private string lastTurnLabel;
+    private static int modeIndex = (int)0;
     private UIManager ui;
 
     public static event System.Action _OnGameFinished;
@@ -32,7 +31,6 @@ public class GameManager : MonoBehaviour {
         CenterCameraToBoard(ChessGame.Board);
         ui = UIManager.Instance;
         ui.CreatePawnPromotionOptions(ChessGame.PawnPromotionOptions);
-        lastTurnLabel = ChessGame.GetCurrentTurnLabel();
     }
 
     private void Update() {
@@ -82,11 +80,9 @@ public class GameManager : MonoBehaviour {
 
         ui.OnTurnComplete();
 
-        if (ChessGame.Board.allowFlipping && ChessGame.GetCurrentTurnLabel().ToString() != lastTurnLabel) {
+        if (ChessGame.Board.allowFlipping) {
             FlipBoard();
         }
-
-        lastTurnLabel = ChessGame.GetCurrentTurnLabel().ToString();
     }
 
     private void CenterCameraToBoard(Board board) {
