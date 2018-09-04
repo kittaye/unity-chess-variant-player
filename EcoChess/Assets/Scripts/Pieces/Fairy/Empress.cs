@@ -43,4 +43,8 @@ public class Empress : ChessPiece {
 
         return moves;
     }
+
+    public override string GetLetterNotation() {
+        return "E";
+    }
 }

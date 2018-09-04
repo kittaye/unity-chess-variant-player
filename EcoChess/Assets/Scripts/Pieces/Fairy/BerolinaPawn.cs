@@ -33,4 +33,8 @@ public class BerolinaPawn : Pawn {
 
         return moves;
     }
+
+    public override string GetLetterNotation() {
+        return "BP";
+    }
 }

@@ -43,4 +43,8 @@ public class Princess : ChessPiece {
 
         return moves;
     }
+
+    public override string GetLetterNotation() {
+        return "P";
+    }
 }

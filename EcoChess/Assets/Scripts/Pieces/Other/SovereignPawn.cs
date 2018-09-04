@@ -145,4 +145,8 @@ public class SovereignPawn : Pawn {
         }
         return moves;
     }
+
+    public override string GetLetterNotation() {
+        return "SP";
+    }
 }

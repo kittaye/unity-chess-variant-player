@@ -41,4 +41,8 @@ public class Champion : ChessPiece {
 
         return moves;
     }
+
+    public override string GetLetterNotation() {
+        return "C";
+    }
 }

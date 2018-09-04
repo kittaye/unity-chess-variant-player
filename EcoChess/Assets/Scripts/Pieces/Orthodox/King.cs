@@ -27,4 +27,8 @@ public class King : ChessPiece {
         }
         return moves;
     }
+
+    public override string GetLetterNotation() {
+        return "K";
+    }
 }

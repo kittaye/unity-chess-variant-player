@@ -25,4 +25,8 @@ public class LeganPawn : Pawn {
 
         return moves;
     }
+
+    public override string GetLetterNotation() {
+        return "LP";
+    }
 }

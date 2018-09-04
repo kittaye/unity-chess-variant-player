@@ -30,4 +30,8 @@ public class Bishop : ChessPiece {
 
         return moves;
     }
+
+    public override string GetLetterNotation() {
+        return "B";
+    }
 }

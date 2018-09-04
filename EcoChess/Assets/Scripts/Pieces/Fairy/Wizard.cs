@@ -43,4 +43,8 @@ public class Wizard : ChessPiece {
 
         return moves;
     }
+
+    public override string GetLetterNotation() {
+        return "W";
+    }
 }

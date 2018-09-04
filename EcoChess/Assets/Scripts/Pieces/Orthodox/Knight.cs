@@ -36,4 +36,8 @@ public class Knight : ChessPiece {
 
         return moves;
     }
+
+    public override string GetLetterNotation() {
+        return "N";
+    }
 }

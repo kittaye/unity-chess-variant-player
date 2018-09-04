@@ -63,6 +63,8 @@ public abstract class ChessPiece {
 
     public abstract List<BoardCoord> CalculateTemplateMoves();
 
+    public abstract string GetLetterNotation();
+
     public BoardCoord GetBoardPosition() {
         return m_BoardPosition;
     }

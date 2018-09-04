@@ -31,4 +31,8 @@ public class Rook : ChessPiece {
 
         return moves;
     }
+
+    public override string GetLetterNotation() {
+        return "R";
+    }
 }

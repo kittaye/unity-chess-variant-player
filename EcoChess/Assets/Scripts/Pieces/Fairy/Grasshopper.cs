@@ -43,4 +43,8 @@ public class Grasshopper : ChessPiece {
         }
         return moves;
     }
+
+    public override string GetLetterNotation() {
+        return "G";
+    }
 }

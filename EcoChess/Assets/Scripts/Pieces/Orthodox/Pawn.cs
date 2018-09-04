@@ -49,4 +49,8 @@ public class Pawn : ChessPiece {
 
         return moves;
     }
+
+    public override string GetLetterNotation() {
+        return string.Empty;
+    }
 }

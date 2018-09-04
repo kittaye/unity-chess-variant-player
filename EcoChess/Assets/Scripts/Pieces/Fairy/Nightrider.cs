@@ -37,4 +37,8 @@ public class Nightrider : ChessPiece {
 
         return moves;
     }
+
+    public override string GetLetterNotation() {
+        return "NR";
+    }
 }

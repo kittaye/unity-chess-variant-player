@@ -27,4 +27,8 @@ public class Queen : ChessPiece {
         }
         return moves;
     }
+
+    public override string GetLetterNotation() {
+        return "Q";
+    }
 }
