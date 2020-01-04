@@ -7,10 +7,13 @@ public enum GameResults { Checkmate, Stalemate };
 public class UIManager : MonoBehaviour {
     public static UIManager Instance;
 
+    public GameObject notationLinePrefab;
+
     public Canvas mainCanvas;
     public GameObject promotionWindow;
     public GameObject defectionWindow;
     public GameObject settingsWindow;
+    public ScrollRect notationLogWindow;
     public GameObject spritePrefab;
     public Button nextVariantButton;
     public Button prevVariantButton;
@@ -24,6 +27,10 @@ public class UIManager : MonoBehaviour {
     private Text gameLogLbl;
     private List<GameObject> promotionOptions;
     private bool settingsVisible;
+
+    private int movesMade = 0;
+    private int notationTurn = 0;
+    private Text currentNotationLine;
 
     // Use this for initialization
     void Awake () {
@@ -186,6 +193,8 @@ public class UIManager : MonoBehaviour {
     }
 
     public void OnTurnComplete() {
+        movesMade++;
+
         teamTurnLbl.text = chessGame.GetCurrentTurnLabel();
         Team newCurrentTeam = chessGame.GetCurrentTeamTurn();
 
@@ -193,7 +202,24 @@ public class UIManager : MonoBehaviour {
             item.GetComponent<Image>().sprite = Resources.Load<Sprite>(newCurrentTeam.ToString() + "_" + item.name);
         }
 
-        Debug.Log(chessGame.GetMoveNotations.Peek());
+        bool newLine = false;
+        if(movesMade % 2 != 0) {
+            newLine = true;
+            notationTurn++;
+            currentNotationLine = Instantiate(notationLinePrefab, notationLogWindow.content.transform).GetComponent<Text>();
+            StartCoroutine(ForceScrollRectToBottom(notationLogWindow));
+        }
+
+        if (newLine) {
+            currentNotationLine.text = string.Format("{0}. {1}", notationTurn, chessGame.GetMoveNotations.Peek());
+        } else {
+            currentNotationLine.text += " " + chessGame.GetMoveNotations.Peek();
+        }
+    }
+
+    private IEnumerator ForceScrollRectToBottom(ScrollRect scrollRect) {
+        yield return new WaitForEndOfFrame();
+        scrollRect.verticalNormalizedPosition = 0;
     }
 
     public void OnClickSettingsButton() {

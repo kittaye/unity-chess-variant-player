@@ -55,6 +55,10 @@ namespace ChessGameModes {
             return false;
         }
 
+        protected override bool IsPieceInCheckAfterThisMove(ChessPiece pieceToCheck, ChessPiece mover, BoardCoord dest) {
+            return false;
+        }
+
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
             return mover.CalculateTemplateMoves();
         }
