@@ -101,7 +101,7 @@ namespace ChessGameModes {
                     TryPerformCastlingRookMoves(mover, ref moveNotation);
                 } else if (mover is Pawn) {
                     ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
-                    CheckPawnEnPassantCapture((Pawn)mover);
+                    CheckPawnEnPassantCapture((Pawn)mover, oldPos, ref moveNotation);
                     ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover, ref moveNotation);
                     if (promotedPiece != null) {
                         if (GetCurrentTeamTurn() == Team.WHITE) {

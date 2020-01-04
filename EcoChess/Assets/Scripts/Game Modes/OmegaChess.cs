@@ -129,7 +129,7 @@ namespace ChessGameModes {
             return BoardCoord.NULL;
         }
 
-        protected override Pawn CheckPawnEnPassantCapture(Pawn mover) {
+        protected override Pawn CheckPawnEnPassantCapture(Pawn mover, BoardCoord moverPreviousPosition, ref string moveNotation) {
             int y = -1;
             while (Board.ContainsCoord(mover.GetRelativeBoardCoord(0, y))) {
                 ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(0, y)).occupier;

@@ -31,8 +31,8 @@ namespace ChessGameModes {
             return "Weak!";
         }
 
-        public override void OnTurnComplete() {
-            base.OnTurnComplete();
+        public override void OnMoveComplete() {
+            base.OnMoveComplete();
             if(GetCurrentTeamTurn() == Team.WHITE) {
                 SelectedPawnPromotion = Piece.Queen;
                 PawnPromotionOptions = whitePromotionOptions;

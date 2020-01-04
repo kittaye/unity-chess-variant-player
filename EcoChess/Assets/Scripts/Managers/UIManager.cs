@@ -28,8 +28,7 @@ public class UIManager : MonoBehaviour {
     private List<GameObject> promotionOptions;
     private bool settingsVisible;
 
-    private int movesMade = 0;
-    private int notationTurn = 0;
+    private int currentNotationTurn = 0;
     private Text currentNotationLine;
 
     // Use this for initialization
@@ -192,9 +191,7 @@ public class UIManager : MonoBehaviour {
         gameModeLbl.text = "<color=white><b>Playing: </b></color>" + chessGame.ToString();
     }
 
-    public void OnTurnComplete() {
-        movesMade++;
-
+    public void OnMoveComplete() {
         teamTurnLbl.text = chessGame.GetCurrentTurnLabel();
         Team newCurrentTeam = chessGame.GetCurrentTeamTurn();
 
@@ -202,19 +199,16 @@ public class UIManager : MonoBehaviour {
             item.GetComponent<Image>().sprite = Resources.Load<Sprite>(newCurrentTeam.ToString() + "_" + item.name);
         }
 
-        bool newLine = false;
-        if(movesMade % 2 != 0) {
-            newLine = true;
-            notationTurn++;
+        int notationTurn = Mathf.CeilToInt((float)chessGame.GetMoveNotations.Count / chessGame.NotationTurnDivider);
+        if (currentNotationTurn < notationTurn) {
+            currentNotationTurn = notationTurn;
+
             currentNotationLine = Instantiate(notationLinePrefab, notationLogWindow.content.transform).GetComponent<Text>();
+            currentNotationLine.text = string.Format("{0}.", notationTurn);
             StartCoroutine(ForceScrollRectToBottom(notationLogWindow));
         }
 
-        if (newLine) {
-            currentNotationLine.text = string.Format("{0}. {1}", notationTurn, chessGame.GetMoveNotations.Peek());
-        } else {
-            currentNotationLine.text += " " + chessGame.GetMoveNotations.Peek();
-        }
+        currentNotationLine.text += " " + chessGame.GetMoveNotations.Peek();
     }
 
     private IEnumerator ForceScrollRectToBottom(ScrollRect scrollRect) {

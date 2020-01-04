@@ -22,17 +22,18 @@ namespace ChessGameModes {
         private bool isWhiteSecondMove = false;
 
         public Monster() : base() {
+            NotationTurnDivider = 3;
         }
 
         public override string ToString() {
             return "Monster Chess";
         }
 
-        public override void OnTurnComplete() {
+        public override void OnMoveComplete() {
             if (!isWhiteSecondMove && GetCurrentTeamTurn() == Team.WHITE) {
                 isWhiteSecondMove = true;
             } else {
-                base.OnTurnComplete();
+                base.OnMoveComplete();
                 isWhiteSecondMove = false;
             }
         }

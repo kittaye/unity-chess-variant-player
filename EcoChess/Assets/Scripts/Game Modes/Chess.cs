@@ -36,8 +36,7 @@ namespace ChessGameModes {
         public bool AllowCastling { get; protected set; }
         public Piece[] CastlerOptions { get; protected set; }
         public bool AllowEnpassantCapture { get; protected set; }
-        public bool RoyaltyChecking { get; protected set; }
-
+        public int NotationTurnDivider { get; protected set; }
         public Stack<string> GetMoveNotations { get; protected set; }
 
         protected const int BOARD_WIDTH = 8;
@@ -93,6 +92,7 @@ namespace ChessGameModes {
             PawnPromotionOptions = new Piece[4] { Piece.Queen, Piece.Rook, Piece.Bishop, Piece.Knight };
             SelectedPawnPromotion = Piece.Queen;
 
+            NotationTurnDivider = 2;
             GetMoveNotations = new Stack<string>(30);
 
             BLACK_BACKROW = Board.GetHeight() - 1;
@@ -224,7 +224,7 @@ namespace ChessGameModes {
                 if (mover is Pawn) {
                     if (AllowEnpassantCapture) {
                         ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
-                        CheckPawnEnPassantCapture((Pawn)mover);
+                        CheckPawnEnPassantCapture((Pawn)mover, oldPos, ref moveNotation);
                     }
 
                     if (AllowPawnPromotion) {
@@ -266,13 +266,16 @@ namespace ChessGameModes {
         /// Called in MovePiece. If an enpassant move was made, enpassant capture is performed.
         /// </summary>
         /// <param name="mover">Moving piece.</param>
+        /// <param name="moverPreviousPosition">TThe position of the piece before it moved.</param>
+        /// <param name="moveNotation">A reference to the current move notation.</param>
         /// <returns>The piece that was removed.</returns>
-        protected virtual Pawn CheckPawnEnPassantCapture(Pawn mover) {
+        protected virtual Pawn CheckPawnEnPassantCapture(Pawn mover, BoardCoord moverPreviousPosition, ref string moveNotation) {
             if (Board.ContainsCoord(mover.GetRelativeBoardCoord(0, -1)) && IsThreat(mover, mover.GetRelativeBoardCoord(0, -1))) {
                 ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(0, -1)).occupier;
                 if (occupier != null && occupier is Pawn && occupier == GetLastMovedOpposingPiece(mover) && ((Pawn)occupier).validEnPassant) {
                     mover.CaptureCount++;
                     RemovePieceFromBoard(occupier);
+                    //moveNotation = Board.GetCoordInfo(moverPreviousPosition).file
                     return (Pawn)occupier;
                 }
             }
@@ -331,7 +334,8 @@ namespace ChessGameModes {
 
                 ChessPiece occupier = null;
                 if (mover is Pawn) {
-                    occupier = CheckPawnEnPassantCapture((Pawn)mover);
+                    string dummy = string.Empty;
+                    occupier = CheckPawnEnPassantCapture((Pawn)mover, oldPos, ref dummy);
                 }
 
                 // Check whether the piece is in check after this temporary move
@@ -876,7 +880,7 @@ namespace ChessGameModes {
         /// Called after a move is played. Switches the current and opposing teams around,
         /// resets the pawn promotion value, and switches the current and opposing royal pieces around.
         /// </summary>
-        public virtual void OnTurnComplete() {
+        public virtual void OnMoveComplete() {
             currentTeamTurn = (currentTeamTurn == Team.WHITE) ? Team.BLACK : Team.WHITE;
             opposingTeamTurn = (currentTeamTurn == Team.WHITE) ? Team.BLACK : Team.WHITE;
 

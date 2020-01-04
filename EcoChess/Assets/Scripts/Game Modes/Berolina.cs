@@ -64,7 +64,7 @@ namespace ChessGameModes {
             return BoardCoord.NULL;
         }
 
-        protected override Pawn CheckPawnEnPassantCapture(Pawn mover) {
+        protected override Pawn CheckPawnEnPassantCapture(Pawn mover, BoardCoord moverPreviousPosition, ref string moveNotation) {
             const int LEFT = -1;
             const int RIGHT = 1;
 

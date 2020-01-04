@@ -71,14 +71,14 @@ public class GameManager : MonoBehaviour {
         return modeIndex;
     }
 
-    public void OnTurnComplete() {
-        ChessGame.OnTurnComplete();
+    public void OnMoveComplete() {
+        ChessGame.OnMoveComplete();
 
         if (ChessGame.CheckWinState()) {
             if (_OnGameFinished != null) _OnGameFinished.Invoke();
         }
 
-        ui.OnTurnComplete();
+        ui.OnMoveComplete();
 
         if (ChessGame.Board.allowFlipping) {
             FlipBoard();

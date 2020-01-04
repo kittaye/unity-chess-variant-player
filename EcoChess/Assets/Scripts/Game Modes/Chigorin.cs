@@ -31,8 +31,8 @@ namespace ChessGameModes {
             return "Chigorin Chess";
         }
 
-        public override void OnTurnComplete() {
-            base.OnTurnComplete();
+        public override void OnMoveComplete() {
+            base.OnMoveComplete();
             if (GetCurrentTeamTurn() == Team.WHITE) {
                 SelectedPawnPromotion = Piece.Empress;
                 PawnPromotionOptions = whitePromotionOptions;

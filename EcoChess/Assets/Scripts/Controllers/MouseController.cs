@@ -66,7 +66,7 @@ public class MouseController : MonoBehaviour {
             // If we have already selected a piece, and it is placed down on a valid square, move it.
             if (hasSelection && lastSelectedOccupierAvailableMoves.Contains(GetHoveredBoardCoord())) {
                 if (chessGame.MovePiece(lastSelectedOccupier, GetHoveredBoardCoord())) {
-                    GameManager.Instance.OnTurnComplete();
+                    GameManager.Instance.OnMoveComplete();
                 }
                 DeSelect();
                 return;

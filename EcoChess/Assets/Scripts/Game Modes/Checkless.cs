@@ -61,7 +61,8 @@ namespace ChessGameModes {
 
                 ChessPiece occupier = null;
                 if (mover is Pawn) {
-                    occupier = CheckPawnEnPassantCapture((Pawn)mover);
+                    string dummy = string.Empty;
+                    occupier = CheckPawnEnPassantCapture((Pawn)mover, oldPos, ref dummy);
                 }
 
                 // Check whether the piece is checkmated after this temporary move

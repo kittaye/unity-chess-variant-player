@@ -105,9 +105,9 @@ namespace ChessGameModes {
             return "Sovereign Chess";
         }
 
-        public override void OnTurnComplete() {
+        public override void OnMoveComplete() {
             if (kingHasDoubleMoveDefection == false) {
-                base.OnTurnComplete();
+                base.OnMoveComplete();
             }
             selectedDefection = (GetCurrentTeamTurn() == Team.WHITE) ? whiteCurrentOwnedColour : blackCurrentOwnedColour;
         }
