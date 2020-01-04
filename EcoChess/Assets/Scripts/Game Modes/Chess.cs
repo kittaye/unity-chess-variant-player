@@ -275,7 +275,7 @@ namespace ChessGameModes {
                 if (occupier != null && occupier is Pawn && occupier == GetLastMovedOpposingPiece(mover) && ((Pawn)occupier).validEnPassant) {
                     mover.CaptureCount++;
                     RemovePieceFromBoard(occupier);
-                    moveNotation = Board.GetCoordInfo(moverPreviousPosition).file + "x" + Board.GetCoordInfo(moverPreviousPosition).algebraicKey + "e.p.";
+                    moveNotation = Board.GetCoordInfo(moverPreviousPosition).file + "x" + Board.GetCoordInfo(mover.GetBoardPosition()).algebraicKey + "e.p.";
                     return (Pawn)occupier;
                 }
             }
