@@ -800,17 +800,50 @@ namespace ChessGameModes {
                 BoardCoord previousPosition = mover.GetBoardPosition();
                 bool attackingThreat = IsThreat(mover, destination);
 
-                mover.SetBoardPosition(destination);
-                mover.gameObject.transform.position = destination;
-
-                UpdateSquareOccupiers(previousPosition, mover.GetBoardPosition()); 
-
                 if (isLastMover) {
                     moveNotation.Append(mover.GetLetterNotation());
 
+                    // Check if there are pieces of the same type that could have made this move (move notation ambiguity checking).
+                    {
+                        bool atLeastOneFileMatched = false;
+                        bool atLeastOneRankMatched = false;
+
+                        foreach (ChessPiece piece in GetPieces(currentTeamTurn)) {
+                            if (piece != mover && piece.GetPieceType() == mover.GetPieceType()) {
+                                if (piece.CalculateTemplateMoves().Contains(destination)) {
+                                    if (IsPieceInCheckAfterThisMove(currentRoyalPiece, piece, destination) == false) {
+                                        // If so, perform file/rank comparisons.
+
+                                        // If the files are the same...
+                                        if (Board.GetCoordInfo(previousPosition).file == Board.GetCoordInfo(piece.GetBoardPosition()).file) {
+                                            atLeastOneFileMatched = true;
+                                        }
+                                        // If the ranks are the same...
+                                        if (Board.GetCoordInfo(previousPosition).rank == Board.GetCoordInfo(piece.GetBoardPosition()).rank) {
+                                            atLeastOneRankMatched = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if ((atLeastOneRankMatched && !atLeastOneFileMatched) || (!atLeastOneRankMatched && !atLeastOneFileMatched)) {
+                            moveNotation.Append(Board.GetCoordInfo(previousPosition).file);
+                        } else if (atLeastOneFileMatched && !atLeastOneRankMatched) {
+                            moveNotation.Append(Board.GetCoordInfo(previousPosition).rank);
+                        } else if (atLeastOneFileMatched && atLeastOneRankMatched) {
+                            // If both file and rank matched, that means there at least 2 other movers, so the whole key is required.
+                            moveNotation.Append(Board.GetCoordInfo(previousPosition).algebraicKey);
+                        }
+                    }
+
+                    mover.SetBoardPosition(destination);
+                    mover.gameObject.transform.position = destination;
+                    UpdateSquareOccupiers(previousPosition, mover.GetBoardPosition());
+
                     if (attackingThreat) {
                         if(mover is Pawn) {
-                            moveNotation.Append(Board.GetCoordInfo(previousPosition).algebraicKey[0]);
+                            moveNotation.Append(Board.GetCoordInfo(previousPosition).file);
                         }
                         moveNotation.Append('x');
                         mover.CaptureCount++;
