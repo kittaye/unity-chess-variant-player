@@ -76,7 +76,7 @@ namespace ChessGameModes {
 
         protected override ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
-                RemovePieceFromBoard(mover);
+                KillPiece(mover);
                 RemovePieceFromActiveTeam(mover);
 
                 ChessPiece newPromotedPiece = ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition());

@@ -76,11 +76,11 @@ namespace ChessGameModes {
                         for (int y = -1; y <= 1; y++) {
                             BoardCoord coord = mover.GetRelativeBoardCoord(x, y);
                             if (Board.ContainsCoord(coord) && ((Board.GetCoordInfo(coord).occupier is Pawn) == false) && coord != mover.GetBoardPosition()) {
-                                RemovePieceFromBoard(Board.GetCoordInfo(coord).occupier);
+                                KillPiece(Board.GetCoordInfo(coord).occupier);
                             }
                         }
                     }
-                    RemovePieceFromBoard(mover);
+                    KillPiece(mover);
                 } else {
                     if (mover == currentRoyalPiece && mover.MoveCount == 1) {
                         TryPerformCastlingRookMoves((King)mover, ref moveNotation);
@@ -90,7 +90,7 @@ namespace ChessGameModes {
                         CheckPawnPromotion((Pawn)mover, ref moveNotation);
                     }
                 }
-                GetMoveNotations.Push(moveNotation);
+                GameMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;

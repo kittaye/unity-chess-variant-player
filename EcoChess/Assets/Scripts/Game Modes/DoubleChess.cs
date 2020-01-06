@@ -161,7 +161,8 @@ namespace ChessGameModes {
                     if (IsThreat(mover, occupier.GetBoardPosition())) {
                         if (occupier is Pawn && ((Pawn)occupier).validEnPassant) {
                             mover.CaptureCount++;
-                            RemovePieceFromBoard(occupier);
+                            KillPiece(occupier);
+                            moveNotation = Board.GetCoordInfo(moverPreviousPosition).file + "x" + Board.GetCoordInfo(mover.GetBoardPosition()).algebraicKey + "e.p.";
                             return (Pawn)occupier;
                         } else {
                             return null;

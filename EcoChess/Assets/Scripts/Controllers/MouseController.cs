@@ -78,6 +78,12 @@ public class MouseController : MonoBehaviour {
                 return;
             }
 
+            string temp = "";
+            for (int i = 0; i < selectedCoord.occupier.MoveStateHistory.ToArray().Length; i++) {
+                temp += chessGame.Board.GetCoordInfo(selectedCoord.occupier.MoveStateHistory.ToArray()[i].position).algebraicKey + ", ";
+            }
+            Debug.Log(temp);
+
             // Otherwise, check if the selected piece is on the current mover's team.
             if (chessGame.IsMoversTurn(selectedCoord.occupier)) {
                 DeSelect();

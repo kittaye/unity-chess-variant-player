@@ -167,7 +167,7 @@ namespace ChessGameModes {
                     CheckPawnEnPassantCapture((Pawn)mover, oldPos, ref moveNotation);
                     CheckPawnPromotion((Pawn)mover, ref moveNotation);
                 }
-                GetMoveNotations.Push(moveNotation);
+                GameMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;

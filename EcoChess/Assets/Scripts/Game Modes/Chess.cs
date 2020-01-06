@@ -37,7 +37,7 @@ namespace ChessGameModes {
         public Piece[] CastlerOptions { get; protected set; }
         public bool AllowEnpassantCapture { get; protected set; }
         public int NotationTurnDivider { get; protected set; }
-        public Stack<string> GetMoveNotations { get; protected set; }
+        public Stack<string> GameMoveNotations { get; protected set; }
 
         protected const int BOARD_WIDTH = 8;
         protected const int BOARD_HEIGHT = 8;
@@ -93,7 +93,7 @@ namespace ChessGameModes {
             SelectedPawnPromotion = Piece.Queen;
 
             NotationTurnDivider = 2;
-            GetMoveNotations = new Stack<string>(30);
+            GameMoveNotations = new Stack<string>(30);
 
             BLACK_BACKROW = Board.GetHeight() - 1;
             BLACK_PAWNROW = Board.GetHeight() - 2;
@@ -126,9 +126,9 @@ namespace ChessGameModes {
         /// <summary>
         /// Module function for the captureless move limit rule end condition.
         /// </summary>
-        /// <returns>True if 50 turns (100 moves) passes without a single capture.</returns>
+        /// <returns>True if 50 turns (50 * 2 moves in FIDE chess) passes without a single capture.</returns>
         public bool CapturelessMovesLimit() {
-            if (numConsecutiveCapturelessMoves >= 100) {
+            if (numConsecutiveCapturelessMoves >= 50 * NotationTurnDivider) {
                 UIManager.Instance.LogCapturelessLimit(GetCurrentTeamTurn().ToString());
                 return true;
             }
@@ -174,10 +174,12 @@ namespace ChessGameModes {
             List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
 
             for (int i = 0; i < templateMoves.Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
+                //if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
                     availableMoves.Add(templateMoves[i]);
-                }
+                //}
             }
+
+            Debug.Log("move count: " + availableMoves.Count);
 
             if (AllowCastling) {
                 if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 0) {
@@ -232,7 +234,7 @@ namespace ChessGameModes {
                     }
                 }
 
-                GetMoveNotations.Push(moveNotation);
+                GameMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;
@@ -274,7 +276,7 @@ namespace ChessGameModes {
                 ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(0, -1)).occupier;
                 if (occupier != null && occupier is Pawn && occupier == GetLastMovedOpposingPiece(mover) && ((Pawn)occupier).validEnPassant) {
                     mover.CaptureCount++;
-                    RemovePieceFromBoard(occupier);
+                    KillPiece(occupier);
                     moveNotation = Board.GetCoordInfo(moverPreviousPosition).file + "x" + Board.GetCoordInfo(mover.GetBoardPosition()).algebraicKey + "e.p.";
                     return (Pawn)occupier;
                 }
@@ -304,7 +306,7 @@ namespace ChessGameModes {
         /// <returns></returns>
         protected virtual ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
             if (mover.GetRelativeBoardCoord(0, 1).y < WHITE_BACKROW || mover.GetRelativeBoardCoord(0, 1).y > BLACK_BACKROW) {
-                RemovePieceFromBoard(mover);
+                KillPiece(mover);
                 RemovePieceFromActiveTeam(mover);
 
                 ChessPiece newPromotedPiece = ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition());
@@ -515,15 +517,15 @@ namespace ChessGameModes {
         }
 
         protected void AddCheckToLastMoveNotation() {
-            string moveNotation = GetMoveNotations.Pop();
+            string moveNotation = GameMoveNotations.Pop();
             moveNotation += "+";
-            GetMoveNotations.Push(moveNotation);
+            GameMoveNotations.Push(moveNotation);
         }
 
         protected void AddCheckmateToLastMoveNotation() {
-            string moveNotation = GetMoveNotations.Pop();
+            string moveNotation = GameMoveNotations.Pop();
             moveNotation += "#";
-            GetMoveNotations.Push(moveNotation);
+            GameMoveNotations.Push(moveNotation);
         }
 
         /// <summary>
@@ -782,7 +784,7 @@ namespace ChessGameModes {
                 if (oldCoordOccupier != null) {
                     Board.GetCoordInfo(previousPosition).occupier = null;
                     if (IsThreat(oldCoordOccupier, newPosition)) {
-                        RemovePieceFromBoard(Board.GetCoordInfo(newPosition).occupier);
+                        KillPiece(Board.GetCoordInfo(newPosition).occupier);
                     }
                     Board.GetCoordInfo(newPosition).occupier = oldCoordOccupier;
                 }
@@ -829,6 +831,23 @@ namespace ChessGameModes {
             }
 
             return moveNotation.ToString();
+        }
+
+        /// <summary>
+        /// Returns the turn number for each team's moves in a turn.
+        /// </summary>
+        /// <returns></returns>
+        public int GetNotationTurn() {
+            return Mathf.CeilToInt((float)GameMoveNotations.Count / NotationTurnDivider);
+        }
+
+        /// <summary>
+        /// Updates all pieces' state histories to be up to date with the total move count. Is called by GameManager when a move is completed.
+        /// </summary>
+        public void UpdateAllChessPiecesMoveStateHistory() {
+            foreach (ChessPiece piece in GetPieces(aliveOnly: false)) {
+                piece.UpdatePieceMoveStateHistory();
+            }
         }
 
         /// <summary>
@@ -894,11 +913,11 @@ namespace ChessGameModes {
         }
 
         /// <summary>
-        /// Removes a chess piece from the board.
+        /// Kills a chess piece and hides it from the board.
         /// </summary>
-        /// <param name="piece">Piece to remove.</param>
-        /// <returns>True if the removal was successful.</returns>
-        protected bool RemovePieceFromBoard(ChessPiece piece) {
+        /// <param name="piece">Piece to kill.</param>
+        /// <returns>True if the kill was successful.</returns>
+        protected bool KillPiece(ChessPiece piece) {
             if (piece != null) {
                 piece.gameObject.SetActive(false);
                 piece.IsAlive = false;
@@ -906,6 +925,38 @@ namespace ChessGameModes {
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Reverts all chess pieces' states to the previous move.
+        /// </summary>
+        public void UndoLastGameMove() {
+            foreach (ChessPiece piece in GetPieces(aliveOnly: false)) {
+                // Remove piece state to be undone.
+                piece.MoveStateHistory.Pop();
+
+                PieceMoveState pieceMoveStateToRestore = piece.MoveStateHistory.Peek();
+
+                // Undo position and occupance.
+                Board.GetCoordInfo(piece.GetBoardPosition()).occupier = null;
+                piece.SetBoardPosition(pieceMoveStateToRestore.position);
+                piece.gameObject.transform.position = piece.GetBoardPosition();
+                Board.GetCoordInfo(piece.GetBoardPosition()).occupier = piece;
+
+                // Undo move/capture counts.
+                piece.MoveCount = pieceMoveStateToRestore.moveCount;
+                piece.CaptureCount = pieceMoveStateToRestore.captureCount;
+
+                // Undo alive status.
+                piece.IsAlive = pieceMoveStateToRestore.wasAlive;
+                piece.gameObject.SetActive(piece.IsAlive);
+            }
+
+            // Undo current team status.
+            OnMoveComplete();
+
+            // Remove last game notation that was undone.
+            GameMoveNotations.Pop();
         }
 
         /// <summary>
@@ -1032,8 +1083,8 @@ namespace ChessGameModes {
             int yModifier;
             GetMoveDirectionModifiers(mover, dir, out xModifier, out yModifier, teamSensitive);
 
-            bool xWrap = mover.hasXWrapping;
-            bool yWrap = mover.hasYWrapping;
+            bool xWrap = mover.HasXWrapping;
+            bool yWrap = mover.HasYWrapping;
 
             uint iter = 0;
             uint threats = 0;
@@ -1078,8 +1129,8 @@ namespace ChessGameModes {
             int xModifier = mover.TeamSensitiveMove(xVariance);
             int yModifier = mover.TeamSensitiveMove(yVariance);
 
-            bool xWrap = mover.hasXWrapping;
-            bool yWrap = mover.hasYWrapping;
+            bool xWrap = mover.HasXWrapping;
+            bool yWrap = mover.HasYWrapping;
 
             uint iter = 0;
             BoardCoord coord;

@@ -7,6 +7,7 @@ public enum GameResults { Checkmate, Stalemate };
 public class UIManager : MonoBehaviour {
     public static UIManager Instance;
 
+    public GameObject camera;
     public GameObject notationLinePrefab;
 
     public Canvas mainCanvas;
@@ -187,6 +188,29 @@ public class UIManager : MonoBehaviour {
         }
     }
 
+    public void OnUndoLastGameMove() {
+        int notationTurn = chessGame.GetNotationTurn();
+
+        if (currentNotationTurn > notationTurn) {
+            currentNotationTurn = notationTurn;
+
+            if (notationLogWindow.content.childCount > 1) {
+                currentNotationLine = notationLogWindow.content.GetChild(notationLogWindow.content.childCount - 2).GetComponent<Text>();
+            }
+            Destroy(notationLogWindow.content.GetChild(notationLogWindow.content.childCount - 1).gameObject);
+        } else {
+            int lastNotationLabelIndex = currentNotationLine.text.LastIndexOf(" ");
+            currentNotationLine.text = currentNotationLine.text.Substring(0, lastNotationLabelIndex);
+        }
+
+        teamTurnLbl.text = chessGame.GetCurrentTurnLabel();
+        Team newCurrentTeam = chessGame.GetCurrentTeamTurn();
+
+        foreach (GameObject item in promotionOptions) {
+            item.GetComponent<Image>().sprite = Resources.Load<Sprite>(newCurrentTeam.ToString() + "_" + item.name);
+        }
+    }
+
     public void UpdateGameModeText() {
         gameModeLbl.text = "<color=white><b>Playing: </b></color>" + chessGame.ToString();
     }
@@ -199,7 +223,7 @@ public class UIManager : MonoBehaviour {
             item.GetComponent<Image>().sprite = Resources.Load<Sprite>(newCurrentTeam.ToString() + "_" + item.name);
         }
 
-        int notationTurn = Mathf.CeilToInt((float)chessGame.GetMoveNotations.Count / chessGame.NotationTurnDivider);
+        int notationTurn = chessGame.GetNotationTurn();
         if (currentNotationTurn < notationTurn) {
             currentNotationTurn = notationTurn;
 
@@ -208,7 +232,7 @@ public class UIManager : MonoBehaviour {
             StartCoroutine(ForceScrollRectToBottom(notationLogWindow));
         }
 
-        currentNotationLine.text += " " + chessGame.GetMoveNotations.Peek();
+        currentNotationLine.text += " " + chessGame.GameMoveNotations.Peek();
     }
 
     private IEnumerator ForceScrollRectToBottom(ScrollRect scrollRect) {

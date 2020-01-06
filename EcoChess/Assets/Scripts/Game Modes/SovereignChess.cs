@@ -220,7 +220,7 @@ namespace ChessGameModes {
 
         protected override ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
-                RemovePieceFromBoard(mover);
+                KillPiece(mover);
                 RemovePieceFromActiveTeam(mover);
 
                 ChessPiece newPromotedPiece = AddSovereignChessPiece(
@@ -506,7 +506,7 @@ namespace ChessGameModes {
                     if (promotedPiece != null) {
                         mover = promotedPiece;
                         if(mover is King) {
-                            RemovePieceFromBoard(currentRoyalPiece);
+                            KillPiece(currentRoyalPiece);
                             SwitchOwnedArmy(mover, GetChessPieceColour(currentRoyalPiece), GetChessPieceColour(mover));
                             currentRoyalPiece = mover;
                         }
@@ -536,7 +536,7 @@ namespace ChessGameModes {
                     }
                 }
 
-                GetMoveNotations.Push(moveNotation);
+                GameMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;

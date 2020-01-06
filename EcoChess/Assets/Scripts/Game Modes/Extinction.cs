@@ -124,7 +124,7 @@ namespace ChessGameModes {
                     }
                 }
 
-                GetMoveNotations.Push(moveNotation);
+                GameMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;

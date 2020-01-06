@@ -86,7 +86,7 @@ namespace ChessGameModes {
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
             string moveNotation = MakeDirectMove(mover, destination);
             if(moveNotation != null) {
-                GetMoveNotations.Push(moveNotation);
+                GameMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;

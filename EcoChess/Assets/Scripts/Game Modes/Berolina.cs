@@ -73,7 +73,8 @@ namespace ChessGameModes {
                     ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(i, -1)).occupier;
                     if (occupier != null && occupier is Pawn && ((Pawn)occupier).validEnPassant) {
                         mover.CaptureCount++;
-                        RemovePieceFromBoard(occupier);
+                        KillPiece(occupier);
+                        moveNotation = Board.GetCoordInfo(moverPreviousPosition).file + "x" + Board.GetCoordInfo(mover.GetBoardPosition()).algebraicKey + "e.p.";
                         return (Pawn)occupier;
                     }
                 }

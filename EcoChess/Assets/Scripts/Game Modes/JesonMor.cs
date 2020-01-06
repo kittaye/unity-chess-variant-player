@@ -71,7 +71,7 @@ namespace ChessGameModes {
                 if (oldPos == centerSquare) {
                     gameFinished = true;
                 }
-                GetMoveNotations.Push(moveNotation);
+                GameMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;

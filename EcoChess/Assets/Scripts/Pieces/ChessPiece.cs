@@ -10,8 +10,9 @@ public abstract class ChessPiece {
     public int MoveCount { get; set; }
     public int CaptureCount { get; set; }
     public bool IsAlive { get; set; }
-    public bool hasXWrapping { get; set; }
-    public bool hasYWrapping { get; set; }
+    public bool HasXWrapping { get; private set; }
+    public bool HasYWrapping { get; private set; }
+    public Stack<PieceMoveState> MoveStateHistory { get; set; }
 
     protected ChessGameModes.Chess chessGame;
 
@@ -21,8 +22,9 @@ public abstract class ChessPiece {
         m_BoardPosition = position;
         MoveCount = 0;
         IsAlive = false;
-        hasXWrapping = false;
-        hasYWrapping = false;
+        HasXWrapping = false;
+        HasYWrapping = false;
+        MoveStateHistory = new Stack<PieceMoveState>();
     }
 
     public ChessPiece(Team team, string algebraicKeyPosition) {
@@ -34,8 +36,9 @@ public abstract class ChessPiece {
         }
         MoveCount = 0;
         IsAlive = false;
-        hasXWrapping = false;
-        hasYWrapping = false;
+        HasXWrapping = false;
+        HasYWrapping = false;
+        MoveStateHistory = new Stack<PieceMoveState>();
     }
 
     public ChessPiece(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping) {
@@ -44,8 +47,9 @@ public abstract class ChessPiece {
         m_BoardPosition = position;
         MoveCount = 0;
         IsAlive = false;
-        this.hasXWrapping = allowXWrapping;
-        this.hasYWrapping = allowYWrapping;
+        this.HasXWrapping = allowXWrapping;
+        this.HasYWrapping = allowYWrapping;
+        MoveStateHistory = new Stack<PieceMoveState>();
     }
 
     public ChessPiece(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping) {
@@ -57,8 +61,13 @@ public abstract class ChessPiece {
         }
         MoveCount = 0;
         IsAlive = false;
-        this.hasXWrapping = allowXWrapping;
-        this.hasYWrapping = allowYWrapping;
+        this.HasXWrapping = allowXWrapping;
+        this.HasYWrapping = allowYWrapping;
+        MoveStateHistory = new Stack<PieceMoveState>();
+    }
+
+    public void UpdatePieceMoveStateHistory() {
+        MoveStateHistory.Push(new PieceMoveState(m_BoardPosition, IsAlive, MoveCount, CaptureCount));
     }
 
     public abstract List<BoardCoord> CalculateTemplateMoves();

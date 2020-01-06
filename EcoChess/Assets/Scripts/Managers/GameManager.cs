@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour {
 
         ChessGame = GameModeFactory.Create((GameMode)modeIndex);
         ChessGame.PopulateBoard();
+        ChessGame.UpdateAllChessPiecesMoveStateHistory();
     }
 
     private void Start() {
@@ -73,6 +74,7 @@ public class GameManager : MonoBehaviour {
 
     public void OnMoveComplete() {
         ChessGame.OnMoveComplete();
+        ChessGame.UpdateAllChessPiecesMoveStateHistory();
 
         if (ChessGame.CheckWinState()) {
             if (_OnGameFinished != null) _OnGameFinished.Invoke();
@@ -82,6 +84,13 @@ public class GameManager : MonoBehaviour {
 
         if (ChessGame.Board.allowFlipping) {
             FlipBoard();
+        }
+    }
+
+    public void UndoLastGameMove() {
+        if (ChessGame.GameMoveNotations.Count > 0) {
+            ChessGame.UndoLastGameMove();
+            ui.OnUndoLastGameMove();
         }
     }
 
