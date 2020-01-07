@@ -65,6 +65,7 @@
     <Compile Include="Assets\Scripts\Data Structures\BoardCoord.cs" />
     <Compile Include="Assets\Scripts\Data Structures\CoordInfo.cs" />
     <Compile Include="Assets\Scripts\Data Structures\PieceMoveState.cs" />
+    <Compile Include="Assets\Scripts\Data Structures\TeamTurnState.cs" />
     <Compile Include="Assets\Scripts\Factories\ChessPieceFactory.cs" />
     <Compile Include="Assets\Scripts\Factories\GameModeFactory.cs" />
     <Compile Include="Assets\Scripts\Game Modes\ActiveChess.cs" />

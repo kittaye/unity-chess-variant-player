@@ -36,6 +36,7 @@ namespace ChessGameModes {
         public bool AllowCastling { get; protected set; }
         public Piece[] CastlerOptions { get; protected set; }
         public bool AllowEnpassantCapture { get; protected set; }
+
         public int NotationTurnDivider { get; protected set; }
         public Stack<string> GameMoveNotations { get; protected set; }
 
@@ -58,6 +59,7 @@ namespace ChessGameModes {
         private List<ChessPiece> blackPieces;
         private ChessPiece lastMovedWhitePiece;
         private ChessPiece lastMovedBlackPiece;
+        private Stack<TeamTurnState> teamTurnStateHistory;
 
         public Chess() {
             Board = new Board(BOARD_WIDTH, BOARD_HEIGHT, new Color(0.9f, 0.9f, 0.9f), new Color(0.1f, 0.1f, 0.1f));
@@ -105,6 +107,7 @@ namespace ChessGameModes {
             lastMovedWhitePiece = null;
             lastMovedBlackPiece = null;
             opposingTeamCheckThreats = null;
+            teamTurnStateHistory = new Stack<TeamTurnState>(30);
         }
 
         public override string ToString() {
@@ -174,12 +177,10 @@ namespace ChessGameModes {
             List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
 
             for (int i = 0; i < templateMoves.Length; i++) {
-                //if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
+                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
                     availableMoves.Add(templateMoves[i]);
-                //}
+                }
             }
-
-            Debug.Log("move count: " + availableMoves.Count);
 
             if (AllowCastling) {
                 if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 0) {
@@ -307,7 +308,7 @@ namespace ChessGameModes {
         protected virtual ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
             if (mover.GetRelativeBoardCoord(0, 1).y < WHITE_BACKROW || mover.GetRelativeBoardCoord(0, 1).y > BLACK_BACKROW) {
                 KillPiece(mover);
-                RemovePieceFromActiveTeam(mover);
+                //RemovePieceFromActiveTeam(mover);
 
                 ChessPiece newPromotedPiece = ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition());
                 moveNotation += string.Format("={0}", newPromotedPiece.GetLetterNotation());
@@ -844,7 +845,9 @@ namespace ChessGameModes {
         /// <summary>
         /// Updates all pieces' state histories to be up to date with the total move count. Is called by GameManager when a move is completed.
         /// </summary>
-        public void UpdateAllChessPiecesMoveStateHistory() {
+        public void UpdateGameStateHistory() {
+            teamTurnStateHistory.Push(new TeamTurnState(currentTeamTurn, opposingTeamTurn, currentRoyalPiece, opposingRoyalPiece));
+
             foreach (ChessPiece piece in GetPieces(aliveOnly: false)) {
                 piece.UpdatePieceMoveStateHistory();
             }
@@ -932,28 +935,40 @@ namespace ChessGameModes {
         /// </summary>
         public void UndoLastGameMove() {
             foreach (ChessPiece piece in GetPieces(aliveOnly: false)) {
-                // Remove piece state to be undone.
-                piece.MoveStateHistory.Pop();
+                if (piece.MoveStateHistory.Count > 1) {
+                    // Remove piece state to be undone.
+                    piece.MoveStateHistory.Pop();
 
-                PieceMoveState pieceMoveStateToRestore = piece.MoveStateHistory.Peek();
+                    PieceMoveState pieceMoveStateToRestore = piece.MoveStateHistory.Peek();
 
-                // Undo position and occupance.
-                Board.GetCoordInfo(piece.GetBoardPosition()).occupier = null;
-                piece.SetBoardPosition(pieceMoveStateToRestore.position);
-                piece.gameObject.transform.position = piece.GetBoardPosition();
-                Board.GetCoordInfo(piece.GetBoardPosition()).occupier = piece;
+                    // Undo position and occupance.
+                    Board.GetCoordInfo(piece.GetBoardPosition()).occupier = null;
+                    piece.SetBoardPosition(pieceMoveStateToRestore.position);
+                    piece.gameObject.transform.position = piece.GetBoardPosition();
+                    Board.GetCoordInfo(piece.GetBoardPosition()).occupier = piece;
 
-                // Undo move/capture counts.
-                piece.MoveCount = pieceMoveStateToRestore.moveCount;
-                piece.CaptureCount = pieceMoveStateToRestore.captureCount;
+                    // Undo move/capture counts.
+                    piece.MoveCount = pieceMoveStateToRestore.moveCount;
+                    piece.CaptureCount = pieceMoveStateToRestore.captureCount;
 
-                // Undo alive status.
-                piece.IsAlive = pieceMoveStateToRestore.wasAlive;
-                piece.gameObject.SetActive(piece.IsAlive);
+                    // Undo alive status.
+                    piece.IsAlive = pieceMoveStateToRestore.wasAlive;
+                    piece.gameObject.SetActive(piece.IsAlive);
+
+                } else if (piece.MoveStateHistory.Count == 1 && piece.IsAlive) {
+                    // This occurs for promoted pieces. A promoted pawn is considered a new piece, so once the new piece has no states left,
+                    // we kill it and bring back the pawn.
+                    KillPiece(piece);
+                }
             }
 
             // Undo current team status.
-            OnMoveComplete();
+            teamTurnStateHistory.Pop();
+            TeamTurnState teamTurnStateToRestore = teamTurnStateHistory.Peek();
+            currentTeamTurn = teamTurnStateToRestore.currentTeam;
+            opposingTeamTurn = teamTurnStateToRestore.opposingTeam;
+            currentRoyalPiece = teamTurnStateToRestore.currentRoyalPiece;
+            opposingRoyalPiece = teamTurnStateToRestore.opposingRoyalPiece;
 
             // Remove last game notation that was undone.
             GameMoveNotations.Pop();

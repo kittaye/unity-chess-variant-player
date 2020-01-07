@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour {
 
         ChessGame = GameModeFactory.Create((GameMode)modeIndex);
         ChessGame.PopulateBoard();
-        ChessGame.UpdateAllChessPiecesMoveStateHistory();
+        ChessGame.UpdateGameStateHistory();
     }
 
     private void Start() {
@@ -74,7 +74,7 @@ public class GameManager : MonoBehaviour {
 
     public void OnMoveComplete() {
         ChessGame.OnMoveComplete();
-        ChessGame.UpdateAllChessPiecesMoveStateHistory();
+        ChessGame.UpdateGameStateHistory();
 
         if (ChessGame.CheckWinState()) {
             if (_OnGameFinished != null) _OnGameFinished.Invoke();
