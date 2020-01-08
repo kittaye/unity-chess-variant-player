@@ -23,7 +23,18 @@ namespace ChessGameModes {
         }
 
         public override string ToString() {
-            return "Advance Chess";
+            return "Advanced Pawn Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Created by Tony Paletta (1980)",
+                this.ToString() + " is a variant where the pawns are positioned a further rank forward.",
+                "Checkmate.",
+                "- No pawn double-moves.",
+                "https://greenchess.net/rules.php?v=advanced-pawn"
+            );
         }
 
         public override void PopulateBoard() {

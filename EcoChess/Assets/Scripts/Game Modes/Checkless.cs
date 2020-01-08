@@ -20,6 +20,17 @@ namespace ChessGameModes {
             return "Checkless Chess";
         }
 
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Created in the 1800s",
+                this.ToString() + " is a variant that prohibits checks against the king except for checkmate.",
+                "Checkmate.",
+                "None.",
+                "https://www.chessvariants.com/usualeq.dir/checklss.html"
+            );
+        }
+
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
             BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
             List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);

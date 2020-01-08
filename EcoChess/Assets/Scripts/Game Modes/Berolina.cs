@@ -18,6 +18,17 @@ namespace ChessGameModes {
             return "Berolina Chess";
         }
 
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Created by Edmund Nebermann (1926)",
+                this.ToString() + " is a variant where pawns are replaced with berolina pawns.",
+                "Checkmate.",
+                "None.",
+                "https://en.wikipedia.org/wiki/Berolina_chess"
+            );
+        }
+
         public override void PopulateBoard() {
             currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(4, WHITE_BACKROW)));
             opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(4, BLACK_BACKROW)));

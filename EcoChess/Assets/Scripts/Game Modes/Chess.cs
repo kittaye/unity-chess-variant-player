@@ -114,6 +114,17 @@ namespace ChessGameModes {
             return "Traditional Chess";
         }
 
+        public virtual VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Standardized in the 19th century",
+                this.ToString() + " is the FIDE standardised ruleset for chess.",
+                "Checkmate.",
+                "None.",
+                "https://en.wikipedia.org/wiki/Chess"
+            );
+        }
+
         public Team GetCurrentTeamTurn() {
             return currentTeamTurn;
         }
@@ -808,13 +819,12 @@ namespace ChessGameModes {
                 BoardCoord previousPosition = mover.GetBoardPosition();
                 bool attackingThreat = IsThreat(mover, destination);
 
+                // Determine the move notation & other details for the moving piece.
+                // The only time this isn't true is if the piece we are moving is a castling piece (e.g. rook).
+                // In that case we ignore it's move notation, count, etc.
                 if (isLastMover) {
                     moveNotation.Append(mover.GetLetterNotation());
                     moveNotation.Append(ResolveMoveNotationAmbiguity(mover, destination));
-
-                    mover.SetBoardPosition(destination);
-                    mover.gameObject.transform.position = destination;
-                    UpdateSquareOccupiers(previousPosition, mover.GetBoardPosition());
 
                     if (attackingThreat) {
                         if(mover is Pawn) {
@@ -829,6 +839,11 @@ namespace ChessGameModes {
 
                     moveNotation.Append(Board.GetCoordInfo(destination).algebraicKey);
                 }
+
+                // Physically move the piece.
+                mover.SetBoardPosition(destination);
+                mover.gameObject.transform.position = destination;
+                UpdateSquareOccupiers(previousPosition, mover.GetBoardPosition());
             }
 
             return moveNotation.ToString();

@@ -19,6 +19,17 @@ namespace ChessGameModes {
             return "Amazon Chess";
         }
 
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Created in the 1900s",
+                this.ToString() + " is a variant that replaces queens with amazons.",
+                "Checkmate.",
+                "None.",
+                "http://www.pathguy.com/chess/AmazonCh.html"
+            );
+        }
+
         public override void PopulateBoard() {
             currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(4, WHITE_BACKROW)));
             opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(4, BLACK_BACKROW)));

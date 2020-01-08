@@ -105,6 +105,17 @@ namespace ChessGameModes {
             return "Sovereign Chess";
         }
 
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Created by Mark Bates (2012)",
+                this.ToString() + " is a variant involving multi-coloured armies to control on a 16x16 board.",
+                "Checkmate.",
+                "For all 16 rules of Sovereign Chess, visit <i>http://www.sovereignchess.com/rules</i>",
+                "https://en.wikipedia.org/wiki/Sovereign_Chess"
+            );
+        }
+
         public override void OnMoveComplete() {
             if (kingHasDoubleMoveDefection == false) {
                 base.OnMoveComplete();

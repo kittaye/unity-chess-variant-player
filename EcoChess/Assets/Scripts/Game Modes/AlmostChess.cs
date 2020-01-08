@@ -19,6 +19,17 @@ namespace ChessGameModes {
             return "Almost Chess";
         }
 
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Created by Ralph Betza (1977)",
+                this.ToString() + " is a variant that replaces queens with empresses.",
+                "Checkmate.",
+                "None.",
+                "https://en.wikipedia.org/wiki/Almost_chess"
+            );
+        }
+
         public override void PopulateBoard() {
             currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(4, WHITE_BACKROW)));
             opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(4, BLACK_BACKROW)));

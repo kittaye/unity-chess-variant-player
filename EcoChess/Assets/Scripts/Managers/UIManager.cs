@@ -8,6 +8,7 @@ public class UIManager : MonoBehaviour {
     public static UIManager Instance;
 
     public GameObject camera;
+    public VariantHelpDialog variantHelpDialog;
     public GameObject notationLinePrefab;
 
     public Canvas mainCanvas;
@@ -68,6 +69,9 @@ public class UIManager : MonoBehaviour {
 
         UpdateGameModeText();
 
+        variantHelpDialog.SetUIValues(chessGame.GetVariantHelpDetails());
+        CloseVariantHelpDialog();
+
         if (chessGame is ChessGameModes.SovereignChess) {
             ChessGameModes.SovereignChess._DisplayDefectionUI += OnDisplayDefectionOptions;
             ChessGameModes.SovereignChess._SetDefectionOptions += OnSetDefectionOptions;
@@ -116,6 +120,14 @@ public class UIManager : MonoBehaviour {
 
     public void LogCustom(string message) {
         gameLogLbl.text = message;
+    }
+
+    public void OpenVariantHelpDialog() {
+        variantHelpDialog.transform.parent.gameObject.SetActive(true);
+    }
+
+    public void CloseVariantHelpDialog() {
+        variantHelpDialog.transform.parent.gameObject.SetActive(false);
     }
 
     public void CreatePawnPromotionOptions(Piece[] pieces) {

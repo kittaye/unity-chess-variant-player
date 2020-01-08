@@ -17,6 +17,7 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     ? ? ? ? ? ? ? ?
     /// </summary>
+    /// TODO: castling is broken !!!!!!!!!!!!!
     public class Chess960 : Chess {
         private Rook castlingRook;
 
@@ -28,7 +29,18 @@ namespace ChessGameModes {
             return "Chess960";
         }
 
-        Dictionary<int, Piece[]> KingsTable = new Dictionary<int, Piece[]> {
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Created by Bobby Fischer (1996)",
+                this.ToString() + " is a variant that randomises the positions of the back rank pieces identically for both teams.",
+                "Checkmate.",
+                "- Given the required space, castling is allowed (with the king selected, select the rook to castle with).",
+                "https://en.wikipedia.org/wiki/Fischer_random_chess"
+            );
+        }
+
+        private Dictionary<int, Piece[]> KingsTable = new Dictionary<int, Piece[]> {
             { 0, new Piece[]{ Piece.Queen, Piece.Knight, Piece.Knight, Piece.Rook, Piece.King, Piece.Rook } },
             { 16, new Piece[]{ Piece.Knight, Piece.Queen, Piece.Knight, Piece.Rook, Piece.King, Piece.Rook } },
             { 32, new Piece[]{ Piece.Knight, Piece.Knight, Piece.Queen, Piece.Rook, Piece.King, Piece.Rook } },
@@ -92,7 +104,7 @@ namespace ChessGameModes {
             { 960, new Piece[]{ Piece.Queen, Piece.Knight, Piece.Knight, Piece.Rook, Piece.King, Piece.Rook } },
         };
 
-        List<Vector2> BishopsTable = new List<Vector2> {
+        private List<Vector2> BishopsTable = new List<Vector2> {
             new Vector2(0,1), new Vector2(0,3), new Vector2(0,5), new Vector2(0,7), new Vector2(1,2),
             new Vector2(2,3), new Vector2(2,5), new Vector2(2,7), new Vector2(1,4), new Vector2(3,4),
             new Vector2(4,5), new Vector2(4,7), new Vector2(1,6), new Vector2(3,6), new Vector2(5,6),

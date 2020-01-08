@@ -66,6 +66,20 @@ namespace ChessGameModes {
             return "Balbo's Chess";
         }
 
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Created by G. Balbo (1974)",
+                this.ToString() + " is a variant on an irregular board shape of 70 squares and one less pawn for both teams.",
+                "Checkmate.",
+                "- At the ends of the inner d and h files, pawns promote as normal.\n" +
+                "- At the ends of the c and i files, pawns may only promote to a bishop or knight.\n" +
+                "- At the ends of the outer four files, pawns may not promote.\n" +
+                "- No castling.",
+                "https://en.wikipedia.org/wiki/Balbo%27s_game"
+            );
+        }
+
         private void AddPromotionSquare(string algebraicKeyPosition) {
             BoardCoord coord;
             if (Board.TryGetCoordWithKey(algebraicKeyPosition, out coord)) {

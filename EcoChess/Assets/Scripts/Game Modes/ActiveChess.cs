@@ -26,6 +26,17 @@ namespace ChessGameModes {
             return "Active Chess";
         }
 
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Created by G. Kuzmichov (1989)",
+                this.ToString() + " is a variant on a 9x8 board with an extra queen and pawn for both teams.",
+                "Checkmate.",
+                "None.",
+                "https://en.wikipedia.org/wiki/Sovereign_Chess"
+            );
+        }
+
         public override void PopulateBoard() {
             base.PopulateBoard();
 

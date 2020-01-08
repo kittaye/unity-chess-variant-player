@@ -20,6 +20,19 @@ namespace ChessGameModes {
             return "Cheshire Cat Chess";
         }
 
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Created by V. R. Parton (1970)",
+                this.ToString() + " is a variant where the square a piece moves from vanishes.",
+                "Checkmate.",
+                "- Pieces can move over, but not onto, vanished squares.\n" +
+                "- The king's first move behaves like a queen.\n" +
+                "- No castling.",
+                "https://www.chessvariants.com/boardrules.dir/cheshir.html"
+            );
+        }
+
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
             BoardCoord[] templateMoves;
 

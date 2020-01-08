@@ -31,6 +31,17 @@ namespace ChessGameModes {
             return "Capablanca's Chess";
         }
 
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Created by José Raúl Capablanca (1920s)",
+                this.ToString() + " is a variant on a 10x8 board adding empresses and princesses.",
+                "Checkmate.",
+                "- King moves three squares when castling.",
+                "https://en.wikipedia.org/wiki/Capablanca_chess"
+            );
+        }
+
         public override void PopulateBoard() {
             currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(5, WHITE_BACKROW)));
             opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(5, BLACK_BACKROW)));

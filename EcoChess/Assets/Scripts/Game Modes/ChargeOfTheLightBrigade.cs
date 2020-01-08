@@ -7,7 +7,7 @@ namespace ChessGameModes {
     /// 
     /// Winstate: Checkmate.
     /// Piece types: Orthodox.
-    /// Piece rules: White may only promote to a queen, Black may only promote to a knight.
+    /// Piece rules: White may only promote to a queen, Black may only promote to a knight. No castling.
     /// Board layout:
     ///     n n n n k n n n
     ///     p p p p p p p p
@@ -26,6 +26,19 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Charge of the Light Brigade";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Created by H. G. Muller (2015)",
+                this.ToString() + " is a variant with a custom initial board layout.",
+                "Checkmate.",
+                "- No castling.\n" +
+                "- White pawns may only promote to queens.\n" +
+                "- Black pawns may only promote to knights.",
+                "https://www.chessvariants.com/rules/charge-of-the-light-brigade"
+            );
         }
 
         public override void OnMoveComplete() {

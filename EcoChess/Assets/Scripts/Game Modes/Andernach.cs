@@ -18,6 +18,17 @@ namespace ChessGameModes {
             return "Andernach Chess";
         }
 
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Created in 1993",
+                this.ToString() + " is a variant where pieces change teams upon capture, except for the king.",
+                "Checkmate.",
+                "None.",
+                "https://en.wikipedia.org/wiki/Andernach_chess"
+            );
+        }
+
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
             int currentCaptures = mover.CaptureCount;
 
