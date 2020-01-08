@@ -40,9 +40,7 @@ public class Pawn : ChessPiece {
     public override List<BoardCoord> CalculateTemplateMoves() {
         List<BoardCoord> moves = new List<BoardCoord>();
 
-
         uint moveCap = (MoveCount == 0) ? initialMoveLimit : 1;
-        Debug.Log(moveCap);
 
         moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up, cap: moveCap, threatAttackLimit: 0));
 

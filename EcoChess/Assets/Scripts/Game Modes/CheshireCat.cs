@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace ChessGameModes {
@@ -49,7 +49,7 @@ namespace ChessGameModes {
             List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
 
             for (int i = 0; i < templateMoves.Length; i++) {
-                if (Board.GetCoordInfo(templateMoves[i]).boardChunk.activeInHierarchy 
+                if (Board.GetCoordInfo(templateMoves[i]).boardChunk.activeInHierarchy
                     && IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
                     availableMoves.Add(templateMoves[i]);
                 }
@@ -78,6 +78,14 @@ namespace ChessGameModes {
             }
 
             return false;
+        }
+
+        public override void UndoLastGameMove() {
+            base.UndoLastGameMove();
+
+            foreach (ChessPiece piece in GetPieces(aliveOnly: false)) {
+                Board.GetCoordInfo(piece.GetBoardPosition()).boardChunk.SetActive(true);
+            }
         }
     }
 }

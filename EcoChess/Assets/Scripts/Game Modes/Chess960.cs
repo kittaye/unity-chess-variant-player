@@ -17,7 +17,6 @@ namespace ChessGameModes {
     ///     p p p p p p p p
     ///     ? ? ? ? ? ? ? ?
     /// </summary>
-    /// TODO: castling is broken !!!!!!!!!!!!!
     public class Chess960 : Chess {
         private Rook castlingRook;
 

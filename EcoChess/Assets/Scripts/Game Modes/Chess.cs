@@ -948,7 +948,7 @@ namespace ChessGameModes {
         /// <summary>
         /// Reverts all chess pieces' states to the previous move.
         /// </summary>
-        public void UndoLastGameMove() {
+        public virtual void UndoLastGameMove() {
             foreach (ChessPiece piece in GetPieces(aliveOnly: false)) {
                 if (piece.MoveStateHistory.Count > 1) {
                     // Remove piece state to be undone.
@@ -956,20 +956,23 @@ namespace ChessGameModes {
 
                     PieceMoveState pieceMoveStateToRestore = piece.MoveStateHistory.Peek();
 
-                    // Undo position and occupance.
-                    Board.GetCoordInfo(piece.GetBoardPosition()).occupier = null;
-                    piece.SetBoardPosition(pieceMoveStateToRestore.position);
-                    piece.gameObject.transform.position = piece.GetBoardPosition();
-                    Board.GetCoordInfo(piece.GetBoardPosition()).occupier = piece;
+                    // Only undo moves where the piece is alive or is about to be brought back. 
+                    // This resolves an issue where square occupance can be overridden by dead pieces.
+                    if (piece.IsAlive || (piece.IsAlive == false && pieceMoveStateToRestore.wasAlive)) {
+                        // Undo position and occupance.
+                        Board.GetCoordInfo(piece.GetBoardPosition()).occupier = null;
+                        piece.SetBoardPosition(pieceMoveStateToRestore.position);
+                        piece.gameObject.transform.position = piece.GetBoardPosition();
+                        Board.GetCoordInfo(piece.GetBoardPosition()).occupier = piece;
 
-                    // Undo move/capture counts.
-                    piece.MoveCount = pieceMoveStateToRestore.moveCount;
-                    piece.CaptureCount = pieceMoveStateToRestore.captureCount;
+                        // Undo move/capture counts.
+                        piece.MoveCount = pieceMoveStateToRestore.moveCount;
+                        piece.CaptureCount = pieceMoveStateToRestore.captureCount;
 
-                    // Undo alive status.
-                    piece.IsAlive = pieceMoveStateToRestore.wasAlive;
-                    piece.gameObject.SetActive(piece.IsAlive);
-
+                        // Undo alive status.
+                        piece.IsAlive = pieceMoveStateToRestore.wasAlive;
+                        piece.gameObject.SetActive(piece.IsAlive);
+                    }
                 } else if (piece.MoveStateHistory.Count == 1 && piece.IsAlive) {
                     // This occurs for promoted pieces. A promoted pawn is considered a new piece, so once the new piece has no states left,
                     // we kill it and bring back the pawn.
