@@ -87,7 +87,9 @@ namespace ChessGameModes {
 
                 // Special rule for when a white pawn from the 8th rank moves to the 7th -- they are still able to double-move.
                 if (mover is Pawn && (mover.GetBoardPosition().y == 1) && mover.MoveCount == 1) {
-                    availableMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(0, 2)));
+                    if (availableMoves.Contains(mover.GetRelativeBoardCoord(0, 1))) {
+                        availableMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(0, 2)));
+                    }
                 }
 
                 // Otherwise, just add the rest of the pawn's template moves as there is no royalty to check for.
