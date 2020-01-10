@@ -24,6 +24,17 @@ namespace ChessGameModes {
             return "Horde";
         }
 
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Lord Dunsany (1942)",
+                this.ToString() + " is a variant that pits 36 white pawns against standard team black.",
+                "Checkmate team black OR capture all of team white.",
+                "- White pawns on the 7th & 8th ranks may double-move at any time.",
+                "https://en.wikipedia.org/wiki/Dunsany%27s_chess"
+            );
+        }
+
         public override bool CheckWinState() {
             if (GetCurrentTeamTurn() == Team.WHITE) {
                 if (GetPieces(Team.WHITE).TrueForAll((x) => (x.IsAlive == false))) {
@@ -42,10 +53,10 @@ namespace ChessGameModes {
         }
 
         public override void PopulateBoard() {
-            AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(1, 4), false));
-            AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(2, 4), false));
-            AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(5, 4), false));
-            AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(6, 4), false));
+            AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(1, 4), initialMoveLimit: 1));
+            AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(2, 4), initialMoveLimit: 1));
+            AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(5, 4), initialMoveLimit: 1));
+            AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(6, 4), initialMoveLimit: 1));
             AddPieceToBoard(new Queen(Team.BLACK, new BoardCoord(3, BLACK_BACKROW)));
 
             currentRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(4, BLACK_BACKROW)));
@@ -55,8 +66,8 @@ namespace ChessGameModes {
             for (int x = 0; x < BOARD_WIDTH; x++) {
                 AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, 0)));
                 AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, 1)));
-                AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, 2), false));
-                AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, 3), false));
+                AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, 2), initialMoveLimit: 1));
+                AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, 3), initialMoveLimit: 1));
                 AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(x, BLACK_PAWNROW)));
 
                 if (x == 1 || x == BOARD_WIDTH - 2) {
@@ -68,8 +79,19 @@ namespace ChessGameModes {
         }
 
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            if(GetCurrentTeamTurn() == Team.WHITE) {
-                return mover.CalculateTemplateMoves();
+            if (GetCurrentTeamTurn() == Team.WHITE) {
+                BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
+                List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
+
+                availableMoves.AddRange(templateMoves);
+
+                // Special rule for when a white pawn from the 8th rank moves to the 7th -- they are still able to double-move.
+                if (mover is Pawn && (mover.GetBoardPosition().y == 1) && mover.MoveCount == 1) {
+                    availableMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(0, 2)));
+                }
+
+                // Otherwise, just add the rest of the pawn's template moves as there is no royalty to check for.
+                return availableMoves;
             }
 
             return base.CalculateAvailableMoves(mover);
