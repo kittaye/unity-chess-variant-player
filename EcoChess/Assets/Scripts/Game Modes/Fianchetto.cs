@@ -3,11 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Fianchetto.cs is a chess variant with a custom initial board layout.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
-    /// Piece rules: No Castling.
     /// Board layout:
     ///     b n r q k r n b
     ///     p p p p p p p p
@@ -25,6 +20,17 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Fianchetto Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Jack Middleman (1999)",
+                this.ToString() + " is a variant with a custom initial board layout.",
+                "Checkmate.",
+                VariantHelpDetails.rule_NoCastling,
+                "https://www.chessvariants.com/diffsetup.dir/fianchetto.html"
+            );
         }
 
         public override void PopulateBoard() {

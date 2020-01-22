@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// HalfChess.cs is a chess variant with a custom board layout on a 4x8 board.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox - Pawns.
     /// Board layout:
     ///     r n . . . . N R
     ///     q b . . . . B Q
@@ -23,6 +19,17 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Half Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by John Groeneman (1960s)",
+                this.ToString() + " is a variant on a 4x8 board without pawns.",
+                "Checkmate.",
+                VariantHelpDetails.rule_NoCastling,
+                "https://www.chessvariants.com/small.dir/halfchess.html"
+            );
         }
 
         public override void PopulateBoard() {

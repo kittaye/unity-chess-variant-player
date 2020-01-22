@@ -2,10 +2,6 @@
 
 namespace ChessGameModes {
     /// <summary>
-    /// ThreeCheck.cs is a chess variant that offers an additional win condition.
-    /// 
-    /// Winstate: Checkmate OR Total of 3 checks against opposing king.
-    /// Piece types: Orthodox.
     /// Board layout: FIDE standard.
     /// </summary>
     public class ThreeCheck : Chess {
@@ -19,6 +15,17 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Three-Check Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by ???",
+                this.ToString() + " is a variant that offers an additional way to win: check the opponent's king three times.",
+                "Checkmate, or check the opponent's king a total of three times.",
+                VariantHelpDetails.rule_None,
+                "https://lichess.org/variant/threeCheck"
+            );
         }
 
         public override bool CheckWinState() {

@@ -3,11 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// GothicChess.cs is a chess variant with a different initial board layout on a 10x8 board.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox + Amazons, Empresses, Princesses.
-    /// Piece rules: King moves 3 squares when castling.
     /// Board layout:
     ///     r n b q $ k ^ b n r
     ///     p p p p p p p p p p
@@ -28,6 +23,18 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Gothic Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Ed Trice (2000)",
+                this.ToString() + " is a variant on a 10x8 board with empresses and princesses for both teams.",
+                "Checkmate.",
+                "- King moves three squares when castling.\n" +
+                "- Pawns may also promote to an empress or princess.",
+                "https://www.chessvariants.com/large.dir/gothicchess.html"
+            );
         }
 
         public override void PopulateBoard() {

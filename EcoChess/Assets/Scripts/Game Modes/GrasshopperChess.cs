@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// GrasshopperChess.cs is a chess variant with Grasshoppers and a custom initial board layout.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox + Grasshoppers.
     /// Board layout:
     ///     r n b q k b n r
     ///     g g g g g g g g
@@ -26,6 +22,18 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Grasshopper Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by J. Boyer (1950s)",
+                this.ToString() + " is a variant including a row of grasshoppers for both teams.",
+                "Checkmate.",
+                "- Pawns may also promote to a grasshopper.\n" +
+                "- Note: Grasshoppers move in any direction, but must be next to another piece to 'hop' over it.",
+                "https://web.archive.org/web/20130425044448/http://www.chessvariants.org/dpieces.dir/grashopper.html"
+            );
         }
 
         public override void PopulateBoard() {

@@ -4,11 +4,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// SovereignChess.cs is a chess variant involving multi-coloured armies to control on a 16x16 board.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
-    /// Piece rules: All rules can be found at: http://www.sovereignchess.com/rules/ by Mark Bates.
     /// Board layout:
     ///     Q B R N ? ? ? ? ? ? ? ? N R N Q
     ///     R P P P ? ? ? ? ? ? ? ? P P P R
@@ -232,7 +227,6 @@ namespace ChessGameModes {
         protected override ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
                 KillPiece(mover);
-                RemovePieceFromActiveTeam(mover);
 
                 ChessPiece newPromotedPiece = AddSovereignChessPiece(
                     SelectedPawnPromotion, mover.GetBoardPosition(), mover.gameObject.GetComponent<SovereignColour>().colour);

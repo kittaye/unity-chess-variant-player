@@ -3,11 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Capablanca.cs is a chess variant on a 10x8 board with empresses and princesses.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox + Empresses, Princesses.
-    /// Piece rules: King moves 3 squares when castling.
     /// Board layout: 
     ///     r n b $ q k ^ b n r
     ///     p p p p p p p p p p
@@ -34,10 +29,11 @@ namespace ChessGameModes {
         public override VariantHelpDetails GetVariantHelpDetails() {
             return new VariantHelpDetails(
                 this.ToString(),
-                "Created by José Raúl Capablanca (1920s)",
+                "Invented by José Raúl Capablanca (1920s)",
                 this.ToString() + " is a variant on a 10x8 board adding empresses and princesses.",
                 "Checkmate.",
-                "- King moves three squares when castling.",
+                "- King moves three squares when castling.\n" +
+                "- Pawns may also promote to an empress or princess.",
                 "https://en.wikipedia.org/wiki/Capablanca_chess"
             );
         }

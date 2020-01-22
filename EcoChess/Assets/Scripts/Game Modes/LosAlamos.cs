@@ -3,11 +3,6 @@ using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
-    /// LosAlamos.cs is a chess variant on a 6x6 board with no bishops.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
-    /// Piece rules: No castling, no pawn double moves, no enpassant.
     /// Board layout:
     ///     r n q k n r
     ///     p p p p p p
@@ -28,6 +23,20 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Los Alamos Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Paul Stein & Mark Wells (1956)",
+                this.ToString() + " is a variant on a 6x6 board with no bishops.",
+                "Checkmate.",
+                "- Pawns may not promote to a bishop.\n" +
+                VariantHelpDetails.rule_NoCastling + "\n" + 
+                VariantHelpDetails.rule_NoPawnDoubleMove + "\n" +
+                VariantHelpDetails.rule_NoEnpassantCapture,
+                "https://en.wikipedia.org/wiki/Los_Alamos_chess"
+            );
         }
 
         public override void PopulateBoard() {

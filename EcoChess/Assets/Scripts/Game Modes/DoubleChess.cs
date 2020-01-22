@@ -4,11 +4,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// DoubleChess.cs is a chess variant with a larger board size and 2 kings.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
-    /// Piece rules: A-side king castles a-side, p-side castles p-side. Pawns can move up to 4 squares on first move.
     /// Board layout:
     ///     r n b q k b n r r n b q k b n r
     ///     p p p p p p p p p p p p p p p p
@@ -35,6 +30,18 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Double-Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Julian Hayward (1916)",
+                this.ToString() + " is a variant on a 12x16 board with an additional king for each team.",
+                "Checkmate.",
+                "- a-side king castles a-side, p-side king castles p-side.\n" +
+                "- Pawns may move up to 4 squares on the initial move.",
+                "https://en.wikipedia.org/wiki/Double_chess"
+            );
         }
 
         public override void OnMoveComplete() {

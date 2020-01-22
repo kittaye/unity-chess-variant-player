@@ -3,11 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Embassy.cs is a chess variant on a 10x8 board with empresses and princesses.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox + Empresses, Princesses.
-    /// Piece rules: King moves 3 squares when castling.
     /// Board layout: 
     ///     r n b q k $ ^ b n r
     ///     p p p p p p p p p p
@@ -29,6 +24,18 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Embassy Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Kevin Hill (2005)",
+                this.ToString() + " is a variant on a 10x8 board with empresses and princesses",
+                "Checkmate.",
+                "- King moves three squares when castling.\n" +
+                "- Pawns may also promote to an empress or princess.",
+                "https://en.wikipedia.org/wiki/Embassy_chess"
+            );
         }
 
         public override void PopulateBoard() {

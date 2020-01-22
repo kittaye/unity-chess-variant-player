@@ -3,11 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// PerfectChess.cs is a chess variant where all rook+bishop+knight combinations occur exactly once.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox + Amazons, Empresses, Princesses.
-    /// Piece rules: King moves 3 squares when castling. Pawns may also promote to any of the new pieces.
     /// Board layout:
     ///     $ ^ q a k b n r
     ///     p p p p p p p p
@@ -28,6 +23,19 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Perfect Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Köksal Karakus (2000)",
+                this.ToString() + " is a variant involving amazon, empress, and princess fairy pieces on both teams.",
+                "Checkmate.",
+                "- Kings move three squares when castling.\n" +
+                "- Kings may a-side castle with the empress.\n" +
+                "- Pawns may also promote to an amazon, empress, or princess.",
+                "https://www.chessvariants.com/diffmove.dir/perfectchess.html"
+            );
         }
 
         public override void PopulateBoard() {

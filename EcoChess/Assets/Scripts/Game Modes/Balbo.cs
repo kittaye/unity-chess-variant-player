@@ -3,11 +3,6 @@ using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Balbo.cs is a chess variant with an irregular board shape.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
-    /// Piece rules: Pawns promote differently on different files.
     /// Board layout:
     ///             q b k    
     ///           r n b n r     
@@ -69,13 +64,13 @@ namespace ChessGameModes {
         public override VariantHelpDetails GetVariantHelpDetails() {
             return new VariantHelpDetails(
                 this.ToString(),
-                "Created by G. Balbo (1974)",
+                "Invented by G. Balbo (1974)",
                 this.ToString() + " is a variant on an irregular board shape of 70 squares and one less pawn for both teams.",
                 "Checkmate.",
                 "- At the ends of the inner d and h files, pawns promote as normal.\n" +
                 "- At the ends of the c and i files, pawns may only promote to a bishop or knight.\n" +
                 "- At the ends of the outer four files, pawns may not promote.\n" +
-                "- No castling.",
+                VariantHelpDetails.rule_NoCastling,
                 "https://en.wikipedia.org/wiki/Balbo%27s_game"
             );
         }
@@ -99,7 +94,6 @@ namespace ChessGameModes {
         protected override ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
                 KillPiece(mover);
-                RemovePieceFromActiveTeam(mover);
 
                 ChessPiece newPromotedPiece = ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition());
                 moveNotation += string.Format("={0}", newPromotedPiece.GetLetterNotation());

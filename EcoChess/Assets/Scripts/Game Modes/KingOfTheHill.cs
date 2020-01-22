@@ -3,19 +3,7 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// KingOfTheHill.cs is a variant of chess that includes an additional winstate.
-    /// 
-    /// Winstate: Checkmate OR King reaches one of the four center squares.
-    /// Piece types: Orthodox.
-    /// Board layout:
-    ///     r n b q k b n r
-    ///     p p p p p p p p
-    ///     . . . . . . . .
-    ///     . . . . . . . .
-    ///     . . . . . . . .
-    ///     . . . . . . . .
-    ///     p p p p p p p p
-    ///     R N B Q K B N R
+    /// Board layout: FIDE standard.
     /// </summary>
     public class KingOfTheHill : Chess {
         private readonly BoardCoord CENTER_SQUARE_1 = new BoardCoord(3, 3);
@@ -27,6 +15,17 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "King of the Hill";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by ???",
+                this.ToString() + " is a variant that includes an additional win condition.",
+                "Checkmate, or move a king onto one of the four central squares (d4, d5, e4, e5).",
+                "- Note: The king's move onto a central square must be legal (i.e. must not move into check).",
+                "https://lichess.org/variant/kingOfTheHill"
+            );
         }
 
         public override bool CheckWinState() {

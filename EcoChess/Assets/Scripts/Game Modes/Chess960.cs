@@ -3,10 +3,6 @@ using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Chess960.cs is a chess variant that randomises the back rank pieces with the other team mirroring them.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
     /// Board layout:
     ///     ? ? ? ? ? ? ? ?
     ///     p p p p p p p p
@@ -31,10 +27,10 @@ namespace ChessGameModes {
         public override VariantHelpDetails GetVariantHelpDetails() {
             return new VariantHelpDetails(
                 this.ToString(),
-                "Created by Bobby Fischer (1996)",
+                "Invented by Bobby Fischer (1996)",
                 this.ToString() + " is a variant that randomises the positions of the back rank pieces identically for both teams.",
                 "Checkmate.",
-                "- Given the required space, castling is allowed (with the king selected, select the rook to castle with).",
+                "- Note: Given the required space, castling is allowed (with the king selected, select the rook to castle with).",
                 "https://en.wikipedia.org/wiki/Fischer_random_chess"
             );
         }

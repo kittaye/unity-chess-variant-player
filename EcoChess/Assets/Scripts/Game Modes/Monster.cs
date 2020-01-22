@@ -4,10 +4,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Monster.cs is a chess variant where white has only 4 pawns and a king, but can move twice per turn.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
     /// Board layout:
     ///     r n b q k b n r
     ///     p p p p p p p p
@@ -27,6 +23,17 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Monster Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by ???",
+                this.ToString() + " is a variant where white has only 4 pawns and a king, but can move twice per turn.",
+                "Checkmate.",
+                "- The white king may move into check and then out of check on the same turn.",
+                "https://en.wikipedia.org/wiki/Monster_chess"
+            );
         }
 
         public override void OnMoveComplete() {

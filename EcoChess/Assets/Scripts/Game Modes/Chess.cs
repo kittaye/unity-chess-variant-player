@@ -8,11 +8,8 @@ public enum MoveDirection { Up, Down, Left, Right, UpLeft, UpRight, DownLeft, Do
 
 namespace ChessGameModes {
     /// <summary>
-    /// Chess.cs is the fully standardised ruleset for traditional chess. 
-    /// This is also the base class for all other gamemodes.
+    /// This is the base class for all other chess gamemodes.
     /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
     /// Board layout:
     ///     r n b q k b n r
     ///     p p p p p p p p
@@ -120,7 +117,7 @@ namespace ChessGameModes {
                 "Standardized in the 19th century",
                 this.ToString() + " is the FIDE standardised ruleset for chess.",
                 "Checkmate.",
-                "None.",
+                VariantHelpDetails.rule_None,
                 "https://en.wikipedia.org/wiki/Chess"
             );
         }
@@ -319,7 +316,6 @@ namespace ChessGameModes {
         protected virtual ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
             if (mover.GetRelativeBoardCoord(0, 1).y < WHITE_BACKROW || mover.GetRelativeBoardCoord(0, 1).y > BLACK_BACKROW) {
                 KillPiece(mover);
-                //RemovePieceFromActiveTeam(mover);
 
                 ChessPiece newPromotedPiece = ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition());
                 moveNotation += string.Format("={0}", newPromotedPiece.GetLetterNotation());

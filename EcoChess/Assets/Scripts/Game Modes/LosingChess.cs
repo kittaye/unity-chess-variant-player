@@ -4,11 +4,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// LosingChess.cs is a chess variant that makes captures compulsory.
-    /// 
-    /// Winstate: Lose all pieces or be stalemated.
-    /// Piece types: Orthodox.
-    /// Piece rules: no castling, kings have no royalty, pawns may promote to kings.
     /// Board layout: FIDE standard.
     /// </summary>
     public class LosingChess : Chess {
@@ -21,6 +16,19 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Losing Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Walter Campbell (1874)",
+                this.ToString() + " is a variant that makes piece capture compulsory.",
+                "Lose all your own pieces or be stalemated.",
+                "- Kings have no royalty (no check/mate rules).\n" +
+                "- Pawns may also promote to a king.\n" + 
+                VariantHelpDetails.rule_NoCastling,
+                "https://www.chessvariants.com/diffobjective.dir/giveaway.html"
+            );
         }
 
         public override bool CheckWinState() {
@@ -75,12 +83,10 @@ namespace ChessGameModes {
 
         private bool CanCaptureAPiece() {
             foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
-                if (piece.IsAlive) {
-                    BoardCoord[] templateMoves = piece.CalculateTemplateMoves().ToArray();
-                    for (int i = 0; i < templateMoves.Length; i++) {
-                        if (IsThreat(piece, templateMoves[i])) {
-                            return true;
-                        }
+                BoardCoord[] templateMoves = piece.CalculateTemplateMoves().ToArray();
+                for (int i = 0; i < templateMoves.Length; i++) {
+                    if (IsThreat(piece, templateMoves[i])) {
+                        return true;
                     }
                 }
             }

@@ -3,11 +3,6 @@ using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Silverman4x5.cs is a chess variant with a smaller board layout.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
-    /// Piece rules: No castling, no pawn double moves, pawn promotes to queen or rook only.
     /// Board layout:
     ///     r q k r
     ///     p p p p
@@ -27,6 +22,20 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Silverman 4x5";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by David Silverman (1981)",
+                this.ToString() + " is a variant on a smaller board layout (4x5).",
+                "Checkmate.",
+                "- Pawns may only promote to a queen or rook.\n" +
+                VariantHelpDetails.rule_NoPawnDoubleMove + "\n" +
+                VariantHelpDetails.rule_NoEnpassantCapture + "\n" +
+                VariantHelpDetails.rule_NoCastling,
+                "https://en.wikipedia.org/wiki/Minichess#4.C3.974.2C_4.C3.975_and_4.C3.978_chess"
+            );
         }
 
         public override void PopulateBoard() {

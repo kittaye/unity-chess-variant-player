@@ -3,11 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Janus.cs is a chess variant on a 10x8 board with princesses.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox + Princesses.
-    /// Piece rules: King moves 3 squares when castling.
     /// Board layout: 
     ///     r ^ n b q k b n ^ r
     ///     p p p p p p p p p p
@@ -29,6 +24,18 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Janus Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Werner Schöndorf (1978)",
+                this.ToString() + " is a variant on a 10x8 board with princesses.",
+                "Checkmate.",
+                "- Pawns may also promote to a princess.\n" +
+                "- King moves three squares when castling.",
+                "https://en.wikipedia.org/wiki/Janus_Chess"
+            );
         }
 
         public override void PopulateBoard() {

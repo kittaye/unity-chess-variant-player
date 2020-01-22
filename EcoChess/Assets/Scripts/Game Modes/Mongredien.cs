@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Mongredien.cs is a chess variant with a custom initial board layout.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
     /// Board layout:
     ///     r b b q k n n r
     ///     p p p p p p p p
@@ -23,6 +19,17 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Mongredien Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Augustus Mongredien (1868)",
+                this.ToString() + " is a variant where knights are placed king-side, and bishops are placed queen-side.",
+                "Checkmate.",
+                VariantHelpDetails.rule_None,
+                "https://greenchess.net/rules.php?v=mongredien"
+            );
         }
 
         public override void PopulateBoard() {

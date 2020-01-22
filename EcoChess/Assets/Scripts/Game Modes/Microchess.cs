@@ -3,11 +3,6 @@ using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Silverman4x5.cs is a chess variant with a smaller board layout.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
-    /// Piece rules: No pawn double moves, no enpassant.
     /// Board layout:
     ///     k n b r
     ///     p . . .
@@ -25,6 +20,18 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Microchess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Glimne (1997)",
+                this.ToString() + " is a variant on a smaller board (4x5) with no queen and a single pawn.",
+                "Checkmate.",
+                VariantHelpDetails.rule_NoPawnDoubleMove + "\n" +
+                VariantHelpDetails.rule_NoEnpassantCapture,
+                "https://greenchess.net/rules.php?v=microchess"
+            );
         }
 
         public override void PopulateBoard() {

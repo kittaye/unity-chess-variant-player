@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Atomic.cs is a chess variant where pieces explode on capture, removing all surrounding pieces in a 3x3 grid except for pawns.
-    /// 
-    /// Winstate: Checkmate OR King indirect capture.
-    /// Piece types: Orthodox.
     /// Board layout: FIDE standard.
     /// </summary>
     public class Atomic : Chess {
@@ -19,10 +15,10 @@ namespace ChessGameModes {
         public override VariantHelpDetails GetVariantHelpDetails() {
             return new VariantHelpDetails(
                 this.ToString(),
-                "Created in 1995",
+                "Invented in 1995",
                 this.ToString() + " is a variant where pieces explode on capture, removing all surrounding pieces in a 3x3 grid except for pawns.",
                 "Checkmate, or king indirect capture.",
-                "None.",
+                VariantHelpDetails.rule_None,
                 "https://en.wikipedia.org/wiki/Atomic_chess"
             );
         }

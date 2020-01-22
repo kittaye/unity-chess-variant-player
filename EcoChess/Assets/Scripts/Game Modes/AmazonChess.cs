@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// AmazonChess.cs is a chess variant that replaces the queens with amazons.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox + Amazons.
     /// Board layout: FIDE standard but queens are amazons.
     /// </summary>
     public class AmazonChess : Chess {
@@ -22,10 +18,10 @@ namespace ChessGameModes {
         public override VariantHelpDetails GetVariantHelpDetails() {
             return new VariantHelpDetails(
                 this.ToString(),
-                "Created in the 1900s",
+                "Invented in the 1900s",
                 this.ToString() + " is a variant that replaces queens with amazons.",
                 "Checkmate.",
-                "None.",
+                "- Pawns may not promote to a queen, but may promote to an amazon.",
                 "http://www.pathguy.com/chess/AmazonCh.html"
             );
         }

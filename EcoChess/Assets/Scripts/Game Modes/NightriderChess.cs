@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// NightriderChess.cs is a chess variant with Nightriders replacing one of the knights.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox + Nightriders.
     /// Board layout:
     ///     r # b q k b n r
     ///     p p p p p p p p
@@ -24,6 +20,17 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Nightrider Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by T. R. Dawson (1925)",
+                this.ToString() + " is a variant with the nightrider fairy piece replacing one of the knights on both teams.",
+                "Checkmate.",
+                "- Pawns may also promote to a nightrider.",
+                "https://greenchess.net/rules.php?piece=nightrider"
+            );
         }
 
         public override void PopulateBoard() {

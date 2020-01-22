@@ -3,10 +3,6 @@ using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Horde.cs is a chess variant that pits 36 white pawns against standard team black.
-    /// 
-    /// Winstate: Checkmate team black OR Eliminate team white.
-    /// Piece types: Orthodox.
     /// Board layout: 
     ///     r n b q k b n r
     ///     p p p p p p p p
@@ -30,7 +26,8 @@ namespace ChessGameModes {
                 "Invented by Lord Dunsany (1942)",
                 this.ToString() + " is a variant that pits 36 white pawns against standard team black.",
                 "Checkmate team black OR capture all of team white.",
-                "- White pawns on the 7th & 8th ranks may double-move at any time.",
+                "- White pawns on the 7th & 8th ranks may double-move. It does not need to be the initial move.\n" +
+                "- Note: The white pawns on the 8th rank may choose to move 1 square, then 2.",
                 "https://en.wikipedia.org/wiki/Dunsany%27s_chess"
             );
         }

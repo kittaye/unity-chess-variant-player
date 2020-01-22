@@ -3,11 +3,6 @@ using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
-    /// LadderChess.cs is a chess variant with an irregular board shape (5x12).
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
-    /// Piece rules: No castling.
     /// Board layout:
     ///             K
     ///           Q p
@@ -58,6 +53,18 @@ namespace ChessGameModes {
             return "Ladder Chess";
         }
 
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Sergey Sirotkin (2000)",
+                this.ToString() + " is a variant on an irregular board shape (5x12).",
+                "Checkmate.",
+                VariantHelpDetails.rule_NoCastling + "\n" +
+                "- Note: Pawns promote as usual at the ends of each file.",
+                "https://www.chessvariants.com/40.dir/ladderchess.html"
+            );
+        }
+
         private void AddPromotionSquare(string algebraicKeyPosition) {
             BoardCoord coord;
             if (Board.TryGetCoordWithKey(algebraicKeyPosition, out coord)) {
@@ -77,7 +84,6 @@ namespace ChessGameModes {
         protected override ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
                 KillPiece(mover);
-                RemovePieceFromActiveTeam(mover);
 
                 ChessPiece newPromotedPiece = ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition());
                 moveNotation += string.Format("={0}", newPromotedPiece.GetLetterNotation());

@@ -2,10 +2,6 @@
 
 namespace ChessGameModes {
     /// <summary>
-    /// UpsideDown.cs is a chess variant that swaps the teams' positions with each other (pawns one move away from promoting).
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
     /// Board layout:
     ///     R N B Q K B N R
     ///     p p p p p p p p
@@ -21,6 +17,17 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Upside-Down Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by G. P. Jelliss (1991)",
+                this.ToString() + " is a variant that swaps the teams' positions with each other (making pawns one move away from promoting)",
+                "Checkmate.",
+                VariantHelpDetails.rule_None,
+                "https://www.chessvariants.com/diffsetup.dir/upside.html"
+            );
         }
 
         public override void PopulateBoard() {

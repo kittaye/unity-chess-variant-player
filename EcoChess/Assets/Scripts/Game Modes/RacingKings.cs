@@ -4,11 +4,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// RacingKings.cs is a chess variant where the king must reach the eighth rank to win.
-    /// 
-    /// Winstate: King reaches 8th rank.
-    /// Piece types: Orthodox.
-    /// Piece rules: Neither team can check or be checked.
     /// Board layout:
     ///     . . . . . . . .
     ///     . . . . . . . .
@@ -28,6 +23,19 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Racing Kings";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Vernon R. Parton (1961)",
+                this.ToString() + " is a variant where check is forbidden, and instead teams must race their kings to the end of the board.",
+                "King reaches the 8th rank.",
+                VariantHelpDetails.rule_NoCastling + "\n" +
+                VariantHelpDetails.rule_NoEnpassantCapture + "\n" +
+                VariantHelpDetails.rule_NoPawnPromotion,
+                "https://www.chessvariants.com/diffobjective.dir/racing.html"
+            );
         }
 
         public override void PopulateBoard() {

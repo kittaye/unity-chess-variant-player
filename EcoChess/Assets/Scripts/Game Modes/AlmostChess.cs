@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// AlmostChess.cs is a chess variant that replaces queens with empresses.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox + Empresses.
     /// Board layout: FIDE standard but queens are empresses.
     /// </summary>
     public class AlmostChess : Chess {
@@ -22,10 +18,10 @@ namespace ChessGameModes {
         public override VariantHelpDetails GetVariantHelpDetails() {
             return new VariantHelpDetails(
                 this.ToString(),
-                "Created by Ralph Betza (1977)",
+                "Invented by Ralph Betza (1977)",
                 this.ToString() + " is a variant that replaces queens with empresses.",
                 "Checkmate.",
-                "None.",
+                "- Pawns may not promote to a queen, but may promote to an empress.",
                 "https://en.wikipedia.org/wiki/Almost_chess"
             );
         }

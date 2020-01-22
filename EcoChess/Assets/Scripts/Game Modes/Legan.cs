@@ -3,11 +3,6 @@ using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Legan.cs is a chess variant that involves a custom board layout and unique pawn rules.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
-    /// Piece rules: Pawns move/attack options are switched. Pawns promote on custom squares. No castling. No enpassant capture.
     /// Board layout: 
     ///     k n b r p . . .
     ///     b q p p . . . .
@@ -52,6 +47,20 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Legan Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by L. Legan (1913)",
+                this.ToString() + " is a variant that involves a custom board layout with unique pawn rules.",
+                "Checkmate.",
+                "- Pawn's move and attack behaviours are switched.\n" +
+                "- Pawns promote at the opposing team's corner of the board. Each square a major piece starts on is a promotion square.\n" +
+                VariantHelpDetails.rule_NoCastling + "\n" +
+                VariantHelpDetails.rule_NoEnpassantCapture,
+                "https://en.wikipedia.org/wiki/Legan_chess"
+            );
         }
 
         public override void PopulateBoard() {
@@ -111,7 +120,6 @@ namespace ChessGameModes {
         protected override ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
                 KillPiece(mover);
-                RemovePieceFromActiveTeam(mover);
 
                 ChessPiece newPromotedPiece = ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition());
                 moveNotation += string.Format("={0}", newPromotedPiece.GetLetterNotation());

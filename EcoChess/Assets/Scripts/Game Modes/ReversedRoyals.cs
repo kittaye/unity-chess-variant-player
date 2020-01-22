@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// ReversedRoyals.cs is a chess variant with a custom initial board layout.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
     /// Board layout:
     ///     r n b k q b n r
     ///     p p p p p p p p
@@ -23,6 +19,17 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Reversed Royals Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by ???",
+                this.ToString() + " is a variant where the king and queen's positions are swapped.",
+                "Checkmate.",
+                VariantHelpDetails.rule_None,
+                "https://greenchess.net/rules.php?v=reversed-royals"
+            );
         }
 
         public override void PopulateBoard() {

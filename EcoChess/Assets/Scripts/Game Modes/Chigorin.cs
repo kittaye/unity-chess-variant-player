@@ -4,10 +4,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Chigorin.cs is a chess variant with knights and an empress for team white; bishops and a queen for team black.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox + Empress.
     /// Board layout:
     ///     r b b q k b b r
     ///     p p p p p p p p
@@ -29,6 +25,18 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Chigorin Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Ralph Betza (2002)",
+                this.ToString() + " is a variant with knights and an empress for team white; bishops and a queen for team black.",
+                "Checkmate.",
+                "- White pawns may only promote to an empress or knight.\n" +
+                "- Black pawns may only promote to a queen or bishop.",
+                "https://www.chessvariants.com/diffsetup.dir/chigorin.html"
+            );
         }
 
         public override void OnMoveComplete() {

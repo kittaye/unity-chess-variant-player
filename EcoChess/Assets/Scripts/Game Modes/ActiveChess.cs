@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// ActiveChess.cs is a chess variant on a 9x8 board adding an extra queen.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
     /// Board layout:
     ///     r n b k q b n r q
     ///     p p p p p p p p p
@@ -29,11 +25,11 @@ namespace ChessGameModes {
         public override VariantHelpDetails GetVariantHelpDetails() {
             return new VariantHelpDetails(
                 this.ToString(),
-                "Created by G. Kuzmichov (1989)",
+                "Invented by G. Kuzmichov (1989)",
                 this.ToString() + " is a variant on a 9x8 board with an extra queen and pawn for both teams.",
                 "Checkmate.",
-                "None.",
-                "https://en.wikipedia.org/wiki/Sovereign_Chess"
+                VariantHelpDetails.rule_None,
+                "https://greenchess.net/rules.php?v=active"
             );
         }
 

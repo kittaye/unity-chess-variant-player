@@ -3,12 +3,7 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Cylinder.cs is a chess variant where the board wraps around horizontally.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
-    /// Piece rules: Pieces may move off only the left and right edges of the board and appear on the other side. No castling.
-    /// Board layout: Orthodox.
+    /// Board layout: FIDE standard.
     /// </summary>
     public class Cylinder : Chess {
 
@@ -18,6 +13,18 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Cylinder Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented in the 1800s",
+                this.ToString() + " is a variant where the board wraps around horizontally, allowing pieces to travel from one side to the other.",
+                "Checkmate.",
+                "- No null moves (where a piece's destination is the same as their current position).\n" + 
+                VariantHelpDetails.rule_NoCastling,
+                "https://en.wikipedia.org/wiki/Cylinder_chess"
+            );
         }
 
         public override void PopulateBoard() {

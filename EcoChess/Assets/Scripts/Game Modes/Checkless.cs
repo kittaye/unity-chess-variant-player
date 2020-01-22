@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Checkless.cs is a chess variant that prohibits checks against the king except checkmate.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
     /// Board layout: FIDE standard.
     /// </summary>
     public class Checkless : Chess {
@@ -23,10 +19,10 @@ namespace ChessGameModes {
         public override VariantHelpDetails GetVariantHelpDetails() {
             return new VariantHelpDetails(
                 this.ToString(),
-                "Created in the 1800s",
+                "Invented in the 1800s",
                 this.ToString() + " is a variant that prohibits checks against the king except for checkmate.",
                 "Checkmate.",
-                "None.",
+                VariantHelpDetails.rule_None,
                 "https://www.chessvariants.com/usualeq.dir/checklss.html"
             );
         }

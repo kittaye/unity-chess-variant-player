@@ -4,11 +4,6 @@ using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
-    /// GrandChess.cs is a chess variant on a 10x10 board with empresses and princesses.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox + Empresses, Princesses.
-    /// Piece rules: No Castling.
     /// Board layout: 
     ///     r . . . . . . . . r
     ///     . n b q k $ ^ b n .
@@ -34,6 +29,18 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Grand Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Christian Freeling (1984)",
+                this.ToString() + " is a variant on a 10x10 board with empresses and princesses.",
+                "Checkmate.",
+                "- Pawns may also promote to an empress or princess.\n" + 
+                VariantHelpDetails.rule_NoCastling,
+                "https://en.wikipedia.org/wiki/Grand_chess"
+            );
         }
 
         public override void PopulateBoard() {

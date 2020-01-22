@@ -4,10 +4,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Andernach.cs is a chess variant where pieces change teams upon capture.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
     /// Board layout: FIDE standard.
     /// </summary>
     public class Andernach : Chess {
@@ -21,10 +17,10 @@ namespace ChessGameModes {
         public override VariantHelpDetails GetVariantHelpDetails() {
             return new VariantHelpDetails(
                 this.ToString(),
-                "Created in 1993",
+                "Invented in 1993",
                 this.ToString() + " is a variant where pieces change teams upon capture, except for the king.",
                 "Checkmate.",
-                "None.",
+                VariantHelpDetails.rule_None,
                 "https://en.wikipedia.org/wiki/Andernach_chess"
             );
         }

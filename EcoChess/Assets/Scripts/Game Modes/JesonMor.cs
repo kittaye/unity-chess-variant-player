@@ -3,10 +3,6 @@ using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
-    /// JesonMor.cs is a chess variant that involves a custom board layout and a custom winstate.
-    /// 
-    /// Winstate: Eliminate all pieces OR enter and leave the central square (e5).
-    /// Piece types: Orthodox.
     /// Board layout: 
     ///     n n n n n n n n n
     ///     . . . . . . . . .
@@ -22,7 +18,7 @@ namespace ChessGameModes {
         protected new const int BOARD_WIDTH = 9;
         protected new const int BOARD_HEIGHT = 9;
 
-        private static BoardCoord centerSquare = new BoardCoord(4, 4);
+        private readonly BoardCoord centerSquare = new BoardCoord(4, 4);
         private bool gameFinished = false;
 
         public JesonMor() : base(BOARD_WIDTH, BOARD_HEIGHT) {
@@ -30,6 +26,17 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Jeson Mor";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented in Mongolia",
+                this.ToString() + " is a variant on a 9x9 board with nine knights for both teams and an alternative win condition.",
+                "Capture all of the opposing team's pieces OR move a knight off of the central e5 square.",
+                "- Note: A knight on the e5 square may be captured.",
+                "https://en.wikipedia.org/wiki/Jeson_Mor"
+            );
         }
 
         public override void PopulateBoard() {

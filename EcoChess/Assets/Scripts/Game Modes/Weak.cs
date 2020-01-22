@@ -3,11 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Weak.cs is a chess variant with a custom initial board layout.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
-    /// Piece rules: Black may only promote to a knight.
     /// Board layout:
     ///     n n n n k n n n
     ///     p p p p p p p p
@@ -29,6 +24,17 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Weak!";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented in the 1960s",
+                this.ToString() + " is a variant that pits the FIDE standard white army against a custom black army of knights and pawns.",
+                "Checkmate.",
+                "- Black pawns may only promote to a knight.",
+                "https://www.chessvariants.com/unequal.dir/weak.html"
+            );
         }
 
         public override void OnMoveComplete() {

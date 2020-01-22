@@ -4,11 +4,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Knightmate.cs is a chess variant where the knight can be checked and checkmated and the king is a normal piece.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
-    /// Piece rules: kings are normal pieces, knights can castle.
     /// Board layout:
     ///     r k b q n b k r
     ///     p p p p p p p p
@@ -26,6 +21,20 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Knightmate";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Bruce Zimov (1972)",
+                this.ToString() + " is a variant where the roles and placements of the king and knights are reversed.",
+                "Checkmate the knight.",
+                "- Pawns may not promote to a knight, but may promote to a king.\n" +
+                "- The knight may castle with the rooks under the same castling rules of orthodox chess.\n" +
+                "- Note: The knight now has royalty, meaning it can be checked.\n" +
+                "- Note: Kings are no longer royal and may be captured like other non-royal piece.",
+                "https://www.chessvariants.com/diffobjective.dir/knightmate.html"
+            );
         }
 
         public override void PopulateBoard() {

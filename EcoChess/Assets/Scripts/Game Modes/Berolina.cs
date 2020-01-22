@@ -4,10 +4,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Berolina.cs is a chess variant where pawns are replaced with berolina pawns.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox + Berolina Pawn.
     /// Board layout: FIDE standard.
     /// </summary>
     public class Berolina : Chess {
@@ -21,10 +17,10 @@ namespace ChessGameModes {
         public override VariantHelpDetails GetVariantHelpDetails() {
             return new VariantHelpDetails(
                 this.ToString(),
-                "Created by Edmund Nebermann (1926)",
+                "Invented by Edmund Nebermann (1926)",
                 this.ToString() + " is a variant where pawns are replaced with berolina pawns.",
                 "Checkmate.",
-                "None.",
+                VariantHelpDetails.rule_None,
                 "https://en.wikipedia.org/wiki/Berolina_chess"
             );
         }

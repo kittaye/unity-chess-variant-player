@@ -3,11 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Advance.cs is a chess variant with a custom initial board layout.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
-    /// Piece rules: pawn no double move.
     /// Board layout:
     ///     r n b q k b n r
     ///     . . . . . . . . 
@@ -29,10 +24,10 @@ namespace ChessGameModes {
         public override VariantHelpDetails GetVariantHelpDetails() {
             return new VariantHelpDetails(
                 this.ToString(),
-                "Created by Tony Paletta (1980)",
+                "Invented by Tony Paletta (1980)",
                 this.ToString() + " is a variant where the pawns are positioned a further rank forward.",
                 "Checkmate.",
-                "- No pawn double-moves.",
+                VariantHelpDetails.rule_NoPawnDoubleMove,
                 "https://greenchess.net/rules.php?v=advanced-pawn"
             );
         }

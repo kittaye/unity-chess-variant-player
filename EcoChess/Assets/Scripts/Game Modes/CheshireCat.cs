@@ -3,12 +3,7 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// CheshireCat.cs is a chess variant where the square a piece moved from is removed.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
-    /// Piece rules: No castling, piece can move over - but not onto - removed squares. King's first move moves like a queen.
-    /// Board layout: Orthodox.
+    /// Board layout: FIDE standard.
     /// </summary>
     public class CheshireCat : Chess {
 
@@ -23,12 +18,12 @@ namespace ChessGameModes {
         public override VariantHelpDetails GetVariantHelpDetails() {
             return new VariantHelpDetails(
                 this.ToString(),
-                "Created by V. R. Parton (1970)",
+                "Invented by V. R. Parton (1970)",
                 this.ToString() + " is a variant where the square a piece moves from vanishes.",
                 "Checkmate.",
                 "- Pieces can move over, but not onto, vanished squares.\n" +
                 "- The king's first move behaves like a queen.\n" +
-                "- No castling.",
+                VariantHelpDetails.rule_NoCastling,
                 "https://www.chessvariants.com/boardrules.dir/cheshir.html"
             );
         }

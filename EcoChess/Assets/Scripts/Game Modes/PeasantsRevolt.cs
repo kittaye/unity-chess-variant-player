@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// PeasantsRevolt.cs is a chess variant with a custom initial board layout.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
     /// Board layout:
     ///     . n n . k . n .
     ///     . . . . p . . .
@@ -22,6 +18,17 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Peasants' Revolt";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by George Whelon",
+                this.ToString() + " is a variant with a standard army of pawns for white and 3 knights and a pawn for black.",
+                "Checkmate.",
+                VariantHelpDetails.rule_None,
+                "https://www.chessvariants.com/large.dir/peasantrevolt.html"
+            );
         }
 
         public override void PopulateBoard() {

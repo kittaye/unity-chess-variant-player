@@ -3,11 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// ChargeOfTheLightBrigade.cs is a chess variant with a custom initial board layout.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
-    /// Piece rules: White may only promote to a queen, Black may only promote to a knight. No castling.
     /// Board layout:
     ///     n n n n k n n n
     ///     p p p p p p p p
@@ -31,12 +26,12 @@ namespace ChessGameModes {
         public override VariantHelpDetails GetVariantHelpDetails() {
             return new VariantHelpDetails(
                 this.ToString(),
-                "Created by H. G. Muller (2015)",
+                "Invented by H. G. Muller (2015)",
                 this.ToString() + " is a variant with a custom initial board layout.",
                 "Checkmate.",
-                "- No castling.\n" +
                 "- White pawns may only promote to queens.\n" +
-                "- Black pawns may only promote to knights.",
+                "- Black pawns may only promote to knights.\n" +
+                VariantHelpDetails.rule_NoCastling,
                 "https://www.chessvariants.com/rules/charge-of-the-light-brigade"
             );
         }

@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// OmegaChess.cs is a chess variant involving Wizard and Champion fairy pieces on a 10x10 board, with 4 corner squares.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox + Champions, Wizards.
     /// Board layout: 
     ///     w                     w
     ///       c r n b q k b n r c
@@ -46,6 +42,20 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Omega Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Daniel C. Macdonald (1999)",
+                this.ToString() + " is a variant involving wizard and champion fairy pieces on a 10x10 board, with an additional 4 corner squares.",
+                "Checkmate.",
+                "- Pawns may move up to three squares on the initial move.\n" +
+                "- En passant rules also apply to pawns moving three squares\n" +
+                "  (in which case the opposing pawn on the same rank or one rank behind the initial mover may perform en passant).\n" +
+                "- Pawns may also promote to a wizard or champion.",
+                "https://www.chessvariants.com/large.dir/omega/rules.html"
+            );
         }
 
         public override void PopulateBoard() {

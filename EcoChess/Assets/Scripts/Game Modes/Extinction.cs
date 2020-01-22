@@ -3,12 +3,7 @@ using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Extinction.cs is a chess variant with a custom winstate.
-    /// 
-    /// Winstate: Elimination of all of a type of chess piece.
-    /// Piece types: Orthodox.
-    /// Piece rules: King isn't royal -- can castle unrestricted by checks.
-    /// Board layout: Orthodox.
+    /// Board layout: FIDE standard.
     /// </summary>
     public class Extinction : Chess {
         private readonly Piece[] pieces;
@@ -28,6 +23,19 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Extinction Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by R. Wayne Schmittberger (1985)",
+                this.ToString() + " is a variant that involves capturing all of a particular piece.",
+                "Capture all of the opposing team's set of unique pieces (pawns, knights, bishops, rooks, queen or king).",
+                "- No royalty (no checks & castling is unrestricted by checks).\n" +
+                "- Note: Pawns may promote to a king, in which capturing the additional king does not result in a game loss." +
+                "- Note: If the last pawn on a team promotes, it is considered a game loss.",
+                "https://en.wikipedia.org/wiki/Extinction_chess"
+            );
         }
 
         public override bool CheckWinState() {

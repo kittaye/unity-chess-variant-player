@@ -3,10 +3,6 @@ using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
-    /// ShiftedChess.cs is a chess variant with an irregular board shape.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox.
     /// Board layout:
     ///           q b n r
     ///   r b n k p p p p
@@ -34,6 +30,17 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Shifted Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented by Robert J. Bell",
+                this.ToString() + " is a variant with an irregular board shape (9x9).",
+                "Checkmate.",
+                "- Kings may only castle king-side.",
+                "https://greenchess.net/rules.php?v=shifted-hv"
+            );
         }
 
         public override void PopulateBoard() {

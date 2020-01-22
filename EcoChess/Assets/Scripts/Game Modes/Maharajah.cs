@@ -3,11 +3,6 @@ using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
-    /// Maharajah.cs is a chess variant that pits the black FIDE army against one amazon.
-    /// 
-    /// Winstate: Checkmate.
-    /// Piece types: Orthodox + Amazon.
-    /// Piece rules: No pawn promotion.
     /// Board layout: 
     ///     r n b q k b n r 
     ///     p p p p p p p p 
@@ -26,6 +21,18 @@ namespace ChessGameModes {
 
         public override string ToString() {
             return "Maharajah Chess";
+        }
+
+        public override VariantHelpDetails GetVariantHelpDetails() {
+            return new VariantHelpDetails(
+                this.ToString(),
+                "Invented in India (1800s)",
+                this.ToString() + " is a variant that pits the black FIDE army against one amazon.",
+                "Checkmate.",
+                VariantHelpDetails.rule_NoPawnPromotion + "\n" +
+                "- Note: The white amazon is royal and must be checkmated for black to win.",
+                "https://en.wikipedia.org/wiki/Maharajah_and_the_Sepoys"
+            );
         }
 
         public override void PopulateBoard() {
