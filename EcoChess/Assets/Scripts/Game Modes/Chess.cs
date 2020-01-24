@@ -135,7 +135,7 @@ namespace ChessGameModes {
         }
 
         /// <summary>
-        /// Module function for the captureless move limit rule end condition.
+        /// Defines the captureless move limit rule.
         /// </summary>
         /// <returns>True if 50 turns (50 * 2 moves in FIDE chess) passes without a single capture.</returns>
         public bool CapturelessMovesLimit() {
@@ -176,49 +176,49 @@ namespace ChessGameModes {
         }
 
         /// <summary>
-        /// Calculates the currently available moves for a selected piece.
+        /// From the piece's template moves, get those that would not put the current royal piece in check.
         /// </summary>
-        /// <param name="mover">Selected piece to calculate moves for.</param>
-        /// <returns>A list of board coordinates for each move.</returns>
-        public virtual List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
+        protected List<BoardCoord> GetLegalTemplateMoves(ChessPiece mover) {
+            List<BoardCoord> legalMoves = new List<BoardCoord>();
             BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
 
             for (int i = 0; i < templateMoves.Length; i++) {
                 if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
+                    legalMoves.Add(templateMoves[i]);
                 }
             }
 
-            if (AllowCastling) {
-                if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 0) {
+            return legalMoves;
+        }
+
+        /// <summary>
+        /// Calculates the currently available moves for a selected piece.
+        /// </summary>
+        public virtual List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
+            List<BoardCoord> availableMoves = new List<BoardCoord>();
+
+            availableMoves.AddRange(GetLegalTemplateMoves(mover));
+
+            if (IsRoyal(mover)) {
+                if (AllowCastling) {
                     availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions, castlingDistance));
                 }
-            }
-
-            if (mover is Pawn) {
+            } else if (mover is Pawn) {
                 if (AllowEnpassantCapture) {
-                    BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                    if (enPassantMove != BoardCoord.NULL) {
-                        availableMoves.Add(enPassantMove);
-                    }
-                }
-
-                if (AllowPawnPromotion) {
-                    if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                        OnDisplayPromotionUI(true);
-                    }
+                    availableMoves.AddRange(TryAddAvailableEnPassantMoves((Pawn)mover));
                 }
             }
 
             return availableMoves;
         }
 
+        protected bool IsRoyal(ChessPiece piece) {
+            return piece == currentRoyalPiece || piece == opposingRoyalPiece;
+        }
+
         /// <summary>
         /// Moves a selected piece to a destination.
         /// </summary>
-        /// <param name="mover">Piece to move.</param>
-        /// <param name="destination">Destination to move to.</param>
         /// <returns>True if the destination is an available move for this piece.</returns>
         public virtual bool MovePiece(ChessPiece mover, BoardCoord destination) {
             BoardCoord oldPos = mover.GetBoardPosition();
@@ -276,8 +276,6 @@ namespace ChessGameModes {
         /// <summary>
         /// Called in MovePiece. If an enpassant move was made, enpassant capture is performed.
         /// </summary>
-        /// <param name="mover">Moving piece.</param>
-        /// <param name="moverPreviousPosition">TThe position of the piece before it moved.</param>
         /// <param name="moveNotation">A reference to the current move notation.</param>
         /// <returns>The piece that was removed.</returns>
         protected virtual Pawn CheckPawnEnPassantCapture(Pawn mover, BoardCoord moverPreviousPosition, ref string moveNotation) {
@@ -296,9 +294,7 @@ namespace ChessGameModes {
         /// <summary>
         /// Called in CalculateAvailableMoves. Determines if a pawn can promote on their move.
         /// </summary>
-        /// <param name="mover">Moving pawn.</param>
         /// <param name="availableMoves">The pawn's available moves to check.</param>
-        /// <returns></returns>
         protected virtual bool CanPromote(Pawn mover, BoardCoord[] availableMoves) {
             for (int i = 0; i < availableMoves.Length; i++) {
                 if (availableMoves[i].y == WHITE_BACKROW || availableMoves[i].y == BLACK_BACKROW) {
@@ -311,8 +307,6 @@ namespace ChessGameModes {
         /// <summary>
         /// Called in MovePiece. If a promoting move was made, the pawn is removed from the board and replaced with the selected pawn promotion.
         /// </summary>
-        /// <param name="mover">Moving pawn.</param>
-        /// <returns></returns>
         protected virtual ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
             if (mover.GetRelativeBoardCoord(0, 1).y < WHITE_BACKROW || mover.GetRelativeBoardCoord(0, 1).y > BLACK_BACKROW) {
                 KillPiece(mover);
@@ -328,10 +322,6 @@ namespace ChessGameModes {
         /// <summary>
         /// Simulates a move, checks whether the piece-to-check is in check, then reverts the simulated move.
         /// </summary>
-        /// <param name="pieceToCheck">Piece to check (usually the current or opposing royal piece).</param>
-        /// <param name="mover">Piece to move.</param>
-        /// <param name="dest">Destination to move to.</param>
-        /// <returns>True if the piece-to-check is in check after the simulated move.</returns>
         protected virtual bool IsPieceInCheckAfterThisMove(ChessPiece pieceToCheck, ChessPiece mover, BoardCoord dest) {
             if (AssertContainsCoord(dest)) {
                 if (checkingForCheck) return false;
@@ -369,8 +359,6 @@ namespace ChessGameModes {
         /// <summary>
         /// Determines whether the piece-to-check is currently in check.
         /// </summary>
-        /// <param name="pieceToCheck">Piece to check (usually the current or opposing royal piece).</param>
-        /// <returns>True if the piece-to-check is in check.</returns>
         protected virtual bool IsPieceInCheck(ChessPiece pieceToCheck) {
             if (checkingForCheck) return false;
 
@@ -392,7 +380,6 @@ namespace ChessGameModes {
         /// Gets all possible check threats against the piece-to-check. This should vary between game-modes 
         /// that involve pieces that don't move directionally.
         /// </summary>
-        /// <param name="pieceToCheck">Piece to check (usually the current or opposing royal piece).</param>
         /// <returns>A list of chess pieces that can check the piece-to-check.</returns>
         protected virtual List<ChessPiece> GetAllPossibleCheckThreats(ChessPiece pieceToCheck) {
             List<ChessPiece> possibleCheckThreats = new List<ChessPiece>();
@@ -411,7 +398,7 @@ namespace ChessGameModes {
                 }
             }
 
-            foreach (Knight knight in GetPiecesOfType<Knight>()) {
+            foreach (Knight knight in GetAllPiecesOfType<Knight>()) {
                 if (IsThreat(pieceToCheck, knight.GetBoardPosition())) {
                     possibleCheckThreats.Add(knight);
                 }
@@ -420,14 +407,21 @@ namespace ChessGameModes {
             return possibleCheckThreats;
         }
 
+        public virtual void DisplayUIIfCanPromote(ChessPiece mover, BoardCoord[] availableMoves) {
+            if (CanPromote((Pawn)mover, availableMoves)) {
+                OnDisplayPromotionUI(true);
+            }
+        }
+
         /// <summary>
         /// Called in CalculateAvailableMoves. If an enpassant move is available, returns the enpassant move.
+        /// In most cases there is only one enpassant move. The exception is in Monster chess, where a black pawn could
+        /// perform en passant on two different white pawns.
         /// </summary>
-        /// <param name="mover">Moving pawn.</param>
-        /// <returns>Enpassant coordinate, otherwise null.</returns>
-        protected virtual BoardCoord TryAddAvailableEnPassantMove(Pawn mover) {
+        protected virtual BoardCoord[] TryAddAvailableEnPassantMoves(Pawn mover) {
             const int LEFT = -1;
             const int RIGHT = 1;
+            List<BoardCoord> enpassantMoves = new List<BoardCoord>(1);
 
             if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
@@ -436,41 +430,41 @@ namespace ChessGameModes {
                         ChessPiece piece = Board.GetCoordInfo(coord).occupier;
                         if (piece is Pawn && piece == GetLastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
                             if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
-                                return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1));
+                                enpassantMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1)));
                             }
                         }
                     }
                 }
             }
-            return BoardCoord.NULL;
+            return enpassantMoves.ToArray();
         }
 
         /// <summary>
         /// Called in CalculateAvailableMoves. Determines if a castling move can be made for a chess piece.
         /// </summary>
-        /// <param name="king">Moving piece.</param>
+        /// <param name="castler">Moving piece.</param>
         /// <param name="castleTypes">Which types of pieces can the moving piece castle with?</param>
         /// <param name="castlingDistance">How many squares should the piece move when castling?</param>
         /// <param name="canCastleLeftward">Can the piece castle leftwards?</param>
         /// <param name="canCastleRightward">Can the piece castle rightwards?</param>
         /// <returns>A list of board coordinates for available castle moves.</returns>
-        protected virtual BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, Piece[] castlerOptions, int castlingDistance = 2, bool canCastleLeftward = true, bool canCastleRightward = true) {
+        protected virtual BoardCoord[] TryAddAvailableCastleMoves(ChessPiece castler, Piece[] castlerOptions, int castlingDistance = 2, bool canCastleLeftward = true, bool canCastleRightward = true) {
             const int LEFT = -1;
             const int RIGHT = 1;
 
-            if(castlerOptions.Length == 0) {
+            if(castler.MoveCount > 0 || castlerOptions.Length == 0) {
                 return new BoardCoord[0];
             }
 
-            if (IsPieceInCheck(king) == false) {
+            if (IsPieceInCheck(castler) == false) {
                 List<BoardCoord> castleMoves = new List<BoardCoord>(2);
 
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     if (!canCastleLeftward && i == LEFT) continue;
                     if (!canCastleRightward && i == RIGHT) break;
 
-                    int x = king.GetBoardPosition().x + i;
-                    int y = king.GetBoardPosition().y;
+                    int x = castler.GetBoardPosition().x + i;
+                    int y = castler.GetBoardPosition().y;
                     BoardCoord coord = new BoardCoord(x, y);
 
                     while (Board.ContainsCoord(coord)) {
@@ -487,14 +481,14 @@ namespace ChessGameModes {
                             if (validCastler && occupier.MoveCount == 0) {
                                 bool inCheck = false;
                                 for (int k = 1; k <= castlingDistance; k++) {
-                                    if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i * k, 0))) {
+                                    if (IsPieceInCheckAfterThisMove(castler, castler, castler.GetBoardPosition() + new BoardCoord(i * k, 0))) {
                                         inCheck = true;
                                         break;
                                     }
                                 }
 
                                 if (!inCheck) {
-                                    castleMoves.Add(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * castlingDistance, 0)));
+                                    castleMoves.Add(TryGetSpecificMove(castler, castler.GetBoardPosition() + new BoardCoord(i * castlingDistance, 0)));
                                 }
                             }
                             break;
@@ -511,10 +505,8 @@ namespace ChessGameModes {
         /// <summary>
         /// Checks whether any piece on the team is able to move.
         /// </summary>
-        /// <param name="team">Team to check.</param>
-        /// <returns>True if a piece is able to move.</returns>
         protected bool TeamHasAnyMoves(Team team) {
-            foreach (ChessPiece piece in GetPieces(team)) {
+            foreach (ChessPiece piece in GetAllPieces(team)) {
                 if (piece.IsAlive) {
                     if (CalculateAvailableMoves(piece).Count > 0) {
                         return true;
@@ -564,10 +556,8 @@ namespace ChessGameModes {
         }
 
         /// <summary>
-        /// Module function to get the last moved piece from a specific team.
+        /// Gets the last moved piece from a specific team.
         /// </summary>
-        /// <param name="team">Team to get the last mover from.</param>
-        /// <returns>The last moved chess piece from the team.</returns>
         public ChessPiece GetLastMovedPiece(Team team) {
             if (team == Team.WHITE) {
                 return lastMovedWhitePiece;
@@ -577,9 +567,8 @@ namespace ChessGameModes {
         }
 
         /// <summary>
-        /// Module function to set the last moved piece. This will update the last mover of the piece's team.
+        /// Sets the last moved piece. This will update the last mover of the piece's team.
         /// </summary>
-        /// <param name="piece">Piece to set to.</param>
         public void SetLastMovedPiece(ChessPiece piece) {
             if (piece != null) {
                 if (piece.GetTeam() == Team.WHITE) {
@@ -591,7 +580,7 @@ namespace ChessGameModes {
         }
 
         /// <summary>
-        /// Module function to get the last moved opposing team's piece based on the mover's team.
+        /// Gets the last moved opposing team's piece based on the mover's team.
         /// </summary>
         /// <param name="mover">Piece to determine the opposing team.</param>
         /// <returns>The last moved piece from the opposing team based on the mover's team.</returns>
@@ -606,7 +595,6 @@ namespace ChessGameModes {
         /// <summary>
         /// Display the UI for showing pawn promotion options to choose from.
         /// </summary>
-        /// <param name="value"></param>
         protected void OnDisplayPromotionUI(bool value) {
             if (_DisplayPromotionUI != null) _DisplayPromotionUI.Invoke(true);
         }
@@ -614,7 +602,6 @@ namespace ChessGameModes {
         /// <summary>
         /// Set the current pawn promotion option to a specified piece.
         /// </summary>
-        /// <param name="piece">Piece to set the pawn promotion option to.</param>
         public virtual void SetPawnPromotionTo(Piece piece) {
             this.SelectedPawnPromotion = piece;
         }
@@ -622,11 +609,9 @@ namespace ChessGameModes {
         /// <summary>
         /// Gets a list of a specific type of chess pieces in the game.
         /// </summary>
-        /// <typeparam name="T">Type of chess piece to retrieve.</typeparam>
-        /// <param name="team">Team to get pieces from.</param>
         /// <param name="aliveOnly">Should only pieces that are currently on the board be retrieved?</param>
         /// <returns>A list of T chess pieces.</returns>
-        public List<T> GetPiecesOfType<T>(Team team, bool aliveOnly = true) where T : ChessPiece {
+        public List<T> GetAllPiecesOfType<T>(Team team, bool aliveOnly = true) where T : ChessPiece {
             List<T> selectionOfPieces = new List<T>();
             switch (team) {
                 case Team.WHITE:
@@ -650,10 +635,9 @@ namespace ChessGameModes {
         /// <summary>
         /// Gets a list of a specific type of chess pieces in the game.
         /// </summary>
-        /// <typeparam name="T">Type of chess piece to retrieve.</typeparam>
         /// <param name="aliveOnly">Should only pieces that are currently on the board be retrieved?</param>
         /// <returns>A list of T chess pieces.</returns>
-        public List<T> GetPiecesOfType<T>(bool aliveOnly = true) where T : ChessPiece {
+        public List<T> GetAllPiecesOfType<T>(bool aliveOnly = true) where T : ChessPiece {
             List<T> selectionOfPieces = new List<T>();
             foreach (ChessPiece piece in whitePieces) {
                 if (piece is T && piece.IsAlive) {
@@ -669,11 +653,11 @@ namespace ChessGameModes {
         }
 
         /// <summary>
-        /// Gets a list of all chess pieces in the current game.
+        /// Gets a list of all chess pieces in the game.
         /// </summary>
         /// <param name="aliveOnly">Should only pieces that are currently on the board be retrieved?</param>
         /// <returns>A list of all chess pieces in the current game.</returns>
-        public List<ChessPiece> GetPieces(bool aliveOnly = true) {
+        public List<ChessPiece> GetAllPieces(bool aliveOnly = true) {
             List<ChessPiece> pieces = new List<ChessPiece>(whitePieces.Count + blackPieces.Count);
             if (aliveOnly) {
                 whitePieces.ForEach(x => { if (x.IsAlive) pieces.Add(x); });
@@ -691,14 +675,16 @@ namespace ChessGameModes {
         /// <param name="team">Team to get pieces from.</param>
         /// <param name="aliveOnly">Should only pieces that are currently on the board be retrieved?</param>
         /// <returns>A list of all chess pieces in the current game.</returns>
-        public List<ChessPiece> GetPieces(Team team, bool aliveOnly = true) {
-            List<ChessPiece> pieces = new List<ChessPiece>();
+        public List<ChessPiece> GetAllPieces(Team team, bool aliveOnly = true) {
             if (aliveOnly) {
+                List<ChessPiece> pieces = new List<ChessPiece>();
+
                 if (team == Team.WHITE) {
                     whitePieces.ForEach(x => { if (x.IsAlive) pieces.Add(x); });
                 } else {
                     blackPieces.ForEach(x => { if (x.IsAlive) pieces.Add(x); });
                 }
+
                 return pieces;
             } else {
                 if (team == Team.WHITE) {
@@ -747,7 +733,6 @@ namespace ChessGameModes {
         /// <summary>
         /// Returns a string that describes who's turn it is currently.
         /// </summary>
-        /// <returns></returns>
         public virtual string GetCurrentTurnLabel() {
             if (currentTeamTurn == Team.WHITE) {
                 return "White's move";
@@ -759,8 +744,7 @@ namespace ChessGameModes {
         /// <summary>
         /// Adds a chess piece to a team based on it's own team value.
         /// </summary>
-        /// <param name="piece">Piece to add.</param>
-        protected void AddPieceToActiveTeam(ChessPiece piece) {
+        protected void AddPieceToTeam(ChessPiece piece) {
             if (piece.GetTeam() == Team.WHITE) {
                 whitePieces.Add(piece);
             } else {
@@ -771,9 +755,8 @@ namespace ChessGameModes {
         /// <summary>
         /// Removes a chess piece from it's team.
         /// </summary>
-        /// <param name="piece">Piece to remove.</param>
         /// <returns>True if the removal was successful.</returns>
-        protected bool RemovePieceFromActiveTeam(ChessPiece piece) {
+        protected bool RemovePieceFromTeam(ChessPiece piece) {
             if (piece.GetTeam() == Team.WHITE) {
                 return whitePieces.Remove(piece);
             } else {
@@ -784,8 +767,6 @@ namespace ChessGameModes {
         /// <summary>
         /// Used to update the occupiers of affected squares after a move is played.
         /// </summary>
-        /// <param name="previousPosition"></param>
-        /// <param name="newPosition"></param>
         private void UpdateSquareOccupiers(BoardCoord previousPosition, BoardCoord newPosition) {
             if (AssertContainsCoord(previousPosition) && AssertContainsCoord(newPosition)) {
                 ChessPiece oldCoordOccupier = Board.GetCoordInfo(previousPosition).occupier;
@@ -804,9 +785,6 @@ namespace ChessGameModes {
         /// If rules are desired, use the virtual method MovePiece for more flexible behaviour. 
         /// Ensure that this method is always called for moving pieces.
         /// </summary>
-        /// <param name="mover"></param>
-        /// <param name="destination"></param>
-        /// <param name="isLastMover"></param>
         /// <returns>The basic algebraic notation describing this move. Returns null if invalid or not last mover.</returns>
         protected string MakeDirectMove(ChessPiece mover, BoardCoord destination, bool isLastMover = true) {
             StringBuilder moveNotation = new StringBuilder(null, 4);
@@ -848,7 +826,6 @@ namespace ChessGameModes {
         /// <summary>
         /// Returns the turn number for each team's moves in a turn.
         /// </summary>
-        /// <returns></returns>
         public int GetNotationTurn() {
             return Mathf.CeilToInt((float)GameMoveNotations.Count / NotationTurnDivider);
         }
@@ -859,7 +836,7 @@ namespace ChessGameModes {
         public void UpdateGameStateHistory() {
             teamTurnStateHistory.Push(new TeamTurnState(currentTeamTurn, opposingTeamTurn, currentRoyalPiece, opposingRoyalPiece));
 
-            foreach (ChessPiece piece in GetPieces(aliveOnly: false)) {
+            foreach (ChessPiece piece in GetAllPieces(aliveOnly: false)) {
                 piece.UpdatePieceMoveStateHistory();
             }
         }
@@ -867,8 +844,6 @@ namespace ChessGameModes {
         /// <summary>
         /// Resolves notation ambiguity between same-type pieces that can move to the same destination.
         /// </summary>
-        /// <param name="mover"></param>
-        /// <param name="destination"></param>
         /// <returns>The resolved notation to be appended.</returns>
         public virtual string ResolveMoveNotationAmbiguity(ChessPiece mover, BoardCoord destination) {
             string result = string.Empty;
@@ -877,7 +852,7 @@ namespace ChessGameModes {
             bool atLeastOneFileMatched = false;
             bool atLeastOneRankMatched = false;
 
-            foreach (ChessPiece piece in GetPieces(currentTeamTurn)) {
+            foreach (ChessPiece piece in GetAllPieces(currentTeamTurn)) {
                 if (piece != mover && piece.GetPieceType() == mover.GetPieceType()) {
                     if (piece.CalculateTemplateMoves().Contains(destination)) {
                         if (IsPieceInCheckAfterThisMove(currentRoyalPiece, piece, destination) == false) {
@@ -929,7 +904,6 @@ namespace ChessGameModes {
         /// <summary>
         /// Kills a chess piece and hides it from the board.
         /// </summary>
-        /// <param name="piece">Piece to kill.</param>
         /// <returns>True if the kill was successful.</returns>
         protected bool KillPiece(ChessPiece piece) {
             if (piece != null) {
@@ -943,9 +917,10 @@ namespace ChessGameModes {
 
         /// <summary>
         /// Reverts all chess pieces' states to the previous move.
+        /// TODO: bug when promotion -> undo -> promotion -> undo
         /// </summary>
         public virtual void UndoLastGameMove() {
-            foreach (ChessPiece piece in GetPieces(aliveOnly: false)) {
+            foreach (ChessPiece piece in GetAllPieces(aliveOnly: false)) {
                 if (piece.MoveStateHistory.Count > 1) {
                     // Remove piece state to be undone.
                     piece.MoveStateHistory.Pop();
@@ -971,8 +946,8 @@ namespace ChessGameModes {
                     }
                 } else if (piece.MoveStateHistory.Count == 1 && piece.IsAlive) {
                     // This occurs for promoted pieces. A promoted pawn is considered a new piece, so once the new piece has no states left,
-                    // we kill it and bring back the pawn.
-                    KillPiece(piece);
+                    // we completely remove it from the game and bring back the pawn.
+                    DestoryPieceFromBoard(piece);
                 }
             }
 
@@ -991,14 +966,13 @@ namespace ChessGameModes {
         /// <summary>
         /// Adds a chess piece to the game board and assigns it to a team based on it's own team value.
         /// </summary>
-        /// <param name="piece">Piece to add.</param>
         /// <returns>Returns the chess piece added to the game board.</returns>
         protected ChessPiece AddPieceToBoard(ChessPiece piece) {
             if (CheckValidPlacement(piece)) {
                 Board.GetCoordInfo(piece.GetBoardPosition()).occupier = piece;
                 piece.IsAlive = true;
                 GameManager.Instance.InstantiateChessPiece(piece);
-                AddPieceToActiveTeam(piece);
+                AddPieceToTeam(piece);
 
                 if (piece.GetTeam() == Team.BLACK && Board.isFlipped) {
                     piece.gameObject.transform.Rotate(new Vector3(0, 0, 180));
@@ -1009,10 +983,18 @@ namespace ChessGameModes {
         }
 
         /// <summary>
+        /// Completely destroys a chess piece. Only used when a promoted piece is undo'd back to a pawn.
+        /// </summary>
+        /// <param name="piece"></param>
+        private void DestoryPieceFromBoard(ChessPiece piece) {
+            KillPiece(piece);
+            RemovePieceFromTeam(piece);
+            GameManager.Instance.DestroyChessPiece(piece);
+        }
+
+        /// <summary>
         /// Used to ensure the chess piece added to the game board has been placed in a valid position.
         /// </summary>
-        /// <param name="piece">Piece to check.</param>
-        /// <returns>True if valid placement.</returns>
         private bool CheckValidPlacement(ChessPiece piece) {
             if (AssertContainsCoord(piece.GetBoardPosition()) == false) {
                 return false;
@@ -1029,8 +1011,6 @@ namespace ChessGameModes {
         /// <summary>
         /// Assert that the current game board contains a specified coordinate.
         /// </summary>
-        /// <param name="coord">Coordinate to check.</param>
-        /// <returns>True if game board contains the coordinate.</returns>
         public bool AssertContainsCoord(BoardCoord coord) {
             if (!Board.ContainsCoord(coord)) {
                 Debug.LogErrorFormat("ERROR: {0} is not a valid position on the GameBoard!", coord.ToString());
@@ -1042,8 +1022,6 @@ namespace ChessGameModes {
         /// <summary>
         /// Determines whether a selected chess piece is it's team's turn to move.
         /// </summary>
-        /// <param name="mover"></param>
-        /// <returns></returns>
         public virtual bool IsMoversTurn(ChessPiece mover) {
             return mover.GetTeam() == currentTeamTurn;
         }
@@ -1051,44 +1029,38 @@ namespace ChessGameModes {
         /// <summary>
         /// Simulates a move being played. NOTE: Must be followed by RevertSimulatedMove.
         /// </summary>
-        /// <param name="mover">Piece to move.</param>
-        /// <param name="dest">Destination to move to.</param>
-        /// <param name="originalOccupier">The occupier at the destination prior to this simulated move.</param>
         /// <param name="originalLastMover">The last moved piece prior to this simulated move.</param>
-        protected void SimulateMove(ChessPiece mover, BoardCoord dest, ChessPiece originalOccupier, out ChessPiece originalLastMover) {
+        protected void SimulateMove(ChessPiece mover, BoardCoord destination, ChessPiece originalDestinationOccupier, out ChessPiece originalLastMover) {
             originalLastMover = null;
-            if (AssertContainsCoord(dest)) {
+            if (AssertContainsCoord(destination)) {
                 originalLastMover = GetLastMovedPiece(mover.GetTeam());
                 SetLastMovedPiece(mover);
 
-                if (originalOccupier != null) {
-                    originalOccupier.IsAlive = false;
+                if (originalDestinationOccupier != null) {
+                    originalDestinationOccupier.IsAlive = false;
                 }
 
                 Board.GetCoordInfo(mover.GetBoardPosition()).occupier = null;
-                Board.GetCoordInfo(dest).occupier = mover;
-                mover.SetBoardPosition(dest);
+                Board.GetCoordInfo(destination).occupier = mover;
+                mover.SetBoardPosition(destination);
             }
         }
 
         /// <summary>
         /// Reverts a simulated move. NOTE: Must be preceeded by SimulateMove.
         /// </summary>
-        /// <param name="mover">Piece to move.</param>
-        /// <param name="dest">Destination to move to.</param>
-        /// <param name="originalOccupier">The occupier at the destination prior to this simulated move.</param>
         /// <param name="originalLastMover">The last moved piece prior to this simulated move.</param>
         /// <param name="oldPos">The position of the mover prior to this simulated move.</param>
-        protected void RevertSimulatedMove(ChessPiece mover, BoardCoord dest, ChessPiece originalOccupier, ChessPiece originalLastMover, BoardCoord oldPos) {
-            if (AssertContainsCoord(dest)) {
+        protected void RevertSimulatedMove(ChessPiece mover, BoardCoord destination, ChessPiece originalDestinationOccupier, ChessPiece originalLastMover, BoardCoord oldPos) {
+            if (AssertContainsCoord(destination)) {
                 mover.SetBoardPosition(oldPos);
                 Board.GetCoordInfo(mover.GetBoardPosition()).occupier = mover;
 
-                if (originalOccupier != null) {
-                    originalOccupier.IsAlive = true;
-                    Board.GetCoordInfo(dest).occupier = originalOccupier;
+                if (originalDestinationOccupier != null) {
+                    originalDestinationOccupier.IsAlive = true;
+                    Board.GetCoordInfo(destination).occupier = originalDestinationOccupier;
                 } else {
-                    Board.GetCoordInfo(dest).occupier = null;
+                    Board.GetCoordInfo(destination).occupier = null;
                 }
 
                 SetLastMovedPiece(originalLastMover);
@@ -1098,19 +1070,17 @@ namespace ChessGameModes {
         /// <summary>
         /// Gets a list of moves that a chess piece can move to. This method is used to build up a chess piece's list of template moves.
         /// </summary>
-        /// <param name="mover">Piece to calculate moves for.</param>
-        /// <param name="dir">Move direction to test moves for.</param>
         /// <param name="cap">Number of squares to test before stopping (0 = unbounded).</param>
         /// <param name="threatAttackLimit">Number of threats to test before stopping (0 = unbounded).</param>
         /// <param name="threatsOnly">Only get attacking moves?</param>
         /// <param name="teamSensitive">Is the move direction relative to the team or to the game board?</param>
         /// <returns></returns>
-        public BoardCoord[] TryGetDirectionalMoves(ChessPiece mover, MoveDirection dir, uint cap = 0, uint threatAttackLimit = 1, bool threatsOnly = false, bool teamSensitive = true) {
+        public BoardCoord[] TryGetDirectionalMoves(ChessPiece mover, MoveDirection direction, uint cap = 0, uint threatAttackLimit = 1, bool threatsOnly = false, bool teamSensitive = true) {
             int x = mover.GetBoardPosition().x;
             int y = mover.GetBoardPosition().y;
             int xModifier;
             int yModifier;
-            GetMoveDirectionModifiers(mover, dir, out xModifier, out yModifier, teamSensitive);
+            GetMoveDirectionModifiers(mover, direction, out xModifier, out yModifier, teamSensitive);
 
             bool xWrap = mover.HasXWrapping;
             bool yWrap = mover.HasYWrapping;
@@ -1146,7 +1116,6 @@ namespace ChessGameModes {
         /// <summary>
         /// Gets a list of moves that a chess piece can move to. This method is used to build up a chess piece's list of template moves.
         /// </summary>
-        /// <param name="mover">Piece to calculate moves for.</param>
         /// <param name="xVariance">Custom direction's x step from the mover's position.</param>
         /// <param name="yVariance">Custom direction's y step from the mover's position.</param>
         /// <param name="cap">Number of squares to test before stopping (0 = unbounded).</param>
@@ -1185,8 +1154,6 @@ namespace ChessGameModes {
         /// <summary>
         /// Calculates to see if a specific move for a chess piece can be made.
         /// </summary>
-        /// <param name="mover">Piece to move.</param>
-        /// <param name="destination">Destination to move to.</param>
         /// <param name="threatOnly">Destination occupier must be a threat?</param>
         /// <returns>The coordinate that the piece can move to; otherwise NULL.</returns>
         public BoardCoord TryGetSpecificMove(ChessPiece mover, BoardCoord destination, bool threatOnly = false) {
@@ -1203,13 +1170,9 @@ namespace ChessGameModes {
         /// <summary>
         /// Returns the x and y step values for a specific move direction.
         /// </summary>
-        /// <param name="mover">Piece to move.</param>
-        /// <param name="dir">Move direction to test.</param>
-        /// <param name="xModifier">X step value to be returned.</param>
-        /// <param name="yModifier">Y step value to be returned.</param>
         /// <param name="teamSensitive">Is the move direction relative to the team or to the game board?</param>
-        public void GetMoveDirectionModifiers(ChessPiece mover, MoveDirection dir, out int xModifier, out int yModifier, bool teamSensitive = true) {
-            switch (dir) {
+        public void GetMoveDirectionModifiers(ChessPiece mover, MoveDirection direction, out int xModifier, out int yModifier, bool teamSensitive = true) {
+            switch (direction) {
                 case MoveDirection.Up:
                     xModifier = 0;
                     yModifier = (teamSensitive) ? mover.TeamSensitiveMove(1) : 1;

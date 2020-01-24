@@ -52,13 +52,7 @@ namespace ChessGameModes {
 
             // This code remains the same from the base method.
             if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    OnDisplayPromotionUI(true);
-                }
+                availableMoves.AddRange(TryAddAvailableEnPassantMoves((Pawn)mover));
             }
 
             return availableMoves;
@@ -78,7 +72,7 @@ namespace ChessGameModes {
         public override void UndoLastGameMove() {
             base.UndoLastGameMove();
 
-            foreach (ChessPiece piece in GetPieces(aliveOnly: false)) {
+            foreach (ChessPiece piece in GetAllPieces(aliveOnly: false)) {
                 Board.GetCoordInfo(piece.GetBoardPosition()).boardChunk.SetActive(true);
             }
         }

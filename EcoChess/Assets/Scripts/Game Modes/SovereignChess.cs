@@ -128,7 +128,7 @@ namespace ChessGameModes {
 
         public override bool CheckWinState() {
             bool hasAnyMoves = false;
-            foreach (ChessPiece piece in GetPieces()) {
+            foreach (ChessPiece piece in GetAllPieces()) {
                 if (GetCurrentTeamTurn() == Team.WHITE) {
                     if (whiteControlledColours.Contains(GetChessPieceColour(piece))) {
                         if (CalculateAvailableMoves(piece).Count > 0) {
@@ -276,9 +276,7 @@ namespace ChessGameModes {
             }
 
             if (mover is King) {
-                if (mover.MoveCount == 0) {
-                    availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions, castlingDistance));
-                }
+                availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions, castlingDistance));
 
                 if (checkingForCheck == false) {
                     HashSet<Color> controlledColours = GetControlledColours(mover);
@@ -300,10 +298,6 @@ namespace ChessGameModes {
                             }
                         }
                     }
-                }
-            } else if (mover is Pawn) {
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    OnDisplayPromotionUI(true);
                 }
             }
 
@@ -398,7 +392,7 @@ namespace ChessGameModes {
                     }
 
                     // Checks for check after adding appropriate colours to opposing team
-                    foreach (ChessPiece piece in GetPieces()) {
+                    foreach (ChessPiece piece in GetAllPieces()) {
                         if (piece == mover) continue;
                         // If the piece is a temporary enemy...
                         if (opposingControlledColours.Contains(GetChessPieceColour(piece))) {
@@ -568,7 +562,7 @@ namespace ChessGameModes {
                     opposingControlledColours.Add(prevOwnedClr);
 
                     // Add all colours that the mover's team previously controlled except its newly owned colour, to the opposing team.
-                    foreach (ChessPiece piece in GetPieces()) {
+                    foreach (ChessPiece piece in GetAllPieces()) {
                         Color pieceClr = GetChessPieceColour(piece);
                         if (controlledColours.Contains(pieceClr)) {
                             // Loop through all colour control parents of this piece

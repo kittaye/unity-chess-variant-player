@@ -34,7 +34,7 @@ namespace ChessGameModes {
 
         public override bool CheckWinState() {
             if (GetCurrentTeamTurn() == Team.WHITE) {
-                if (GetPieces(Team.WHITE).TrueForAll((x) => (x.IsAlive == false))) {
+                if (GetAllPieces(Team.WHITE).TrueForAll((x) => (x.IsAlive == false))) {
                     UIManager.Instance.LogCustom("Team Black wins by elimination!");
                     return true;
                 }

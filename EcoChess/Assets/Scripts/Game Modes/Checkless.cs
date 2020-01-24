@@ -42,17 +42,12 @@ namespace ChessGameModes {
                 }
             }
 
-            if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 0) {
+            if (IsRoyal(mover)) {
                 availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions));
             } else if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    OnDisplayPromotionUI(true);
-                }
+                availableMoves.AddRange(TryAddAvailableEnPassantMoves((Pawn)mover));
             }
+
             return availableMoves;
         }
 
@@ -75,7 +70,7 @@ namespace ChessGameModes {
                 // Check whether the piece is checkmated after this temporary move
                 bool hasAnyMoves = false;
                 checkingForCheckmate = true;
-                foreach (ChessPiece piece in GetPieces(pieceToCheck.GetTeam())) {
+                foreach (ChessPiece piece in GetAllPieces(pieceToCheck.GetTeam())) {
                     if (piece.IsAlive && hasAnyMoves == false) {
                         BoardCoord[] availableMoves = CalculateAvailableMoves(piece).ToArray();
                         for (int i = 0; i < availableMoves.Length; i++) {

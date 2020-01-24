@@ -53,7 +53,7 @@ public class GameManager : MonoBehaviour {
         ChessGame.Board.isFlipped = !ChessGame.Board.isFlipped;
 
         mainCamera.transform.Rotate(new Vector3(0, 0, 180));
-        foreach (ChessPiece piece in ChessGame.GetPieces(true)) {
+        foreach (ChessPiece piece in ChessGame.GetAllPieces(true)) {
             piece.gameObject.transform.Rotate(new Vector3(0, 0, 180));
         }
     }
@@ -106,5 +106,9 @@ public class GameManager : MonoBehaviour {
         piece.gameObject.name = piece.ToString();
         piece.gameObject.transform.SetParent(ChessGame.Board.gameBoardObj.transform);
         piece.gameObject.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>(piece.ToString());
+    }
+
+    public void DestroyChessPiece(ChessPiece piece) {
+        Destroy(piece.gameObject);
     }
 }

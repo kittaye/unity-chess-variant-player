@@ -52,28 +52,23 @@ namespace ChessGameModes {
         }
 
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
+            List<BoardCoord> availableMoves = new List<BoardCoord>();
 
-            for (int i = 0; i < templateMoves.Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
-                }
-            }
+            availableMoves.AddRange(GetLegalTemplateMoves(mover));
 
-            if (mover is King && mover.MoveCount == 0) {
+            if (IsRoyal(mover)) {
                 if (mover.GetTeam() == Team.WHITE) {
                     availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions, canCastleRightward: false));
                 } else {
                     availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions, canCastleLeftward: false));
                 }
             }
+
             return availableMoves;
         }
 
         protected override bool TryPerformCastlingRookMoves(ChessPiece mover, ref string moveNotation) {
             if (mover.MoveCount == 1 && mover == currentRoyalPiece) {
-
                 if (mover.GetBoardPosition() == new BoardCoord(1, WHITE_BACKROW)) {
                     ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
                     MakeDirectMove(castlingPiece, new BoardCoord(2, mover.GetBoardPosition().y), false);

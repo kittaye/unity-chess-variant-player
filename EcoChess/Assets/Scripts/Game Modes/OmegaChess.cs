@@ -111,9 +111,10 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override BoardCoord TryAddAvailableEnPassantMove(Pawn mover) {
+        protected override BoardCoord[] TryAddAvailableEnPassantMoves(Pawn mover) {
             const int LEFT = -1;
             const int RIGHT = 1;
+            List<BoardCoord> enpassantMoves = new List<BoardCoord>(1);
 
             if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
@@ -125,7 +126,7 @@ namespace ChessGameModes {
                             if (piece != null) {
                                 if (piece is Pawn && piece == GetLastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
                                     if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
-                                        return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1));
+                                        enpassantMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1)));
                                     }
                                 } else {
                                     break;
@@ -136,7 +137,7 @@ namespace ChessGameModes {
                     }
                 }
             }
-            return BoardCoord.NULL;
+            return enpassantMoves.ToArray();
         }
 
         protected override Pawn CheckPawnEnPassantCapture(Pawn mover, BoardCoord moverPreviousPosition, ref string moveNotation) {
@@ -166,8 +167,8 @@ namespace ChessGameModes {
         protected override List<ChessPiece> GetAllPossibleCheckThreats(ChessPiece pieceToCheck) {
             List<ChessPiece> possibleCheckThreats = base.GetAllPossibleCheckThreats(pieceToCheck);
 
-            GetPiecesOfType<Wizard>(pieceToCheck.GetOpposingTeam()).ForEach(x => { possibleCheckThreats.Add(x); });
-            GetPiecesOfType<Champion>(pieceToCheck.GetOpposingTeam()).ForEach(x => { possibleCheckThreats.Add(x); });
+            GetAllPiecesOfType<Wizard>(pieceToCheck.GetOpposingTeam()).ForEach(x => { possibleCheckThreats.Add(x); });
+            GetAllPiecesOfType<Champion>(pieceToCheck.GetOpposingTeam()).ForEach(x => { possibleCheckThreats.Add(x); });
 
             return possibleCheckThreats;
         }

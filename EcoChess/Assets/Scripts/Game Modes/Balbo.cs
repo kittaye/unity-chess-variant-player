@@ -103,37 +103,33 @@ namespace ChessGameModes {
             return null;
         }
 
-        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
+        public override void DisplayUIIfCanPromote(ChessPiece mover, BoardCoord[] availableMoves) {
+            if (CanPromote((Pawn)mover, availableMoves)) {
+                SelectedPawnPromotion = Piece.Queen;
+                PawnPromotionOptions = allPromotionOptions;
 
-            for (int i = 0; i < templateMoves.Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
+                for (int i = 0; i < availableMoves.Length; i++) {
+                    if (availableMoves[i] == new BoardCoord(2, 2) || availableMoves[i] == new BoardCoord(2, 7)
+                        || availableMoves[i] == new BoardCoord(8, 2) || availableMoves[i] == new BoardCoord(8, 7)) {
+                        SelectedPawnPromotion = Piece.Bishop;
+                        PawnPromotionOptions = limitedPromotionOptions;
+                        break;
+                    }
                 }
-            }
 
-            if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 0) {
+                OnDisplayPromotionUI(true);
+            }
+        }
+
+        public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
+            List<BoardCoord> availableMoves = new List<BoardCoord>();
+
+            availableMoves.AddRange(GetLegalTemplateMoves(mover));
+
+            if (IsRoyal(mover)) {
                 availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions));
             } else if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    // This is where the code differs from the base method. More specific pawn promotion mechanics.
-                    SelectedPawnPromotion = Piece.Queen;
-                    PawnPromotionOptions = allPromotionOptions;
-                    for (int i = 0; i < availableMoves.Count; i++) {
-                        if (availableMoves[i] == new BoardCoord(2, 2) || availableMoves[i] == new BoardCoord(2, 7)
-                            || availableMoves[i] == new BoardCoord(8, 2) || availableMoves[i] == new BoardCoord(8, 7)) {
-                            SelectedPawnPromotion = Piece.Bishop;
-                            PawnPromotionOptions = limitedPromotionOptions;
-                            break;
-                        }
-                    }
-                    OnDisplayPromotionUI(true);
-                }
+                availableMoves.AddRange(TryAddAvailableEnPassantMoves((Pawn)mover));
             }
 
             return availableMoves;

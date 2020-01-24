@@ -113,27 +113,22 @@ namespace ChessGameModes {
                 }
             }
 
-            if (mover is King && mover.MoveCount == 0) {
+            if (IsRoyal(mover)) {
                 if (mover == currentRoyalPiece) {
                     availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions, canCastleRightward: false));
                 } else if (mover == secondCurrentKing) {
                     availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions, canCastleLeftward: false));
                 }
             } else if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    OnDisplayPromotionUI(true);
-                }
+                availableMoves.AddRange(TryAddAvailableEnPassantMoves((Pawn)mover));
             }
             return availableMoves;
         }
 
-        protected override BoardCoord TryAddAvailableEnPassantMove(Pawn mover) {
+        protected override BoardCoord[] TryAddAvailableEnPassantMoves(Pawn mover) {
             const int LEFT = -1;
             const int RIGHT = 1;
+            List<BoardCoord> enpassantMoves = new List<BoardCoord>(1);
 
             if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
@@ -145,7 +140,7 @@ namespace ChessGameModes {
                             if (piece != null) {
                                 if (piece is Pawn && piece == GetLastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
                                     if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
-                                        return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1));
+                                        enpassantMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1)));
                                     }
                                 } else {
                                     break;
@@ -156,7 +151,7 @@ namespace ChessGameModes {
                     }
                 }
             }
-            return BoardCoord.NULL;
+            return enpassantMoves.ToArray();
         }
 
         protected override Pawn CheckPawnEnPassantCapture(Pawn mover, BoardCoord moverPreviousPosition, ref string moveNotation) {

@@ -58,17 +58,12 @@ namespace ChessGameModes {
                 if (isValid) availableMoves.Add(templateMoves[i]);
             }
 
-            if (mover is King && mover.MoveCount == 0) {
+            if (IsRoyal(mover)) {
                 availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions));
             } else if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    OnDisplayPromotionUI(true);
-                }
+                availableMoves.AddRange(TryAddAvailableEnPassantMoves((Pawn)mover));
             }
+
             return availableMoves;
         }
 
@@ -121,9 +116,10 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override BoardCoord TryAddAvailableEnPassantMove(Pawn mover) {
+        protected override BoardCoord[] TryAddAvailableEnPassantMoves(Pawn mover) {
             const int LEFT = -1;
             const int RIGHT = 1;
+            List<BoardCoord> enpassantMoves = new List<BoardCoord>(1);
 
             if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
@@ -142,13 +138,15 @@ namespace ChessGameModes {
                                         }
                                     }
                                 }
-                                if (isValid) return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1));
+                                if (isValid) {
+                                    enpassantMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1)));
+                                }
                             }
                         }
                     }
                 }
             }
-            return BoardCoord.NULL;
+            return enpassantMoves.ToArray();
         }
     }
 }

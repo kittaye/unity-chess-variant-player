@@ -51,9 +51,10 @@ namespace ChessGameModes {
             }
         }
 
-        protected override BoardCoord TryAddAvailableEnPassantMove(Pawn mover) {
+        protected override BoardCoord[] TryAddAvailableEnPassantMoves(Pawn mover) {
             const int LEFT = -1;
             const int RIGHT = 1;
+            List<BoardCoord> enpassantMoves = new List<BoardCoord>(1);
 
             if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
@@ -62,13 +63,13 @@ namespace ChessGameModes {
                         ChessPiece piece = Board.GetCoordInfo(coord).occupier;
                         if (piece is Pawn && piece == GetLastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
                             if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(0, 1)) == false) {
-                                return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(0, 1));
+                                enpassantMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(0, 1)));
                             }
                         }
                     }
                 }
             }
-            return BoardCoord.NULL;
+            return enpassantMoves.ToArray();
         }
 
         protected override Pawn CheckPawnEnPassantCapture(Pawn mover, BoardCoord moverPreviousPosition, ref string moveNotation) {

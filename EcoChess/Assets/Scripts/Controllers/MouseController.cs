@@ -106,6 +106,10 @@ public class MouseController : MonoBehaviour {
                     selectedObject.SetActive(true);
 
                     chessGame.Board.HighlightCoordinates(selectedOccupierMoves.ToArray());
+
+                    if (chessGame.AllowPawnPromotion && lastSelectedOccupier is Pawn) {
+                        chessGame.DisplayUIIfCanPromote(lastSelectedOccupier, lastSelectedOccupierAvailableMoves.ToArray());
+                    }
                 }
                 return;
             }
