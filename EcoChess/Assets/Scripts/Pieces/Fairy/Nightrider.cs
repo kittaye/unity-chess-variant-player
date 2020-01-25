@@ -24,16 +24,16 @@ public class Nightrider : ChessPiece {
     public override List<BoardCoord> CalculateTemplateMoves() {
         List<BoardCoord> moves = new List<BoardCoord>();
         // Vertical "L" movements
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 1, 2));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -1, 2));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 1, -2));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -1, -2));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 1, 2));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -1, 2));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 1, -2));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -1, -2));
 
         // Horizontal "L" movements
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 2, 1));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -2, 1));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 2, -1));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -2, -1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 2, 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -2, 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 2, -1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -2, -1));
 
         return moves;
     }

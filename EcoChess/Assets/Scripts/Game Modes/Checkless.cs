@@ -51,21 +51,15 @@ namespace ChessGameModes {
             return availableMoves;
         }
 
-        private bool IsPieceInCheckMateAfterThisMove(ChessPiece pieceToCheck, ChessPiece mover, BoardCoord dest) {
-            if (AssertContainsCoord(dest)) {
+        private bool IsPieceInCheckMateAfterThisMove(ChessPiece pieceToCheck, ChessPiece mover, BoardCoord destination) {
+            if (AssertContainsCoord(destination)) {
                 if (checkingForCheckmate) return false;
 
                 // Temporarily simulate the move actually happening
-                ChessPiece originalOccupier = Board.GetCoordInfo(dest).occupier;
+                ChessPiece originalOccupier = Board.GetCoordInfo(destination).occupier;
                 ChessPiece originalLastMover;
                 BoardCoord oldPos = mover.GetBoardPosition();
-                SimulateMove(mover, dest, originalOccupier, out originalLastMover);
-
-                ChessPiece occupier = null;
-                if (mover is Pawn) {
-                    string dummy = string.Empty;
-                    occupier = CheckPawnEnPassantCapture((Pawn)mover, oldPos, ref dummy);
-                }
+                SimulateMove(mover, destination, originalOccupier, out originalLastMover);
 
                 // Check whether the piece is checkmated after this temporary move
                 bool hasAnyMoves = false;
@@ -84,14 +78,8 @@ namespace ChessGameModes {
                 }
                 checkingForCheckmate = false;
 
-                if (occupier != null) {
-                    Board.GetCoordInfo(occupier.GetBoardPosition()).occupier = occupier;
-                    occupier.IsAlive = true;
-                    occupier.gameObject.SetActive(true);
-                }
-
                 // Revert the temporary move back to normal
-                RevertSimulatedMove(mover, dest, originalOccupier, originalLastMover, oldPos);
+                RevertSimulatedMove(mover, destination, originalOccupier, originalLastMover, oldPos);
 
                 return hasAnyMoves == false;
             }

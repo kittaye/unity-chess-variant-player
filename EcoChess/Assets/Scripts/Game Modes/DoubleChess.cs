@@ -44,8 +44,8 @@ namespace ChessGameModes {
             );
         }
 
-        public override void OnMoveComplete() {
-            base.OnMoveComplete();
+        protected override void SwapCurrentAndOpposingRoyaltyPieces() {
+            base.SwapCurrentAndOpposingRoyaltyPieces();
 
             King temp = secondCurrentKing;
             secondCurrentKing = secondOpposingKing;
@@ -83,9 +83,8 @@ namespace ChessGameModes {
             }
         }
 
-        protected override bool TryPerformCastlingRookMoves(ChessPiece mover, ref string moveNotation) {
-            if (mover.MoveCount == 1 && mover == currentRoyalPiece) {
-
+        protected override bool TryPerformCastlingMove(ChessPiece mover, ref string moveNotation) {
+            if (mover.MoveCount == 1) {
                 if (mover.GetBoardPosition().x == 2) {
                     ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
                     MakeDirectMove(castlingPiece, new BoardCoord(3, mover.GetBoardPosition().y), false);
@@ -138,7 +137,7 @@ namespace ChessGameModes {
                         if (Board.ContainsCoord(coord)) {
                             ChessPiece piece = Board.GetCoordInfo(coord).occupier;
                             if (piece != null) {
-                                if (piece is Pawn && piece == GetLastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
+                                if (piece is Pawn && piece == GetLastMovedOpposingPiece(mover) && ((Pawn)piece).enPassantVulnerable) {
                                     if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
                                         enpassantMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1)));
                                     }
@@ -154,17 +153,20 @@ namespace ChessGameModes {
             return enpassantMoves.ToArray();
         }
 
-        protected override Pawn CheckPawnEnPassantCapture(Pawn mover, BoardCoord moverPreviousPosition, ref string moveNotation) {
+        protected override Pawn TryPerformPawnEnPassantCapture(Pawn mover, ref string moveNotation) {
+            BoardCoord oldPos = mover.MoveStateHistory.Peek().position;
+            BoardCoord newPos = mover.GetBoardPosition();
             int y = -1;
+
             while(Board.ContainsCoord(mover.GetRelativeBoardCoord(0, y))) {
                 ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(0, y)).occupier;
 
                 if(occupier != null) {
                     if (IsThreat(mover, occupier.GetBoardPosition())) {
-                        if (occupier is Pawn && ((Pawn)occupier).validEnPassant) {
+                        if (occupier is Pawn && ((Pawn)occupier).enPassantVulnerable) {
                             mover.CaptureCount++;
                             KillPiece(occupier);
-                            moveNotation = Board.GetCoordInfo(moverPreviousPosition).file + "x" + Board.GetCoordInfo(mover.GetBoardPosition()).algebraicKey + "e.p.";
+                            moveNotation = Board.GetCoordInfo(oldPos).file + "x" + Board.GetCoordInfo(newPos).algebraicKey + "e.p.";
                             return (Pawn)occupier;
                         } else {
                             return null;

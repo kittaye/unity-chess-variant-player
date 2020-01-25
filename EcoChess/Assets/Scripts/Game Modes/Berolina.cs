@@ -61,7 +61,7 @@ namespace ChessGameModes {
                     BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
                     if (Board.ContainsCoord(coord)) {
                         ChessPiece piece = Board.GetCoordInfo(coord).occupier;
-                        if (piece is Pawn && piece == GetLastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
+                        if (piece is Pawn && piece == GetLastMovedOpposingPiece(mover) && ((Pawn)piece).enPassantVulnerable) {
                             if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(0, 1)) == false) {
                                 enpassantMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(0, 1)));
                             }
@@ -72,17 +72,20 @@ namespace ChessGameModes {
             return enpassantMoves.ToArray();
         }
 
-        protected override Pawn CheckPawnEnPassantCapture(Pawn mover, BoardCoord moverPreviousPosition, ref string moveNotation) {
+        protected override Pawn TryPerformPawnEnPassantCapture(Pawn mover, ref string moveNotation) {
             const int LEFT = -1;
             const int RIGHT = 1;
+
+            BoardCoord oldPos = mover.MoveStateHistory.Peek().position;
+            BoardCoord newPos = mover.GetBoardPosition();
 
             for (int i = LEFT; i <= RIGHT; i += 2) {
                 if (Board.ContainsCoord(mover.GetRelativeBoardCoord(i, -1)) && IsThreat(mover, mover.GetRelativeBoardCoord(i, -1))) {
                     ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(i, -1)).occupier;
-                    if (occupier != null && occupier is Pawn && ((Pawn)occupier).validEnPassant) {
+                    if (occupier != null && occupier is Pawn && ((Pawn)occupier).enPassantVulnerable) {
                         mover.CaptureCount++;
                         KillPiece(occupier);
-                        moveNotation = Board.GetCoordInfo(moverPreviousPosition).file + "x" + Board.GetCoordInfo(mover.GetBoardPosition()).algebraicKey + "e.p.";
+                        moveNotation = Board.GetCoordInfo(oldPos).file + "x" + Board.GetCoordInfo(newPos).algebraicKey + "e.p.";
                         return (Pawn)occupier;
                     }
                 }

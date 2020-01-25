@@ -18,10 +18,10 @@ public class LeganPawn : Pawn {
     public override List<BoardCoord> CalculateTemplateMoves() {
         List<BoardCoord> moves = new List<BoardCoord>();
 
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, cap: 1, threatAttackLimit: 0));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, moveCap: 1, threatAttackLimit: 0));
 
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up, cap: 1, threatsOnly: true));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Left, cap: 1, threatsOnly: true));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up, moveCap: 1, threatsOnly: true));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Left, moveCap: 1, threatsOnly: true));
 
         return moves;
     }

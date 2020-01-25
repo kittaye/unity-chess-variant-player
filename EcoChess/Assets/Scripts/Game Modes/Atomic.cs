@@ -68,9 +68,9 @@ namespace ChessGameModes {
         }
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            BoardCoord oldPos = mover.GetBoardPosition();
             bool pieceCaptured = IsThreat(mover, destination);
 
+            // Try make the move.
             string moveNotation = MakeDirectMove(mover, destination);
             if (moveNotation != null) {
                 if (pieceCaptured) {
@@ -84,12 +84,13 @@ namespace ChessGameModes {
                     }
                     KillPiece(mover);
                 } else {
-                    if (mover == currentRoyalPiece && mover.MoveCount == 1) {
-                        TryPerformCastlingRookMoves((King)mover, ref moveNotation);
+                    if (IsRoyal(mover)) {
+                        TryPerformCastlingMove((King)mover, ref moveNotation);
                     } else if (mover is Pawn) {
-                        ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
-                        CheckPawnEnPassantCapture((Pawn)mover, oldPos, ref moveNotation);
-                        CheckPawnPromotion((Pawn)mover, ref moveNotation);
+                        ((Pawn)mover).enPassantVulnerable = CheckEnPassantVulnerability((Pawn)mover);
+
+                        TryPerformPawnEnPassantCapture((Pawn)mover, ref moveNotation);
+                        TryPerformPawnPromotion((Pawn)mover, ref moveNotation);
                     }
                 }
                 GameMoveNotations.Push(moveNotation);
@@ -126,7 +127,7 @@ namespace ChessGameModes {
                     BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
                     if (Board.ContainsCoord(coord)) {
                         ChessPiece piece = Board.GetCoordInfo(coord).occupier;
-                        if (piece is Pawn && piece == GetLastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
+                        if (piece is Pawn && piece == GetLastMovedOpposingPiece(mover) && ((Pawn)piece).enPassantVulnerable) {
                             if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
                                 bool isValid = true;
                                 for (int x = -1; x <= 1 && isValid; x++) {

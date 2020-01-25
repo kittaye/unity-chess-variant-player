@@ -121,18 +121,20 @@ namespace ChessGameModes {
             return availableMoves;
         }
 
-        protected override bool TryPerformCastlingRookMoves(ChessPiece mover, ref string moveNotation) {
-            if (mover.GetBoardPosition().x == 1) {
-                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
-                MakeDirectMove(castlingPiece, new BoardCoord(2, mover.GetBoardPosition().y), false);
-                moveNotation = "O-O";
-                return true;
+        protected override bool TryPerformCastlingMove(ChessPiece mover, ref string moveNotation) {
+            if (mover.MoveCount == 1) {
+                if (mover.GetBoardPosition().x == 1) {
+                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
+                    MakeDirectMove(castlingPiece, new BoardCoord(2, mover.GetBoardPosition().y), false);
+                    moveNotation = "O-O";
+                    return true;
 
-            } else if (mover.GetBoardPosition().x == 7) {
-                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).occupier;
-                MakeDirectMove(castlingPiece, new BoardCoord(6, mover.GetBoardPosition().y), false);
-                moveNotation = "O-O";
-                return true;
+                } else if (mover.GetBoardPosition().x == 7) {
+                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).occupier;
+                    MakeDirectMove(castlingPiece, new BoardCoord(6, mover.GetBoardPosition().y), false);
+                    moveNotation = "O-O";
+                    return true;
+                }
             }
             return false;
         }

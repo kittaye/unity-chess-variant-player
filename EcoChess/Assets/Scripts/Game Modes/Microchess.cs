@@ -67,8 +67,8 @@ namespace ChessGameModes {
             return availableMoves;
         }
 
-        protected override bool TryPerformCastlingRookMoves(ChessPiece mover, ref string moveNotation) {
-            if (mover.MoveCount == 1 && mover == currentRoyalPiece) {
+        protected override bool TryPerformCastlingMove(ChessPiece mover, ref string moveNotation) {
+            if (mover.MoveCount == 1) {
                 if (mover.GetBoardPosition() == new BoardCoord(1, WHITE_BACKROW)) {
                     ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
                     MakeDirectMove(castlingPiece, new BoardCoord(2, mover.GetBoardPosition().y), false);

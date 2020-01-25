@@ -93,24 +93,25 @@ namespace ChessGameModes {
             }
         }
 
-        protected override bool IsPieceInCheckAfterThisMove(ChessPiece pieceToCheck, ChessPiece mover, BoardCoord dest) {
+        protected override bool IsPieceInCheckAfterThisMove(ChessPiece pieceToCheck, ChessPiece mover, BoardCoord destination) {
             return false;
         }
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            BoardCoord oldPos = mover.GetBoardPosition();
             ChessPiece capturedPiece = Board.GetCoordInfo(destination).occupier;
 
             // Try make the move
             string moveNotation = MakeDirectMove(mover, destination);
             if (moveNotation != null) {
                 // Check castling moves
-                if (mover == currentRoyalPiece && mover.MoveCount == 1) {
-                    TryPerformCastlingRookMoves(mover, ref moveNotation);
+                if (IsRoyal(mover)) {
+                    TryPerformCastlingMove(mover, ref moveNotation);
                 } else if (mover is Pawn) {
-                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
-                    CheckPawnEnPassantCapture((Pawn)mover, oldPos, ref moveNotation);
-                    ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover, ref moveNotation);
+                    ((Pawn)mover).enPassantVulnerable = CheckEnPassantVulnerability((Pawn)mover);
+
+                    TryPerformPawnEnPassantCapture((Pawn)mover, ref moveNotation);
+
+                    ChessPiece promotedPiece = TryPerformPawnPromotion((Pawn)mover, ref moveNotation);
                     if (promotedPiece != null) {
                         if (GetCurrentTeamTurn() == Team.WHITE) {
                             whitePieceCounts[Piece.Pawn]--;

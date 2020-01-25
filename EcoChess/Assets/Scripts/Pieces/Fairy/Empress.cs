@@ -30,16 +30,16 @@ public class Empress : ChessPiece {
         moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Right));
 
         // Vertical "L" movements
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 1, 2, cap: 1));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -1, 2, cap: 1));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 1, -2, cap: 1));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -1, -2, cap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 1, 2, moveCap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -1, 2, moveCap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 1, -2, moveCap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -1, -2, moveCap: 1));
 
         // Horizontal "L" movements
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 2, 1, cap: 1));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -2, 1, cap: 1));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 2, -1, cap: 1));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -2, -1, cap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 2, 1, moveCap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -2, 1, moveCap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 2, -1, moveCap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -2, -1, moveCap: 1));
 
         return moves;
     }

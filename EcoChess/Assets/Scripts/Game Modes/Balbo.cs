@@ -91,7 +91,7 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
+        protected override ChessPiece TryPerformPawnPromotion(Pawn mover, ref string moveNotation) {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
                 KillPiece(mover);
 
@@ -103,7 +103,7 @@ namespace ChessGameModes {
             return null;
         }
 
-        public override void DisplayUIIfCanPromote(ChessPiece mover, BoardCoord[] availableMoves) {
+        public override void DisplayPromotionOptionsUIIfCanPromote(ChessPiece mover, BoardCoord[] availableMoves) {
             if (CanPromote((Pawn)mover, availableMoves)) {
                 SelectedPawnPromotion = Piece.Queen;
                 PawnPromotionOptions = allPromotionOptions;

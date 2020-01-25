@@ -79,9 +79,8 @@ namespace ChessGameModes {
             return possibleCheckThreats;
         }
 
-        protected override bool TryPerformCastlingRookMoves(ChessPiece mover, ref string moveNotation) {
-            if (mover.MoveCount == 1 && mover == currentRoyalPiece) {
-
+        protected override bool TryPerformCastlingMove(ChessPiece mover, ref string moveNotation) {
+            if (mover.MoveCount == 1) {
                 if (mover.GetBoardPosition().x == 2) {
                     ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
                     MakeDirectMove(castlingPiece, new BoardCoord(3, mover.GetBoardPosition().y), false);

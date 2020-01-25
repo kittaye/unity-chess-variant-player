@@ -62,7 +62,7 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override bool IsPieceInCheckAfterThisMove(ChessPiece pieceToCheck, ChessPiece mover, BoardCoord dest) {
+        protected override bool IsPieceInCheckAfterThisMove(ChessPiece pieceToCheck, ChessPiece mover, BoardCoord destination) {
             return false;
         }
 

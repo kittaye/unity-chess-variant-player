@@ -117,7 +117,7 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
+        protected override ChessPiece TryPerformPawnPromotion(Pawn mover, ref string moveNotation) {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
                 KillPiece(mover);
 

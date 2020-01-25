@@ -112,19 +112,19 @@ namespace ChessGameModes {
             return availableMoves;
         }
 
-        private bool IsAKingInCheckAfterThisMove(ChessPiece mover, BoardCoord dest) {
-            if (AssertContainsCoord(dest)) {
+        private bool IsAKingInCheckAfterThisMove(ChessPiece mover, BoardCoord destination) {
+            if (AssertContainsCoord(destination)) {
                 // Temporarily simulate the move actually happening
-                ChessPiece originalOccupier = Board.GetCoordInfo(dest).occupier;
+                ChessPiece originalOccupier = Board.GetCoordInfo(destination).occupier;
                 ChessPiece originalLastMover;
                 BoardCoord oldPos = mover.GetBoardPosition();
-                SimulateMove(mover, dest, originalOccupier, out originalLastMover);
+                SimulateMove(mover, destination, originalOccupier, out originalLastMover);
 
                 // Check if either king is in check after this temporary move
                 bool kingChecked = IsPieceInCheck(currentRoyalPiece) || IsPieceInCheck(opposingRoyalPiece);
 
                 // Revert the temporary move back to normal
-                RevertSimulatedMove(mover, dest, originalOccupier, originalLastMover, oldPos);
+                RevertSimulatedMove(mover, destination, originalOccupier, originalLastMover, oldPos);
 
                 return kingChecked;
             }

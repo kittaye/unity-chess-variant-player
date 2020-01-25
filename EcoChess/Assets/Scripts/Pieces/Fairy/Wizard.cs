@@ -24,22 +24,22 @@ public class Wizard : ChessPiece {
     public override List<BoardCoord> CalculateTemplateMoves() {
         List<BoardCoord> moves = new List<BoardCoord>();
 
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, cap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight, cap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownLeft, cap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownRight, cap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, moveCap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight, moveCap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownLeft, moveCap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownRight, moveCap: 1));
 
         // Vertical "L" movements
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 1, 3, cap: 1));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -1, 3, cap: 1));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 1, -3, cap: 1));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -1, -3, cap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 1, 3, moveCap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -1, 3, moveCap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 1, -3, moveCap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -1, -3, moveCap: 1));
 
         // Horizontal "L" movements
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 3, 1, cap: 1));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -3, 1, cap: 1));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, 3, -1, cap: 1));
-        moves.AddRange(chessGame.TryGetCustomDirectionalMoves(this, -3, -1, cap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 3, 1, moveCap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -3, 1, moveCap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 3, -1, moveCap: 1));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -3, -1, moveCap: 1));
 
         return moves;
     }

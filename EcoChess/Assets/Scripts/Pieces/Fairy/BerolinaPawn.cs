@@ -26,10 +26,10 @@ public class BerolinaPawn : Pawn {
 
         uint moveCap = (MoveCount == 0) ? initialMoveLimit : 1;
 
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight, cap: moveCap, threatAttackLimit: 0));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, cap: moveCap, threatAttackLimit: 0));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight, moveCap: moveCap, threatAttackLimit: 0));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, moveCap: moveCap, threatAttackLimit: 0));
 
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up, cap: 1, threatsOnly: true));
+        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up, moveCap: 1, threatsOnly: true));
 
         return moves;
     }

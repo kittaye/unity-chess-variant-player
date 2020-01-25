@@ -224,7 +224,7 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
+        protected override ChessPiece TryPerformPawnPromotion(Pawn mover, ref string moveNotation) {
             if (promotionSquares.Contains(mover.GetBoardPosition())) {
                 KillPiece(mover);
 
@@ -496,12 +496,12 @@ namespace ChessGameModes {
                         return true;
 
                         // Else try perform castling move.
-                    } else if (mover.MoveCount == 1) {
-                        TryPerformCastlingRookMoves(mover, ref moveNotation);
+                    } else {
+                        TryPerformCastlingMove(mover, ref moveNotation);
                     } 
                 } else if (mover is Pawn) {
                     if (mover is SovereignPawn) UpdatePawnQuadrant((SovereignPawn)mover);
-                    ChessPiece promotedPiece = CheckPawnPromotion((Pawn)mover, ref moveNotation);
+                    ChessPiece promotedPiece = TryPerformPawnPromotion((Pawn)mover, ref moveNotation);
                     if (promotedPiece != null) {
                         mover = promotedPiece;
                         if(mover is King) {
@@ -662,28 +662,30 @@ namespace ChessGameModes {
             return new BoardCoord[0];
         }
 
-        protected override bool TryPerformCastlingRookMoves(ChessPiece mover, ref string moveNotation) {
+        protected override bool TryPerformCastlingMove(ChessPiece mover, ref string moveNotation) {
             ChessPiece castlingPiece = null;
 
-            if (mover.GetBoardPosition().x < 7) {
-                if (GetTeamOwnedColour(mover) == whiteCurrentOwnedColour) {
-                    castlingPiece = aSideWhiteRook;
-                } else {
-                    castlingPiece = aSideBlackRook;
-                }
-                MakeDirectMove(castlingPiece, new BoardCoord(mover.GetBoardPosition().x + 1, mover.GetBoardPosition().y), false);
-                moveNotation = "O-O-O";
-                return true;
+            if (mover.MoveCount == 1) {
+                if (mover.GetBoardPosition().x < 7) {
+                    if (GetTeamOwnedColour(mover) == whiteCurrentOwnedColour) {
+                        castlingPiece = aSideWhiteRook;
+                    } else {
+                        castlingPiece = aSideBlackRook;
+                    }
+                    MakeDirectMove(castlingPiece, new BoardCoord(mover.GetBoardPosition().x + 1, mover.GetBoardPosition().y), false);
+                    moveNotation = "O-O-O";
+                    return true;
 
-            } else if (mover.GetBoardPosition().x > 9) {
-                if (GetTeamOwnedColour(mover) == whiteCurrentOwnedColour) {
-                    castlingPiece = hSideWhiteRook;
-                } else {
-                    castlingPiece = hSideBlackRook;
+                } else if (mover.GetBoardPosition().x > 9) {
+                    if (GetTeamOwnedColour(mover) == whiteCurrentOwnedColour) {
+                        castlingPiece = hSideWhiteRook;
+                    } else {
+                        castlingPiece = hSideBlackRook;
+                    }
+                    MakeDirectMove(castlingPiece, new BoardCoord(mover.GetBoardPosition().x - 1, mover.GetBoardPosition().y), false);
+                    moveNotation = "O-O";
+                    return true;
                 }
-                MakeDirectMove(castlingPiece, new BoardCoord(mover.GetBoardPosition().x - 1, mover.GetBoardPosition().y), false);
-                moveNotation = "O-O";
-                return true;
             }
             return false;
         }

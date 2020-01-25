@@ -147,7 +147,6 @@ namespace ChessGameModes {
         }
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            BoardCoord oldPos = mover.GetBoardPosition();
             bool kingCastlingThisMove = false;
 
             ChessPiece destinationOccupier = Board.GetCoordInfo(destination).occupier;
@@ -168,11 +167,12 @@ namespace ChessGameModes {
             string moveNotation = MakeDirectMove(mover, destination);
             if (moveNotation != null) {
                 if (kingCastlingThisMove) {
-                    TryPerformCastlingRookMoves((King)mover, ref moveNotation);
+                    TryPerformCastlingMove((King)mover, ref moveNotation);
                 } else if (mover is Pawn) {
-                    ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
-                    CheckPawnEnPassantCapture((Pawn)mover, oldPos, ref moveNotation);
-                    CheckPawnPromotion((Pawn)mover, ref moveNotation);
+                    ((Pawn)mover).enPassantVulnerable = CheckEnPassantVulnerability((Pawn)mover);
+
+                    TryPerformPawnEnPassantCapture((Pawn)mover, ref moveNotation);
+                    TryPerformPawnPromotion((Pawn)mover, ref moveNotation);
                 }
                 GameMoveNotations.Push(moveNotation);
                 return true;
@@ -180,9 +180,8 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override bool TryPerformCastlingRookMoves(ChessPiece mover, ref string moveNotation) {
-            if (mover.MoveCount == 1 && mover == currentRoyalPiece) {
-
+        protected override bool TryPerformCastlingMove(ChessPiece mover, ref string moveNotation) {
+            if (mover.MoveCount == 1) {
                 if (mover.GetBoardPosition().x == 2) {
                     MakeDirectMove(castlingRook, new BoardCoord(3, mover.GetBoardPosition().y), false);
                     moveNotation = "O-O-O";
