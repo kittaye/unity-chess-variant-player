@@ -60,8 +60,8 @@ namespace ChessGameModes {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
                     if (Board.ContainsCoord(coord)) {
-                        ChessPiece piece = Board.GetCoordInfo(coord).occupier;
-                        if (piece is Pawn && piece == GetLastMovedOpposingPiece(mover) && ((Pawn)piece).enPassantVulnerable) {
+                        ChessPiece piece = Board.GetCoordInfo(coord).GetOccupier();
+                        if (piece is Pawn && CheckEnPassantVulnerability((Pawn)piece)) {
                             if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(0, 1)) == false) {
                                 enpassantMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(0, 1)));
                             }
@@ -76,13 +76,13 @@ namespace ChessGameModes {
             const int LEFT = -1;
             const int RIGHT = 1;
 
-            BoardCoord oldPos = mover.MoveStateHistory.Peek().position;
+            BoardCoord oldPos = mover.MoveStateHistory[GameMoveNotations.Count - 1].position;
             BoardCoord newPos = mover.GetBoardPosition();
 
             for (int i = LEFT; i <= RIGHT; i += 2) {
                 if (Board.ContainsCoord(mover.GetRelativeBoardCoord(i, -1)) && IsThreat(mover, mover.GetRelativeBoardCoord(i, -1))) {
-                    ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(i, -1)).occupier;
-                    if (occupier != null && occupier is Pawn && ((Pawn)occupier).enPassantVulnerable) {
+                    ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(i, -1)).GetOccupier();
+                    if (occupier != null && occupier is Pawn && CheckEnPassantVulnerability((Pawn)occupier)) {
                         mover.CaptureCount++;
                         KillPiece(occupier);
                         moveNotation = Board.GetCoordInfo(oldPos).file + "x" + Board.GetCoordInfo(newPos).algebraicKey + "e.p.";

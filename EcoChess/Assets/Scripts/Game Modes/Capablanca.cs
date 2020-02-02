@@ -82,13 +82,13 @@ namespace ChessGameModes {
         protected override bool TryPerformCastlingMove(ChessPiece mover, ref string moveNotation) {
             if (mover.MoveCount == 1) {
                 if (mover.GetBoardPosition().x == 2) {
-                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
+                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).GetOccupier();
                     MakeDirectMove(castlingPiece, new BoardCoord(3, mover.GetBoardPosition().y), false);
                     moveNotation = "O-O-O";
                     return true;
 
                 } else if (mover.GetBoardPosition().x == 8) {
-                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).occupier;
+                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).GetOccupier();
                     MakeDirectMove(castlingPiece, new BoardCoord(7, mover.GetBoardPosition().y), false);
                     moveNotation = "O-O";
                     return true;

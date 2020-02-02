@@ -62,26 +62,26 @@ namespace ChessGameModes {
             if (mover.MoveCount == 1) {
                 if (mover.GetTeam() == Team.WHITE) {
                     if (mover.GetBoardPosition().x == 2) {
-                        ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
+                        ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).GetOccupier();
                         MakeDirectMove(castlingPiece, new BoardCoord(3, mover.GetBoardPosition().y), false);
                         moveNotation = "O-O-O";
                         return true;
 
                     } else if (mover.GetBoardPosition().x == 6) {
-                        ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).occupier;
+                        ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).GetOccupier();
                         MakeDirectMove(castlingPiece, new BoardCoord(5, mover.GetBoardPosition().y), false);
                         moveNotation = "O-O";
                         return true;
                     }
                 } else {
                     if (mover.GetBoardPosition().x == 1) {
-                        ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
+                        ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).GetOccupier();
                         MakeDirectMove(castlingPiece, new BoardCoord(2, mover.GetBoardPosition().y), false);
                         moveNotation = "O-O";
                         return true;
 
                     } else if (mover.GetBoardPosition().x == 5) {
-                        ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).occupier;
+                        ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).GetOccupier();
                         MakeDirectMove(castlingPiece, new BoardCoord(4, mover.GetBoardPosition().y), false);
                         moveNotation = "O-O-O";
                         return true;

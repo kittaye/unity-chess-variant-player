@@ -55,11 +55,7 @@ namespace ChessGameModes {
             if (AssertContainsCoord(destination)) {
                 if (checkingForCheckmate) return false;
 
-                // Temporarily simulate the move actually happening
-                ChessPiece originalOccupier = Board.GetCoordInfo(destination).occupier;
-                ChessPiece originalLastMover;
-                BoardCoord oldPos = mover.GetBoardPosition();
-                SimulateMove(mover, destination, originalOccupier, out originalLastMover);
+                SimulateMove(mover, destination);
 
                 // Check whether the piece is checkmated after this temporary move
                 bool hasAnyMoves = false;
@@ -78,8 +74,7 @@ namespace ChessGameModes {
                 }
                 checkingForCheckmate = false;
 
-                // Revert the temporary move back to normal
-                RevertSimulatedMove(mover, destination, originalOccupier, originalLastMover, oldPos);
+                RevertSimulatedMove();
 
                 return hasAnyMoves == false;
             }

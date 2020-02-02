@@ -73,26 +73,26 @@ public class MouseController : MonoBehaviour {
             }
 
             // If we clicked on an empty square or on a piece that is inactive, deselect.
-            if (selectedCoord.occupier == null || !selectedCoord.occupier.gameObject.activeInHierarchy) {
+            if (selectedCoord.GetOccupier() == null || !selectedCoord.GetOccupier().gameObject.activeInHierarchy) {
                 DeSelect();
                 return;
             }
 
-            string temp = "";
-            for (int i = 0; i < selectedCoord.occupier.MoveStateHistory.ToArray().Length; i++) {
-                temp += chessGame.Board.GetCoordInfo(selectedCoord.occupier.MoveStateHistory.ToArray()[i].position).algebraicKey + ", ";
-            }
-            Debug.Log(temp);
+            //string temp = "";
+            //for (int i = 0; i < selectedCoord.GetOccupier().MoveStateHistory.Count; i++) {
+            //    temp += chessGame.Board.GetCoordInfo(selectedCoord.GetOccupier().MoveStateHistory[i].position).algebraicKey + ", ";
+            //}
+            //Debug.Log(temp);
 
             // Otherwise, check if the selected piece is on the current mover's team.
-            if (chessGame.IsMoversTurn(selectedCoord.occupier)) {
+            if (chessGame.IsMoversTurn(selectedCoord.GetOccupier())) {
                 DeSelect();
 
                 // If so, calculate it's moves and display visual graphics for moving it around.
-                List<BoardCoord> selectedOccupierMoves = chessGame.CalculateAvailableMoves(selectedCoord.occupier);
+                List<BoardCoord> selectedOccupierMoves = chessGame.CalculateAvailableMoves(selectedCoord.GetOccupier());
                 if (selectedOccupierMoves.Count > 0) {
                     hasSelection = true;
-                    lastSelectedOccupier = selectedCoord.occupier;
+                    lastSelectedOccupier = selectedCoord.GetOccupier();
                     lastSelectedOccupierAvailableMoves = selectedOccupierMoves;
                     lastSelectedOccupier.gameObject.SetActive(false);
 

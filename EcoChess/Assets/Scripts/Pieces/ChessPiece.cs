@@ -12,7 +12,7 @@ public abstract class ChessPiece {
     public bool IsAlive { get; set; }
     public bool HasXWrapping { get; private set; }
     public bool HasYWrapping { get; private set; }
-    public Stack<PieceMoveState> MoveStateHistory { get; set; }
+    public Dictionary<int, PieceMoveState> MoveStateHistory { get; set; }
 
     protected ChessGameModes.Chess chessGame;
 
@@ -24,7 +24,7 @@ public abstract class ChessPiece {
         IsAlive = false;
         HasXWrapping = false;
         HasYWrapping = false;
-        MoveStateHistory = new Stack<PieceMoveState>();
+        MoveStateHistory = new Dictionary<int, PieceMoveState>();
     }
 
     public ChessPiece(Team team, string algebraicKeyPosition) {
@@ -38,7 +38,7 @@ public abstract class ChessPiece {
         IsAlive = false;
         HasXWrapping = false;
         HasYWrapping = false;
-        MoveStateHistory = new Stack<PieceMoveState>();
+        MoveStateHistory = new Dictionary<int, PieceMoveState>();
     }
 
     public ChessPiece(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping) {
@@ -49,7 +49,7 @@ public abstract class ChessPiece {
         IsAlive = false;
         this.HasXWrapping = allowXWrapping;
         this.HasYWrapping = allowYWrapping;
-        MoveStateHistory = new Stack<PieceMoveState>();
+        MoveStateHistory = new Dictionary<int, PieceMoveState>();
     }
 
     public ChessPiece(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping) {
@@ -63,11 +63,11 @@ public abstract class ChessPiece {
         IsAlive = false;
         this.HasXWrapping = allowXWrapping;
         this.HasYWrapping = allowYWrapping;
-        MoveStateHistory = new Stack<PieceMoveState>();
+        MoveStateHistory = new Dictionary<int, PieceMoveState>();
     }
 
-    public void UpdatePieceMoveStateHistory() {
-        MoveStateHistory.Push(new PieceMoveState(m_BoardPosition, IsAlive, MoveCount, CaptureCount));
+    public void UpdatePieceMoveStateHistory(int gameTurnNumber) {
+        MoveStateHistory.Add(gameTurnNumber, new PieceMoveState(m_BoardPosition, IsAlive, MoveCount, CaptureCount));
     }
 
     public abstract List<BoardCoord> CalculateTemplateMoves();

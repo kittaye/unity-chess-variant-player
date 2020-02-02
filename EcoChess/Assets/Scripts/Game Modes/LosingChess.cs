@@ -97,8 +97,8 @@ namespace ChessGameModes {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
                     if (Board.ContainsCoord(coord)) {
-                        ChessPiece piece = Board.GetCoordInfo(coord).occupier;
-                        if (piece is Pawn && piece == GetLastMovedOpposingPiece(mover) && ((Pawn)piece).enPassantVulnerable) {
+                        ChessPiece piece = Board.GetCoordInfo(coord).GetOccupier();
+                        if (piece is Pawn && CheckEnPassantVulnerability((Pawn)piece)) {
                             enpassantMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1)));
                         }
                     }

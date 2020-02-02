@@ -98,7 +98,7 @@ namespace ChessGameModes {
         }
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            ChessPiece capturedPiece = Board.GetCoordInfo(destination).occupier;
+            ChessPiece capturedPiece = Board.GetCoordInfo(destination).GetOccupier();
 
             // Try make the move
             string moveNotation = MakeDirectMove(mover, destination);
@@ -107,8 +107,6 @@ namespace ChessGameModes {
                 if (IsRoyal(mover)) {
                     TryPerformCastlingMove(mover, ref moveNotation);
                 } else if (mover is Pawn) {
-                    ((Pawn)mover).enPassantVulnerable = CheckEnPassantVulnerability((Pawn)mover);
-
                     TryPerformPawnEnPassantCapture((Pawn)mover, ref moveNotation);
 
                     ChessPiece promotedPiece = TryPerformPawnPromotion((Pawn)mover, ref moveNotation);
