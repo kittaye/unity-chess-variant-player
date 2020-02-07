@@ -67,18 +67,18 @@ namespace ChessGameModes {
             return availableMoves;
         }
 
-        protected override bool TryPerformCastlingMove(ChessPiece mover, ref string moveNotation) {
+        protected override bool TryPerformCastlingMove(ChessPiece mover) {
             if (mover.MoveCount == 1) {
                 if (mover.GetBoardPosition() == new BoardCoord(1, WHITE_BACKROW)) {
                     ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).GetOccupier();
                     MakeDirectMove(castlingPiece, new BoardCoord(2, mover.GetBoardPosition().y), false);
-                    moveNotation = "O-O";
+                    SetLastMoveNotationToKingSideCastle();
                     return true;
 
                 } else if (mover.GetBoardPosition() == new BoardCoord(2, BLACK_BACKROW)) {
                     ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).GetOccupier();
                     MakeDirectMove(castlingPiece, new BoardCoord(1, mover.GetBoardPosition().y), false);
-                    moveNotation = "O-O";
+                    SetLastMoveNotationToKingSideCastle();
                     return true;
                 }
             }

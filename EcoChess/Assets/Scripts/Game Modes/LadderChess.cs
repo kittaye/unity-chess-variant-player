@@ -72,25 +72,12 @@ namespace ChessGameModes {
             }
         }
 
-        protected override bool CanPromote(Pawn mover, BoardCoord[] availableMoves) {
-            for (int i = 0; i < availableMoves.Length; i++) {
-                if (promotionSquares.Contains(availableMoves[i])) {
-                    return true;
-                }
-            }
-            return false;
+        protected override bool IsAPromotionMove(BoardCoord move) {
+            return promotionSquares.Contains(move);
         }
 
-        protected override ChessPiece TryPerformPawnPromotion(Pawn mover, ref string moveNotation) {
-            if (promotionSquares.Contains(mover.GetBoardPosition())) {
-                KillPiece(mover);
-
-                ChessPiece newPromotedPiece = ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition());
-                moveNotation += string.Format("={0}", newPromotedPiece.GetLetterNotation());
-
-                return AddPieceToBoard(newPromotedPiece);
-            }
-            return null;
+        protected override bool PerformedAPromotionMove(Pawn mover) {
+            return promotionSquares.Contains(mover.GetBoardPosition());
         }
 
         public override void PopulateBoard() {

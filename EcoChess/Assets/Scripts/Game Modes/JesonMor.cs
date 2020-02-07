@@ -73,12 +73,10 @@ namespace ChessGameModes {
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
             BoardCoord oldPos = mover.GetBoardPosition();
 
-            string moveNotation = MakeDirectMove(mover, destination);
-            if (moveNotation != null) {
+            if (MakeDirectMove(mover, destination)) {
                 if (oldPos == centerSquare) {
                     gameFinished = true;
                 }
-                GameMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;

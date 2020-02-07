@@ -71,8 +71,7 @@ namespace ChessGameModes {
             bool pieceCaptured = IsThreat(mover, destination);
 
             // Try make the move.
-            string moveNotation = MakeDirectMove(mover, destination);
-            if (moveNotation != null) {
+            if (MakeDirectMove(mover, destination)) {
                 if (pieceCaptured) {
                     for (int x = -1; x <= 1; x++) {
                         for (int y = -1; y <= 1; y++) {
@@ -85,13 +84,12 @@ namespace ChessGameModes {
                     KillPiece(mover);
                 } else {
                     if (IsRoyal(mover)) {
-                        TryPerformCastlingMove((King)mover, ref moveNotation);
+                        TryPerformCastlingMove(mover);
                     } else if (mover is Pawn) {
-                        TryPerformPawnEnPassantCapture((Pawn)mover, ref moveNotation);
-                        TryPerformPawnPromotion((Pawn)mover, ref moveNotation);
+                        TryPerformPawnEnPassantCapture((Pawn)mover);
+                        TryPerformPawnPromotion((Pawn)mover);
                     }
                 }
-                GameMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;

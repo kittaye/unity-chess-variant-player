@@ -164,30 +164,28 @@ namespace ChessGameModes {
             }
 
             // Try make the move
-            string moveNotation = MakeDirectMove(mover, destination);
-            if (moveNotation != null) {
+            if (MakeDirectMove(mover, destination)) {
                 if (kingCastlingThisMove) {
-                    TryPerformCastlingMove((King)mover, ref moveNotation);
+                    TryPerformCastlingMove((King)mover);
                 } else if (mover is Pawn) {
-                    TryPerformPawnEnPassantCapture((Pawn)mover, ref moveNotation);
-                    TryPerformPawnPromotion((Pawn)mover, ref moveNotation);
+                    TryPerformPawnEnPassantCapture((Pawn)mover);
+                    TryPerformPawnPromotion((Pawn)mover);
                 }
-                GameMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;
         }
 
-        protected override bool TryPerformCastlingMove(ChessPiece mover, ref string moveNotation) {
+        protected override bool TryPerformCastlingMove(ChessPiece mover) {
             if (mover.MoveCount == 1) {
                 if (mover.GetBoardPosition().x == 2) {
                     MakeDirectMove(castlingRook, new BoardCoord(3, mover.GetBoardPosition().y), false);
-                    moveNotation = "O-O-O";
+                    SetLastMoveNotationToQueenSideCastle();
                     return true;
 
                 } else if (mover.GetBoardPosition().x == 6) {
                     MakeDirectMove(castlingRook, new BoardCoord(5, mover.GetBoardPosition().y), false);
-                    moveNotation = "O-O";
+                    SetLastMoveNotationToKingSideCastle();
                     return true;
                 }
             }

@@ -101,15 +101,14 @@ namespace ChessGameModes {
             ChessPiece capturedPiece = Board.GetCoordInfo(destination).GetOccupier();
 
             // Try make the move
-            string moveNotation = MakeDirectMove(mover, destination);
-            if (moveNotation != null) {
+            if (MakeDirectMove(mover, destination)) {
                 // Check castling moves
                 if (IsRoyal(mover)) {
-                    TryPerformCastlingMove(mover, ref moveNotation);
+                    TryPerformCastlingMove(mover);
                 } else if (mover is Pawn) {
-                    TryPerformPawnEnPassantCapture((Pawn)mover, ref moveNotation);
+                    TryPerformPawnEnPassantCapture((Pawn)mover);
 
-                    ChessPiece promotedPiece = TryPerformPawnPromotion((Pawn)mover, ref moveNotation);
+                    ChessPiece promotedPiece = TryPerformPawnPromotion((Pawn)mover);
                     if (promotedPiece != null) {
                         if (GetCurrentTeamTurn() == Team.WHITE) {
                             whitePieceCounts[Piece.Pawn]--;
@@ -131,7 +130,6 @@ namespace ChessGameModes {
                     }
                 }
 
-                GameMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;

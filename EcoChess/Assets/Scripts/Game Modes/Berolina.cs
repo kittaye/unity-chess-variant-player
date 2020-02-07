@@ -72,7 +72,7 @@ namespace ChessGameModes {
             return enpassantMoves.ToArray();
         }
 
-        protected override Pawn TryPerformPawnEnPassantCapture(Pawn mover, ref string moveNotation) {
+        protected override Pawn TryPerformPawnEnPassantCapture(Pawn mover) {
             const int LEFT = -1;
             const int RIGHT = 1;
 
@@ -85,7 +85,8 @@ namespace ChessGameModes {
                     if (occupier != null && occupier is Pawn && CheckEnPassantVulnerability((Pawn)occupier)) {
                         mover.CaptureCount++;
                         KillPiece(occupier);
-                        moveNotation = Board.GetCoordInfo(oldPos).file + "x" + Board.GetCoordInfo(newPos).algebraicKey + "e.p.";
+
+                        SetLastMoveNotationToEnPassant(oldPos, newPos);
                         return (Pawn)occupier;
                     }
                 }

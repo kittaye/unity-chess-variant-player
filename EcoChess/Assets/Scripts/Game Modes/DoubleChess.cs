@@ -83,18 +83,18 @@ namespace ChessGameModes {
             }
         }
 
-        protected override bool TryPerformCastlingMove(ChessPiece mover, ref string moveNotation) {
+        protected override bool TryPerformCastlingMove(ChessPiece mover) {
             if (mover.MoveCount == 1) {
                 if (mover.GetBoardPosition().x == 2) {
                     ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).GetOccupier();
                     MakeDirectMove(castlingPiece, new BoardCoord(3, mover.GetBoardPosition().y), false);
-                    moveNotation = "O-O-O";
+                    SetLastMoveNotationToQueenSideCastle();
                     return true;
 
                 } else if (mover.GetBoardPosition().x == 14) {
                     ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).GetOccupier();
                     MakeDirectMove(castlingPiece, new BoardCoord(13, mover.GetBoardPosition().y), false);
-                    moveNotation = "O-O";
+                    SetLastMoveNotationToKingSideCastle();
                     return true;
                 }
             }
@@ -153,7 +153,7 @@ namespace ChessGameModes {
             return enpassantMoves.ToArray();
         }
 
-        protected override Pawn TryPerformPawnEnPassantCapture(Pawn mover, ref string moveNotation) {
+        protected override Pawn TryPerformPawnEnPassantCapture(Pawn mover) {
             BoardCoord oldPos = mover.MoveStateHistory[GameMoveNotations.Count - 1].position;
             BoardCoord newPos = mover.GetBoardPosition();
             int y = -1;
@@ -166,7 +166,8 @@ namespace ChessGameModes {
                         if (occupier is Pawn && CheckEnPassantVulnerability((Pawn)occupier)) {
                             mover.CaptureCount++;
                             KillPiece(occupier);
-                            moveNotation = Board.GetCoordInfo(oldPos).file + "x" + Board.GetCoordInfo(newPos).algebraicKey + "e.p.";
+
+                            SetLastMoveNotationToEnPassant(oldPos, newPos);
                             return (Pawn)occupier;
                         } else {
                             return null;

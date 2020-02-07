@@ -209,22 +209,22 @@ namespace ChessGameModes {
             MouseController.Instance.CalculateLastOccupierAvailableMoves();
         }
 
-        protected override bool CanPromote(Pawn mover, BoardCoord[] availableMoves) {
-            for (int i = 0; i < availableMoves.Length; i++) {
-                if (promotionSquares.Contains(availableMoves[i])) {
-                    return true;
-                }
-            }
-            return false;
+        protected override bool IsAPromotionMove(BoardCoord move) {
+            return promotionSquares.Contains(move);
         }
 
-        protected override ChessPiece TryPerformPawnPromotion(Pawn mover, ref string moveNotation) {
-            if (promotionSquares.Contains(mover.GetBoardPosition())) {
+        protected override bool PerformedAPromotionMove(Pawn mover) {
+            return promotionSquares.Contains(mover.GetBoardPosition());
+        }
+
+        protected override ChessPiece TryPerformPawnPromotion(Pawn mover) {
+            if (PerformedAPromotionMove(mover)) {
                 KillPiece(mover);
 
                 ChessPiece newPromotedPiece = AddSovereignChessPiece(
                     SelectedPawnPromotion, mover.GetBoardPosition(), mover.gameObject.GetComponent<SovereignColour>().colour);
-                moveNotation += string.Format("={0}", newPromotedPiece.GetLetterNotation());
+
+                AddPromotionToLastMoveNotation(newPromotedPiece.GetLetterNotation());
                 
                 return newPromotedPiece;
             }
@@ -476,8 +476,7 @@ namespace ChessGameModes {
             Color movedFromColour = Board.GetCoordInfo(oldPos).boardChunk.GetComponent<MeshRenderer>().material.color;
 
             // Try make the move
-            string moveNotation = MakeDirectMove(mover, destination);
-            if (moveNotation != null) {
+            if (MakeDirectMove(mover, destination)) {
                 if (mover is King) {
                     if (kingHasDoubleMoveDefection) kingHasDoubleMoveDefection = false;
 
@@ -491,11 +490,11 @@ namespace ChessGameModes {
 
                         // Else try perform castling move.
                     } else {
-                        TryPerformCastlingMove(mover, ref moveNotation);
+                        TryPerformCastlingMove(mover);
                     } 
                 } else if (mover is Pawn) {
                     if (mover is SovereignPawn) UpdatePawnQuadrant((SovereignPawn)mover);
-                    ChessPiece promotedPiece = TryPerformPawnPromotion((Pawn)mover, ref moveNotation);
+                    ChessPiece promotedPiece = TryPerformPawnPromotion((Pawn)mover);
                     if (promotedPiece != null) {
                         mover = promotedPiece;
                         if(mover is King) {
@@ -528,8 +527,6 @@ namespace ChessGameModes {
                         }
                     }
                 }
-
-                GameMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;
@@ -656,7 +653,7 @@ namespace ChessGameModes {
             return new BoardCoord[0];
         }
 
-        protected override bool TryPerformCastlingMove(ChessPiece mover, ref string moveNotation) {
+        protected override bool TryPerformCastlingMove(ChessPiece mover) {
             ChessPiece castlingPiece = null;
 
             if (mover.MoveCount == 1) {
@@ -667,7 +664,7 @@ namespace ChessGameModes {
                         castlingPiece = aSideBlackRook;
                     }
                     MakeDirectMove(castlingPiece, new BoardCoord(mover.GetBoardPosition().x + 1, mover.GetBoardPosition().y), false);
-                    moveNotation = "O-O-O";
+                    SetLastMoveNotationToQueenSideCastle();
                     return true;
 
                 } else if (mover.GetBoardPosition().x > 9) {
@@ -677,7 +674,7 @@ namespace ChessGameModes {
                         castlingPiece = hSideBlackRook;
                     }
                     MakeDirectMove(castlingPiece, new BoardCoord(mover.GetBoardPosition().x - 1, mover.GetBoardPosition().y), false);
-                    moveNotation = "O-O";
+                    SetLastMoveNotationToKingSideCastle();
                     return true;
                 }
             }

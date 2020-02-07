@@ -223,28 +223,23 @@ namespace ChessGameModes {
         /// </summary>
         /// <returns>True if the destination is an available move for this piece.</returns>
         public virtual bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            // Try make the move.
-            string moveNotation = MakeDirectMove(mover, destination);
-
-            // If the move was successful...
-            if (moveNotation != null) {
+            // Make the move. If successful, try perform special cases.
+            if (MakeDirectMove(mover, destination)) {
                 if (IsRoyal(mover)) {
                     if (AllowCastling) {
-                        TryPerformCastlingMove(mover, ref moveNotation);
+                        TryPerformCastlingMove(mover);
                     }
                 }
 
                 if (mover is Pawn) {
                     if (AllowEnpassantCapture) {
-                        TryPerformPawnEnPassantCapture((Pawn)mover, ref moveNotation);
+                        TryPerformPawnEnPassantCapture((Pawn)mover);
                     }
 
                     if (AllowPawnPromotion) {
-                        TryPerformPawnPromotion((Pawn)mover, ref moveNotation);
+                        TryPerformPawnPromotion((Pawn)mover);
                     }
                 }
-
-                GameMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;
@@ -256,20 +251,20 @@ namespace ChessGameModes {
         /// <param name="mover">Piece to perform the castling move.</param>
         /// <param name="moveNotation">A reference to the current move notation.</param>
         /// <returns>True if the castle is successful.</returns>
-        protected virtual bool TryPerformCastlingMove(ChessPiece mover, ref string moveNotation) {
+        protected virtual bool TryPerformCastlingMove(ChessPiece mover) {
             if (mover.MoveCount == 1) {
                 // If the king moved to the left to castle, grab the rook on the left-side of the board to castle with and move it.
                 if (mover.GetBoardPosition().x == 2) {
                     ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).GetOccupier();
                     MakeDirectMove(castlingPiece, new BoardCoord(3, mover.GetBoardPosition().y), false);
-                    moveNotation = "O-O-O";
+                    SetLastMoveNotationToQueenSideCastle();
                     return true;
 
                     // Else the king moved right, so grab the right rook instead.
                 } else if (mover.GetBoardPosition().x == 6) {
                     ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).GetOccupier();
                     MakeDirectMove(castlingPiece, new BoardCoord(5, mover.GetBoardPosition().y), false);
-                    moveNotation = "O-O";
+                    SetLastMoveNotationToKingSideCastle();
                     return true;
                 }
             }
@@ -316,8 +311,8 @@ namespace ChessGameModes {
         /// </summary>
         /// <param name="moveNotation">A reference to the current move notation.</param>
         /// <returns>The piece that was removed.</returns>
-        protected virtual Pawn TryPerformPawnEnPassantCapture(Pawn mover, ref string moveNotation) {
-            BoardCoord oldPos = mover.MoveStateHistory[GameMoveNotations.Count].position;
+        protected virtual Pawn TryPerformPawnEnPassantCapture(Pawn mover) {
+            BoardCoord oldPos = mover.MoveStateHistory[GameMoveNotations.Count - 1].position;
             BoardCoord newPos = mover.GetBoardPosition();
 
             if (Board.ContainsCoord(mover.GetRelativeBoardCoord(0, -1)) && IsThreat(mover, mover.GetRelativeBoardCoord(0, -1))) {
@@ -325,7 +320,8 @@ namespace ChessGameModes {
                 if (occupier != null && occupier is Pawn && CheckEnPassantVulnerability((Pawn)occupier)) {
                     mover.CaptureCount++;
                     KillPiece(occupier);
-                    moveNotation = Board.GetCoordInfo(oldPos).file + "x" + Board.GetCoordInfo(newPos).algebraicKey + "e.p.";
+
+                    SetLastMoveNotationToEnPassant(oldPos, newPos);
                     return (Pawn)occupier;
                 }
             }
@@ -336,9 +332,9 @@ namespace ChessGameModes {
         /// Called in CalculateAvailableMoves. Determines if a pawn can promote on their move.
         /// </summary>
         /// <param name="availableMoves">The pawn's available moves to check.</param>
-        protected virtual bool CanPromote(Pawn mover, BoardCoord[] availableMoves) {
+        protected bool IsPromotionMoveAvailable(Pawn mover, BoardCoord[] availableMoves) {
             for (int i = 0; i < availableMoves.Length; i++) {
-                if (availableMoves[i].y == WHITE_BACKROW || availableMoves[i].y == BLACK_BACKROW) {
+                if (IsAPromotionMove(availableMoves[i])) {
                     return true;
                 }
             }
@@ -347,17 +343,32 @@ namespace ChessGameModes {
 
         /// <summary>
         /// Called in MovePiece. If a promoting move was made, the pawn is removed from the board and replaced with the selected pawn promotion.
+        /// TODO: The only variant using this virtual method is Sovereign chess. Maybe find a way to remove this?
         /// </summary>
-        protected virtual ChessPiece TryPerformPawnPromotion(Pawn mover, ref string moveNotation) {
-            if (mover.GetRelativeBoardCoord(0, 1).y < WHITE_BACKROW || mover.GetRelativeBoardCoord(0, 1).y > BLACK_BACKROW) {
+        protected virtual ChessPiece TryPerformPawnPromotion(Pawn mover) {
+            if (PerformedAPromotionMove(mover)) {
                 KillPiece(mover);
 
                 ChessPiece newPromotedPiece = ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition());
-                moveNotation += string.Format("={0}", newPromotedPiece.GetLetterNotation());
 
+                AddPromotionToLastMoveNotation(newPromotedPiece.GetLetterNotation());
                 return AddPieceToBoard(newPromotedPiece);
             }
             return null;
+        }
+
+        /// <summary>
+        /// Determines whether the move is a potential promotion move. Override this to change the condition for potential promotion moves.
+        /// </summary>
+        protected virtual bool IsAPromotionMove(BoardCoord move) {
+            return move.y == WHITE_BACKROW || move.y == BLACK_BACKROW;
+        }
+
+        /// <summary>
+        /// Determines whether the mover should be promoted. Override this to change the condition for piece promotion.
+        /// </summary>
+        protected virtual bool PerformedAPromotionMove(Pawn mover) {
+            return mover.GetRelativeBoardCoord(0, 1).y < WHITE_BACKROW || mover.GetRelativeBoardCoord(0, 1).y > BLACK_BACKROW;
         }
 
         /// <summary>
@@ -426,7 +437,7 @@ namespace ChessGameModes {
         }
 
         public virtual void DisplayPromotionOptionsUIIfCanPromote(ChessPiece mover, BoardCoord[] availableMoves) {
-            if (CanPromote((Pawn)mover, availableMoves)) {
+            if (IsPromotionMoveAvailable((Pawn)mover, availableMoves)) {
                 OnDisplayPromotionUI(true);
             }
         }
@@ -517,6 +528,30 @@ namespace ChessGameModes {
         protected void AddCheckmateToLastMoveNotation() {
             string moveNotation = GameMoveNotations.Pop();
             moveNotation += "#";
+            GameMoveNotations.Push(moveNotation);
+        }
+
+        protected void AddPromotionToLastMoveNotation(string promotedPieceNotation) {
+            string moveNotation = GameMoveNotations.Pop();
+            moveNotation += string.Format("={0}", promotedPieceNotation);
+            GameMoveNotations.Push(moveNotation);
+        }
+
+        protected void SetLastMoveNotationToEnPassant(BoardCoord oldPos, BoardCoord newPos) {
+            string moveNotation = GameMoveNotations.Pop();
+            moveNotation = Board.GetCoordInfo(oldPos).file + "x" + Board.GetCoordInfo(newPos).algebraicKey + "e.p.";
+            GameMoveNotations.Push(moveNotation);
+        }
+
+        protected void SetLastMoveNotationToKingSideCastle() {
+            string moveNotation = GameMoveNotations.Pop();
+            moveNotation = "O-O";
+            GameMoveNotations.Push(moveNotation);
+        }
+
+        protected void SetLastMoveNotationToQueenSideCastle() {
+            string moveNotation = GameMoveNotations.Pop();
+            moveNotation = "O-O-O";
             GameMoveNotations.Push(moveNotation);
         }
 
@@ -617,16 +652,16 @@ namespace ChessGameModes {
         }
 
         public List<T> GetPiecesOfType<T>(Team team) where T : ChessPiece {
-            List<ChessPiece> selectedArmy = GetPieces(team);
-            return GetPiecesOfTypeInCollection<T>(selectedArmy);
+            List<ChessPiece> selectedArmy = GetPiecesFrom(team);
+            return GetPiecesOfType<T>(selectedArmy);
         }
 
         public List<T> GetAlivePiecesOfType<T>(Team team) where T : ChessPiece {
-            List<ChessPiece> selectedArmy = GetPieces(team);
-            return GetAlivePiecesOfTypeInCollection<T>(selectedArmy);
+            List<ChessPiece> selectedArmy = GetPiecesFrom(team);
+            return GetAlivePiecesOfType<T>(selectedArmy);
         }
 
-        private List<T> GetPiecesOfTypeInCollection<T>(List<ChessPiece> pieceCollection) where T : ChessPiece {
+        private List<T> GetPiecesOfType<T>(List<ChessPiece> pieceCollection) where T : ChessPiece {
             List<T> selectionOfPieces = new List<T>();
 
             foreach (ChessPiece piece in pieceCollection) {
@@ -637,7 +672,7 @@ namespace ChessGameModes {
             return selectionOfPieces;
         }
 
-        private List<T> GetAlivePiecesOfTypeInCollection<T>(List<ChessPiece> pieceCollection) where T : ChessPiece {
+        private List<T> GetAlivePiecesOfType<T>(List<ChessPiece> pieceCollection) where T : ChessPiece {
             List<T> selectionOfPieces = new List<T>();
 
             foreach (ChessPiece piece in pieceCollection) {
@@ -648,7 +683,7 @@ namespace ChessGameModes {
             return selectionOfPieces;
         }
 
-        private List<ChessPiece> GetPieces(Team team) {
+        private List<ChessPiece> GetPiecesFrom(Team team) {
             List<ChessPiece> selectedArmy = new List<ChessPiece>();
 
             if (team == Team.WHITE) {
@@ -737,10 +772,9 @@ namespace ChessGameModes {
         /// Ensure that this method is always called for moving pieces.
         /// </summary>
         /// <returns>The basic algebraic notation describing this move. Returns null if invalid or not last mover.</returns>
-        protected string MakeDirectMove(ChessPiece mover, BoardCoord destination, bool isLastMover = true) {
-            StringBuilder moveNotation = new StringBuilder(null, 4);
-
+        protected bool MakeDirectMove(ChessPiece mover, BoardCoord destination, bool isLastMover = true) {
             if (AssertContainsCoord(destination)) {
+                StringBuilder moveNotation = new StringBuilder(null, 4);
                 BoardCoord previousPosition = mover.GetBoardPosition();
                 bool attackingThreat = IsThreat(mover, destination);
 
@@ -777,9 +811,12 @@ namespace ChessGameModes {
                 UpdateSquareOccupiers(previousPosition, destination);
                 mover.SetBoardPosition(destination);
                 mover.gameObject.transform.position = destination;
+
+                GameMoveNotations.Push(moveNotation.ToString());
+                return true;
             }
 
-            return moveNotation.ToString();
+            return false;
         }
 
         /// <summary>

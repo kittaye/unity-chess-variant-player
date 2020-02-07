@@ -84,20 +84,18 @@ namespace ChessGameModes {
             AddPieceToBoard(new Pawn(Team.BLACK, "h8"));
         }
 
-        protected override bool CanPromote(Pawn mover, BoardCoord[] availableMoves) {
-            for (int i = 0; i < availableMoves.Length; i++) {
-                if (availableMoves[i].x <= 3) {
-                    if (availableMoves[i].y == WHITE_BACKROW || availableMoves[i].y == BLACK_BACKROW - 1) {
-                        return true;
-                    }
-                } else if (availableMoves[i].x >= 5) {
-                    if (availableMoves[i].y == WHITE_BACKROW + 1 || availableMoves[i].y == BLACK_BACKROW) {
-                        return true;
-                    }
-                } else {
-                    if (availableMoves[i] == new BoardCoord(4, WHITE_BACKROW) || availableMoves[i] == new BoardCoord(4, BLACK_BACKROW)) {
-                        return true;
-                    }
+        protected override bool IsAPromotionMove(BoardCoord move) {
+            if (move.x <= 3) {
+                if (move.y == WHITE_BACKROW || move.y == BLACK_BACKROW - 1) {
+                    return true;
+                }
+            } else if (move.x >= 5) {
+                if (move.y == WHITE_BACKROW + 1 || move.y == BLACK_BACKROW) {
+                    return true;
+                }
+            } else {
+                if (move == new BoardCoord(4, WHITE_BACKROW) || move == new BoardCoord(4, BLACK_BACKROW)) {
+                    return true;
                 }
             }
             return false;
@@ -121,18 +119,18 @@ namespace ChessGameModes {
             return availableMoves;
         }
 
-        protected override bool TryPerformCastlingMove(ChessPiece mover, ref string moveNotation) {
+        protected override bool TryPerformCastlingMove(ChessPiece mover) {
             if (mover.MoveCount == 1) {
                 if (mover.GetBoardPosition().x == 1) {
                     ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).GetOccupier();
                     MakeDirectMove(castlingPiece, new BoardCoord(2, mover.GetBoardPosition().y), false);
-                    moveNotation = "O-O";
+                    SetLastMoveNotationToQueenSideCastle();
                     return true;
 
                 } else if (mover.GetBoardPosition().x == 7) {
                     ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).GetOccupier();
                     MakeDirectMove(castlingPiece, new BoardCoord(6, mover.GetBoardPosition().y), false);
-                    moveNotation = "O-O";
+                    SetLastMoveNotationToKingSideCastle();
                     return true;
                 }
             }
