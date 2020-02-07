@@ -256,19 +256,25 @@ namespace ChessGameModes {
                 // If the king moved to the left to castle, grab the rook on the left-side of the board to castle with and move it.
                 if (mover.GetBoardPosition().x == 2) {
                     ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).GetOccupier();
-                    MakeDirectMove(castlingPiece, new BoardCoord(3, mover.GetBoardPosition().y), false);
+                    UpdatePiecePositionAndOccupance(castlingPiece, new BoardCoord(3, mover.GetBoardPosition().y));
                     SetLastMoveNotationToQueenSideCastle();
                     return true;
 
                     // Else the king moved right, so grab the right rook instead.
                 } else if (mover.GetBoardPosition().x == 6) {
                     ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).GetOccupier();
-                    MakeDirectMove(castlingPiece, new BoardCoord(5, mover.GetBoardPosition().y), false);
+                    UpdatePiecePositionAndOccupance(castlingPiece, new BoardCoord(5, mover.GetBoardPosition().y));
                     SetLastMoveNotationToKingSideCastle();
                     return true;
                 }
             }
             return false;
+        }
+
+        protected void UpdatePiecePositionAndOccupance(ChessPiece piece, BoardCoord newPos) {
+            UpdateSquareOccupiers(piece.GetBoardPosition(), newPos);
+            piece.SetBoardPosition(newPos);
+            piece.gameObject.transform.position = newPos;
         }
 
         /// <summary>
@@ -771,46 +777,38 @@ namespace ChessGameModes {
         /// If rules are desired, use the virtual method MovePiece for more flexible behaviour. 
         /// Ensure that this method is always called for moving pieces.
         /// </summary>
-        /// <returns>The basic algebraic notation describing this move. Returns null if invalid or not last mover.</returns>
-        protected bool MakeDirectMove(ChessPiece mover, BoardCoord destination, bool isLastMover = true) {
+        protected bool MakeDirectMove(ChessPiece mover, BoardCoord destination) {
             if (AssertContainsCoord(destination)) {
                 StringBuilder moveNotation = new StringBuilder(null, 4);
                 BoardCoord previousPosition = mover.GetBoardPosition();
                 bool attackingThreat = IsThreat(mover, destination);
 
-                // Determine the move notation & other details for the moving piece.
-                // The only time this isn't true is if the piece we are moving is a castling piece (e.g. rook).
-                // In that case we ignore it's move notation, count, etc.
-                if (isLastMover) {
-                    mover.MoveCount++;
-                    SetLastMovedPiece(mover);
+                mover.MoveCount++;
+                SetLastMovedPiece(mover);
 
-                    moveNotation.Append(mover.GetLetterNotation());
+                moveNotation.Append(mover.GetLetterNotation());
 
-                    // This condition is needed to avoid a stack overflow when checking for check.
-                    if (checkingSimulatedMove == false) {
-                        moveNotation.Append(ResolveMoveNotationAmbiguity(mover, destination));
-                    }
-
-                    if (attackingThreat) {
-                        KillPiece(Board.GetCoordInfo(destination).GetOccupier());
-
-                        if (mover is Pawn) {
-                            moveNotation.Append(Board.GetCoordInfo(previousPosition).file);
-                        }
-                        moveNotation.Append('x');
-                        mover.CaptureCount++;
-                    }
-
-                    numConsecutiveCapturelessMoves = (attackingThreat == false && (mover is Pawn) == false) ? numConsecutiveCapturelessMoves + 1 : 0;
-
-                    moveNotation.Append(Board.GetCoordInfo(destination).algebraicKey);
+                // This condition is needed to avoid a stack overflow when checking for check.
+                if (checkingSimulatedMove == false) {
+                    moveNotation.Append(ResolveMoveNotationAmbiguity(mover, destination));
                 }
 
+                if (attackingThreat) {
+                    KillPiece(Board.GetCoordInfo(destination).GetOccupier());
+
+                    if (mover is Pawn) {
+                        moveNotation.Append(Board.GetCoordInfo(previousPosition).file);
+                    }
+                    moveNotation.Append('x');
+                    mover.CaptureCount++;
+                }
+
+                numConsecutiveCapturelessMoves = (attackingThreat == false && (mover is Pawn) == false) ? numConsecutiveCapturelessMoves + 1 : 0;
+
+                moveNotation.Append(Board.GetCoordInfo(destination).algebraicKey);
+
                 // Physically move the piece.
-                UpdateSquareOccupiers(previousPosition, destination);
-                mover.SetBoardPosition(destination);
-                mover.gameObject.transform.position = destination;
+                UpdatePiecePositionAndOccupance(mover, destination);
 
                 GameMoveNotations.Push(moveNotation.ToString());
                 return true;
@@ -942,10 +940,7 @@ namespace ChessGameModes {
                     PieceMoveState pieceMoveStateToRestore = piece.MoveStateHistory[GameMoveNotations.Count];
 
                     // Undo position & occupance.
-                    Board.GetCoordInfo(piece.GetBoardPosition()).RemoveOccupier(piece);
-                    piece.SetBoardPosition(pieceMoveStateToRestore.position);
-                    piece.gameObject.transform.position = piece.GetBoardPosition();
-                    Board.GetCoordInfo(piece.GetBoardPosition()).AddOccupier(piece);
+                    UpdatePiecePositionAndOccupance(piece, pieceMoveStateToRestore.position);
 
                     // Undo move/capture counts.
                     piece.MoveCount = pieceMoveStateToRestore.moveCount;

@@ -663,7 +663,7 @@ namespace ChessGameModes {
                     } else {
                         castlingPiece = aSideBlackRook;
                     }
-                    MakeDirectMove(castlingPiece, new BoardCoord(mover.GetBoardPosition().x + 1, mover.GetBoardPosition().y), false);
+                    UpdatePiecePositionAndOccupance(castlingPiece, new BoardCoord(mover.GetBoardPosition().x + 1, mover.GetBoardPosition().y));
                     SetLastMoveNotationToQueenSideCastle();
                     return true;
 
@@ -673,7 +673,7 @@ namespace ChessGameModes {
                     } else {
                         castlingPiece = hSideBlackRook;
                     }
-                    MakeDirectMove(castlingPiece, new BoardCoord(mover.GetBoardPosition().x - 1, mover.GetBoardPosition().y), false);
+                    UpdatePiecePositionAndOccupance(castlingPiece, new BoardCoord(mover.GetBoardPosition().x - 1, mover.GetBoardPosition().y));
                     SetLastMoveNotationToKingSideCastle();
                     return true;
                 }

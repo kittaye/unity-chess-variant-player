@@ -179,12 +179,12 @@ namespace ChessGameModes {
         protected override bool TryPerformCastlingMove(ChessPiece mover) {
             if (mover.MoveCount == 1) {
                 if (mover.GetBoardPosition().x == 2) {
-                    MakeDirectMove(castlingRook, new BoardCoord(3, mover.GetBoardPosition().y), false);
+                    UpdatePiecePositionAndOccupance(castlingRook, new BoardCoord(3, mover.GetBoardPosition().y));
                     SetLastMoveNotationToQueenSideCastle();
                     return true;
 
                 } else if (mover.GetBoardPosition().x == 6) {
-                    MakeDirectMove(castlingRook, new BoardCoord(5, mover.GetBoardPosition().y), false);
+                    UpdatePiecePositionAndOccupance(castlingRook, new BoardCoord(5, mover.GetBoardPosition().y));
                     SetLastMoveNotationToKingSideCastle();
                     return true;
                 }

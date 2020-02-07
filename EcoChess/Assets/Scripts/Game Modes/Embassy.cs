@@ -74,13 +74,13 @@ namespace ChessGameModes {
             if (mover.MoveCount == 1) {
                 if (mover.GetBoardPosition().x == 1) {
                     ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).GetOccupier();
-                    MakeDirectMove(castlingPiece, new BoardCoord(2, mover.GetBoardPosition().y), false);
+                    UpdatePiecePositionAndOccupance(castlingPiece, new BoardCoord(2, mover.GetBoardPosition().y));
                     SetLastMoveNotationToQueenSideCastle();
                     return true;
 
                 } else if (mover.GetBoardPosition().x == 7) {
                     ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).GetOccupier();
-                    MakeDirectMove(castlingPiece, new BoardCoord(6, mover.GetBoardPosition().y), false);
+                    UpdatePiecePositionAndOccupance(castlingPiece, new BoardCoord(6, mover.GetBoardPosition().y));
                     SetLastMoveNotationToKingSideCastle();
                     return true;
                 }
