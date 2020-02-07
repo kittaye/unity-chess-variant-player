@@ -128,7 +128,7 @@ namespace ChessGameModes {
 
         public override bool CheckWinState() {
             bool hasAnyMoves = false;
-            foreach (ChessPiece piece in GetAllPieces()) {
+            foreach (ChessPiece piece in GetAlivePiecesOfType<ChessPiece>()) {
                 if (GetCurrentTeamTurn() == Team.WHITE) {
                     if (whiteControlledColours.Contains(GetChessPieceColour(piece))) {
                         if (CalculateAvailableMoves(piece).Count > 0) {
@@ -164,35 +164,29 @@ namespace ChessGameModes {
         }
 
         protected override bool IsThreat(ChessPiece mover, BoardCoord coord) {
-            if (AssertContainsCoord(coord)) {
-                ChessPiece occupier = Board.GetCoordInfo(coord).GetOccupier();
-                if (occupier != null) {
-                    if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
-                        return blackControlledColours.Contains(GetChessPieceColour(occupier));
-                    } else if (blackControlledColours.Contains(GetChessPieceColour(mover))) {
-                        return whiteControlledColours.Contains(GetChessPieceColour(occupier));
-                    }
-                } else {
-                    return false;
+            ChessPiece occupier = Board.GetCoordInfo(coord).GetOccupier();
+            if (occupier != null) {
+                if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
+                    return blackControlledColours.Contains(GetChessPieceColour(occupier));
+                } else if (blackControlledColours.Contains(GetChessPieceColour(mover))) {
+                    return whiteControlledColours.Contains(GetChessPieceColour(occupier));
                 }
+            } else {
+                return false;
             }
             return false;
         }
 
         protected override bool IsAlly(ChessPiece mover, BoardCoord coord) {
-            if (AssertContainsCoord(coord)) {
-                ChessPiece occupier = Board.GetCoordInfo(coord).GetOccupier();
-                if (occupier != null) {
-                    if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
-                        return whiteControlledColours.Contains(GetChessPieceColour(occupier));
-                    } else if (blackControlledColours.Contains(GetChessPieceColour(mover))) {
-                        return blackControlledColours.Contains(GetChessPieceColour(occupier));
-                    } else {
-                        return true;
-                    }
-                } else {
-                    return false;
+            ChessPiece occupier = Board.GetCoordInfo(coord).GetOccupier();
+            if (occupier != null) {
+                if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
+                    return whiteControlledColours.Contains(GetChessPieceColour(occupier));
+                } else if (blackControlledColours.Contains(GetChessPieceColour(mover))) {
+                    return blackControlledColours.Contains(GetChessPieceColour(occupier));
                 }
+            } else {
+                return false;
             }
             return false;
         }
@@ -392,7 +386,7 @@ namespace ChessGameModes {
                     }
 
                     // Checks for check after adding appropriate colours to opposing team
-                    foreach (ChessPiece piece in GetAllPieces()) {
+                    foreach (ChessPiece piece in GetPiecesOfType<ChessPiece>()) {
                         if (piece == mover) continue;
                         // If the piece is a temporary enemy...
                         if (opposingControlledColours.Contains(GetChessPieceColour(piece))) {
@@ -562,7 +556,7 @@ namespace ChessGameModes {
                     opposingControlledColours.Add(prevOwnedClr);
 
                     // Add all colours that the mover's team previously controlled except its newly owned colour, to the opposing team.
-                    foreach (ChessPiece piece in GetAllPieces()) {
+                    foreach (ChessPiece piece in GetPiecesOfType<ChessPiece>()) {
                         Color pieceClr = GetChessPieceColour(piece);
                         if (controlledColours.Contains(pieceClr)) {
                             // Loop through all colour control parents of this piece

@@ -62,11 +62,11 @@ namespace ChessGameModes {
         }
 
         protected override List<ChessPiece> GetAllPossibleCheckThreats(ChessPiece pieceToCheck) {
-            List<ChessPiece> checkThreats = base.GetAllPossibleCheckThreats(pieceToCheck);
+            List<ChessPiece> possibleCheckThreats = base.GetAllPossibleCheckThreats(pieceToCheck);
 
-            GetAllPiecesOfType<Nightrider>(pieceToCheck.GetOpposingTeam()).ForEach((x) => { checkThreats.Add(x); });
+            possibleCheckThreats.AddRange(GetAlivePiecesOfType<Nightrider>(pieceToCheck.GetOpposingTeam()));
 
-            return checkThreats;
+            return possibleCheckThreats;
         }
     }
 }

@@ -32,7 +32,7 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            if (GetAllPieces(GetCurrentTeamTurn()).TrueForAll(x => x.IsAlive == false)) {
+            if (GetAlivePiecesOfType<ChessPiece>(GetCurrentTeamTurn()).Count == 0) {
                 UIManager.Instance.LogCustom("Team " + GetCurrentTeamTurn().ToString() + " has lost all pieces -- Team " + GetCurrentTeamTurn().ToString() + " wins!");
                 return true;
             }
@@ -77,7 +77,7 @@ namespace ChessGameModes {
         }
 
         private bool CanCaptureAPiece() {
-            foreach (ChessPiece piece in GetAllPieces(GetCurrentTeamTurn())) {
+            foreach (ChessPiece piece in GetAlivePiecesOfType<ChessPiece>(GetCurrentTeamTurn())) {
                 BoardCoord[] templateMoves = piece.CalculateTemplateMoves().ToArray();
                 for (int i = 0; i < templateMoves.Length; i++) {
                     if (IsThreat(piece, templateMoves[i])) {

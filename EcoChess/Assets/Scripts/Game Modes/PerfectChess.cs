@@ -71,9 +71,9 @@ namespace ChessGameModes {
         protected override List<ChessPiece> GetAllPossibleCheckThreats(ChessPiece pieceToCheck) {
             List<ChessPiece> possibleCheckThreats = base.GetAllPossibleCheckThreats(pieceToCheck);
 
-            GetAllPiecesOfType<Amazon>(pieceToCheck.GetOpposingTeam()).ForEach(x => { possibleCheckThreats.Add(x); });
-            GetAllPiecesOfType<Empress>(pieceToCheck.GetOpposingTeam()).ForEach(x => { possibleCheckThreats.Add(x); });
-            GetAllPiecesOfType<Princess>(pieceToCheck.GetOpposingTeam()).ForEach(x => { possibleCheckThreats.Add(x); });
+            possibleCheckThreats.AddRange(GetAlivePiecesOfType<Amazon>(pieceToCheck.GetOpposingTeam()));
+            possibleCheckThreats.AddRange(GetAlivePiecesOfType<Empress>(pieceToCheck.GetOpposingTeam()));
+            possibleCheckThreats.AddRange(GetAlivePiecesOfType<Princess>(pieceToCheck.GetOpposingTeam()));
 
             return possibleCheckThreats;
         }

@@ -420,11 +420,7 @@ namespace ChessGameModes {
                 }
             }
 
-            foreach (Knight knight in GetAllPiecesOfType<Knight>()) {
-                if (IsThreat(pieceToCheck, knight.GetBoardPosition())) {
-                    possibleCheckThreats.Add(knight);
-                }
-            }
+            possibleCheckThreats.AddRange(GetAlivePiecesOfType<Knight>(pieceToCheck.GetOpposingTeam()));
 
             return possibleCheckThreats;
         }
@@ -502,7 +498,7 @@ namespace ChessGameModes {
         /// Checks whether any piece on the team is able to move.
         /// </summary>
         protected bool TeamHasAnyMoves(Team team) {
-            foreach (ChessPiece piece in GetAllPieces(team)) {
+            foreach (ChessPiece piece in GetPiecesOfType<ChessPiece>(team)) {
                 if (piece.IsAlive) {
                     if (CalculateAvailableMoves(piece).Count > 0) {
                         return true;
@@ -602,128 +598,90 @@ namespace ChessGameModes {
             this.SelectedPawnPromotion = piece;
         }
 
-        /// <summary>
-        /// Gets a list of a specific type of chess pieces in the game.
-        /// </summary>
-        /// <param name="aliveOnly">Should only pieces that are currently on the board be retrieved?</param>
-        /// <returns>A list of T chess pieces.</returns>
-        public List<T> GetAllPiecesOfType<T>(Team team, bool aliveOnly = true) where T : ChessPiece {
-            List<T> selectionOfPieces = new List<T>();
-            switch (team) {
-                case Team.WHITE:
-                    foreach (ChessPiece piece in whitePieces) {
-                        if (piece is T && piece.IsAlive) {
-                            selectionOfPieces.Add((T)piece);
-                        }
-                    }
-                    break;
-                case Team.BLACK:
-                    foreach (ChessPiece piece in blackPieces) {
-                        if (piece is T && piece.IsAlive) {
-                            selectionOfPieces.Add((T)piece);
-                        }
-                    }
-                    break;
-            }
+        public List<T> GetPiecesOfType<T>() where T : ChessPiece {
+            List<T> selectionOfPieces = new List<T>(whitePieces.Count + blackPieces.Count);
+
+            selectionOfPieces.AddRange(GetPiecesOfType<T>(Team.WHITE));
+            selectionOfPieces.AddRange(GetPiecesOfType<T>(Team.BLACK));
+
             return selectionOfPieces;
         }
 
-        /// <summary>
-        /// Gets a list of a specific type of chess pieces in the game.
-        /// </summary>
-        /// <param name="aliveOnly">Should only pieces that are currently on the board be retrieved?</param>
-        /// <returns>A list of T chess pieces.</returns>
-        public List<T> GetAllPiecesOfType<T>(bool aliveOnly = true) where T : ChessPiece {
+        public List<T> GetAlivePiecesOfType<T>() where T : ChessPiece {
             List<T> selectionOfPieces = new List<T>();
-            foreach (ChessPiece piece in whitePieces) {
-                if (piece is T && piece.IsAlive) {
-                    selectionOfPieces.Add((T)piece);
-                }
-            }
-            foreach (ChessPiece piece in blackPieces) {
-                if (piece is T && piece.IsAlive) {
+
+            selectionOfPieces.AddRange(GetAlivePiecesOfType<T>(Team.WHITE));
+            selectionOfPieces.AddRange(GetAlivePiecesOfType<T>(Team.BLACK));
+
+            return selectionOfPieces;
+        }
+
+        public List<T> GetPiecesOfType<T>(Team team) where T : ChessPiece {
+            List<ChessPiece> selectedArmy = GetPieces(team);
+            return GetPiecesOfTypeInCollection<T>(selectedArmy);
+        }
+
+        public List<T> GetAlivePiecesOfType<T>(Team team) where T : ChessPiece {
+            List<ChessPiece> selectedArmy = GetPieces(team);
+            return GetAlivePiecesOfTypeInCollection<T>(selectedArmy);
+        }
+
+        private List<T> GetPiecesOfTypeInCollection<T>(List<ChessPiece> pieceCollection) where T : ChessPiece {
+            List<T> selectionOfPieces = new List<T>();
+
+            foreach (ChessPiece piece in pieceCollection) {
+                if (piece is T) {
                     selectionOfPieces.Add((T)piece);
                 }
             }
             return selectionOfPieces;
         }
 
-        /// <summary>
-        /// Gets a list of all chess pieces in the game.
-        /// </summary>
-        /// <param name="aliveOnly">Should only pieces that are currently on the board be retrieved?</param>
-        /// <returns>A list of all chess pieces in the current game.</returns>
-        public List<ChessPiece> GetAllPieces(bool aliveOnly = true) {
-            List<ChessPiece> pieces = new List<ChessPiece>(whitePieces.Count + blackPieces.Count);
-            if (aliveOnly) {
-                whitePieces.ForEach(x => { if (x.IsAlive) pieces.Add(x); });
-                blackPieces.ForEach(x => { if (x.IsAlive) pieces.Add(x); });
-            } else {
-                pieces.AddRange(whitePieces);
-                pieces.AddRange(blackPieces);
+        private List<T> GetAlivePiecesOfTypeInCollection<T>(List<ChessPiece> pieceCollection) where T : ChessPiece {
+            List<T> selectionOfPieces = new List<T>();
+
+            foreach (ChessPiece piece in pieceCollection) {
+                if (piece is T && piece.IsAlive) {
+                    selectionOfPieces.Add((T)piece);
+                }
             }
-            return pieces;
+            return selectionOfPieces;
         }
 
-        /// <summary>
-        /// Gets a list of all chess pieces in the current game.
-        /// </summary>
-        /// <param name="team">Team to get pieces from.</param>
-        /// <param name="aliveOnly">Should only pieces that are currently on the board be retrieved?</param>
-        /// <returns>A list of all chess pieces in the current game.</returns>
-        public List<ChessPiece> GetAllPieces(Team team, bool aliveOnly = true) {
-            if (aliveOnly) {
-                List<ChessPiece> pieces = new List<ChessPiece>();
+        private List<ChessPiece> GetPieces(Team team) {
+            List<ChessPiece> selectedArmy = new List<ChessPiece>();
 
-                if (team == Team.WHITE) {
-                    whitePieces.ForEach(x => { if (x.IsAlive) pieces.Add(x); });
-                } else {
-                    blackPieces.ForEach(x => { if (x.IsAlive) pieces.Add(x); });
-                }
-
-                return pieces;
+            if (team == Team.WHITE) {
+                selectedArmy = whitePieces;
             } else {
-                if (team == Team.WHITE) {
-                    return new List<ChessPiece>(whitePieces);
-                }
-                return new List<ChessPiece>(blackPieces);
+                selectedArmy = blackPieces;
             }
+
+            return selectedArmy;
         }
 
-        /// <summary>
-        /// Determines whether or not a specific coord is considered an ally against the specified chess piece.
-        /// </summary>
-        /// <param name="mover">Piece to compare against.</param>
-        /// <param name="coord">Board coordinate to test.</param>
-        /// <returns>True if the specified square is an ally to mover.</returns>
         protected virtual bool IsAlly(ChessPiece mover, BoardCoord coord) {
-            if (AssertContainsCoord(coord)) {
-                ChessPiece occupier = Board.GetCoordInfo(coord).GetOccupier();
-                if (occupier != null) {
-                    return occupier.GetTeam() == mover.GetTeam();
-                } else {
-                    return false;
-                }
+            ChessPiece occupier = Board.GetCoordInfo(coord).GetOccupier();
+            if (occupier != null) {
+                return !IsThreat(mover, occupier);
             }
             return false;
         }
 
-        /// <summary>
-        /// Determines whether or not a specific coord is considered a threat against the specified chess piece.
-        /// </summary>
-        /// <param name="mover">Piece to compare against.</param>
-        /// <param name="coord">Board coordinate to test.</param>
-        /// <returns>True if the specified square is a threat to mover.</returns>
+        protected bool IsAlly(ChessPiece mover, ChessPiece target) {
+            return !IsThreat(mover, target);
+        }
+
         protected virtual bool IsThreat(ChessPiece mover, BoardCoord coord) {
-            if (AssertContainsCoord(coord)) {
-                ChessPiece occupier = Board.GetCoordInfo(coord).GetOccupier();
-                if (occupier != null) {
-                    return occupier.GetTeam() != mover.GetTeam();
-                } else {
-                    return false;
-                }
+            ChessPiece occupier = Board.GetCoordInfo(coord).GetOccupier();
+            if (occupier != null) {
+                return IsThreat(mover, occupier);
             }
             return false;
+        }
+
+        protected bool IsThreat(ChessPiece mover, ChessPiece target) {
+            return target.GetTeam() != mover.GetTeam();
         }
 
         /// <summary>
@@ -768,9 +726,6 @@ namespace ChessGameModes {
                 ChessPiece oldCoordOccupier = Board.GetCoordInfo(previousPosition).GetOccupier();
                 if (oldCoordOccupier != null) {
                     Board.GetCoordInfo(previousPosition).RemoveOccupier(oldCoordOccupier);
-                    if (IsThreat(oldCoordOccupier, newPosition)) {
-                        KillPiece(Board.GetCoordInfo(newPosition).GetOccupier());
-                    }
                     Board.GetCoordInfo(newPosition).AddOccupier(oldCoordOccupier);
                 }
             }
@@ -793,6 +748,9 @@ namespace ChessGameModes {
                 // The only time this isn't true is if the piece we are moving is a castling piece (e.g. rook).
                 // In that case we ignore it's move notation, count, etc.
                 if (isLastMover) {
+                    mover.MoveCount++;
+                    SetLastMovedPiece(mover);
+
                     moveNotation.Append(mover.GetLetterNotation());
 
                     // This condition is needed to avoid a stack overflow when checking for check.
@@ -801,23 +759,24 @@ namespace ChessGameModes {
                     }
 
                     if (attackingThreat) {
-                        if(mover is Pawn) {
+                        KillPiece(Board.GetCoordInfo(destination).GetOccupier());
+
+                        if (mover is Pawn) {
                             moveNotation.Append(Board.GetCoordInfo(previousPosition).file);
                         }
                         moveNotation.Append('x');
                         mover.CaptureCount++;
                     }
-                    mover.MoveCount++;
+
                     numConsecutiveCapturelessMoves = (attackingThreat == false && (mover is Pawn) == false) ? numConsecutiveCapturelessMoves + 1 : 0;
-                    SetLastMovedPiece(mover);
 
                     moveNotation.Append(Board.GetCoordInfo(destination).algebraicKey);
                 }
 
                 // Physically move the piece.
+                UpdateSquareOccupiers(previousPosition, destination);
                 mover.SetBoardPosition(destination);
                 mover.gameObject.transform.position = destination;
-                UpdateSquareOccupiers(previousPosition, mover.GetBoardPosition());
             }
 
             return moveNotation.ToString();
@@ -837,7 +796,7 @@ namespace ChessGameModes {
             teamTurnStateHistory.Push(new TeamTurnState(currentTeamTurn, opposingTeamTurn, currentRoyalPiece, opposingRoyalPiece,
                 GetLastMovedPiece(opposingTeamTurn), GetLastMovedPiece(currentTeamTurn), (uint)GetNumConseqCapturelessMoves()));
 
-            foreach (ChessPiece piece in GetAllPieces(aliveOnly: false)) {
+            foreach (ChessPiece piece in GetPiecesOfType<ChessPiece>()) {
                 piece.UpdatePieceMoveStateHistory(GameMoveNotations.Count);
             }
         }
@@ -853,7 +812,7 @@ namespace ChessGameModes {
             bool atLeastOneFileMatched = false;
             bool atLeastOneRankMatched = false;
 
-            foreach (ChessPiece piece in GetAllPieces(mover.GetTeam())) {
+            foreach (ChessPiece piece in GetPiecesOfType<ChessPiece>(mover.GetTeam())) {
                 if (piece != mover && piece.GetPieceType() == mover.GetPieceType()) {
                     if (piece.CalculateTemplateMoves().Contains(destination)) {
                         if (IsPieceInCheckAfterThisMove(currentRoyalPiece, piece, destination) == false) {
@@ -938,7 +897,7 @@ namespace ChessGameModes {
                 numConsecutiveCapturelessMoves = teamTurnStateToRestore.numConsequtiveCapturelessMoves;
             }
 
-            foreach (ChessPiece piece in GetAllPieces(aliveOnly: false)) {
+            foreach (ChessPiece piece in GetPiecesOfType<ChessPiece>()) {
                 if (piece.MoveStateHistory.Count > 1) {
                     // Remove piece state to be undone.
                     piece.MoveStateHistory.Remove(GameMoveNotations.Count + 1);

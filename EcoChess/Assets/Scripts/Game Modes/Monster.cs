@@ -86,7 +86,7 @@ namespace ChessGameModes {
 
             checkingForCheck = true;
             if (pieceToCheck.GetTeam() == Team.BLACK) {
-                foreach (ChessPiece piece in GetAllPieces(Team.WHITE)) {
+                foreach (ChessPiece piece in GetAlivePiecesOfType<ChessPiece>(Team.WHITE)) {
                     if (CalculateAvailableMoves(piece).Contains(pieceToCheck.GetBoardPosition())) {
                         checkingForCheck = false;
                         return true;

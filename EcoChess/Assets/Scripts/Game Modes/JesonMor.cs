@@ -50,7 +50,7 @@ namespace ChessGameModes {
             if (gameFinished) {
                 UIManager.Instance.LogCustom("Team " + GetOpposingTeamTurn().ToString() + " has left e5 -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
                 return true;
-            } else if (GetAllPieces(GetCurrentTeamTurn()).TrueForAll((x) => (x.IsAlive == false))) {
+            } else if (GetAlivePiecesOfType<ChessPiece>(GetCurrentTeamTurn()).Count == 0) {
                 UIManager.Instance.LogCustom("Team " + GetOpposingTeamTurn().ToString() + " wins by elimination!");
                 return true;
             }

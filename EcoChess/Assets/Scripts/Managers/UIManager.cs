@@ -7,7 +7,6 @@ public enum GameResults { Checkmate, Stalemate };
 public class UIManager : MonoBehaviour {
     public static UIManager Instance;
 
-    public GameObject camera;
     public VariantHelpDialog variantHelpDialog;
     public GameObject notationLinePrefab;
 

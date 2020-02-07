@@ -72,7 +72,7 @@ namespace ChessGameModes {
         public override void UndoLastMove() {
             base.UndoLastMove();
 
-            foreach (ChessPiece piece in GetAllPieces(aliveOnly: false)) {
+            foreach (ChessPiece piece in GetAlivePiecesOfType<ChessPiece>()) {
                 Board.GetCoordInfo(piece.GetBoardPosition()).boardChunk.SetActive(true);
             }
         }

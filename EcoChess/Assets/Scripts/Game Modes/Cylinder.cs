@@ -75,11 +75,7 @@ namespace ChessGameModes {
                 }
             }
 
-            foreach (Knight knight in GetAllPiecesOfType<Knight>()) {
-                if (IsThreat(pieceToCheck, knight.GetBoardPosition())) {
-                    possibleCheckThreats.Add(knight);
-                }
-            }
+            possibleCheckThreats.AddRange(GetAlivePiecesOfType<Knight>(pieceToCheck.GetOpposingTeam()));
 
             return possibleCheckThreats;
         }

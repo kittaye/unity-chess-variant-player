@@ -60,7 +60,7 @@ namespace ChessGameModes {
                 // Check whether the piece is checkmated after this temporary move
                 bool hasAnyMoves = false;
                 checkingForCheckmate = true;
-                foreach (ChessPiece piece in GetAllPieces(pieceToCheck.GetTeam())) {
+                foreach (ChessPiece piece in GetAlivePiecesOfType<ChessPiece>(pieceToCheck.GetTeam())) {
                     if (piece.IsAlive && hasAnyMoves == false) {
                         BoardCoord[] availableMoves = CalculateAvailableMoves(piece).ToArray();
                         for (int i = 0; i < availableMoves.Length; i++) {
