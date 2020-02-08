@@ -30,7 +30,7 @@ public class Grasshopper : ChessPiece {
             BoardCoord coord = GetBoardPosition() + new BoardCoord(xModifier, yModifier);
 
             while (chessGame.Board.ContainsCoord(coord)) {
-                if(chessGame.Board.GetCoordInfo(coord).GetOccupier() != null) {
+                if(chessGame.Board.GetCoordInfo(coord).GetAliveOccupier() != null) {
                     BoardCoord grasshopperMove = chessGame.TryGetSpecificMove(this, coord + new BoardCoord(xModifier, yModifier));
                     if(grasshopperMove != BoardCoord.NULL) {
                         moves.Add(grasshopperMove);

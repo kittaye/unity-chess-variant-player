@@ -22,17 +22,17 @@ namespace ChessGameModes {
         private new const int WHITE_PAWNROW = 2;
 
         public OmegaChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-            Board.RemoveBoardCoordinates(new string[] { "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9", "a10", "a11" });
-            Board.RemoveBoardCoordinates(new string[] { "l2", "l3", "l4", "l5", "l6", "l7", "l8", "l9", "l10", "l11" });
-            Board.RemoveBoardCoordinates(new string[] { "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1", "j1", "k1" });
-            Board.RemoveBoardCoordinates(new string[] { "b12", "c12", "d12", "e12", "f12", "g12", "h12", "i12", "j12", "k12" });
+            Board.RemoveAndDestroyBoardCoordinates(new string[] { "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9", "a10", "a11" });
+            Board.RemoveAndDestroyBoardCoordinates(new string[] { "l2", "l3", "l4", "l5", "l6", "l7", "l8", "l9", "l10", "l11" });
+            Board.RemoveAndDestroyBoardCoordinates(new string[] { "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1", "j1", "k1" });
+            Board.RemoveAndDestroyBoardCoordinates(new string[] { "b12", "c12", "d12", "e12", "f12", "g12", "h12", "i12", "j12", "k12" });
 
-            Board.SetCustomBoardCoordinateKey("a1", "W1");
-            Board.SetCustomBoardCoordinateKey("l1", "W2");
-            Board.SetCustomBoardCoordinateKey("a12", "W3");
-            Board.SetCustomBoardCoordinateKey("l12", "W4");
+            Board.SetCustomBoardAlgebraicKey("a1", "W1");
+            Board.SetCustomBoardAlgebraicKey("l1", "W2");
+            Board.SetCustomBoardAlgebraicKey("a12", "W3");
+            Board.SetCustomBoardAlgebraicKey("l12", "W4");
 
-            Board.ResetAlgebraicKeys("b2", 10, 10);
+            Board.SetCustomBoardAlgebraicKeys("b2", 10, 10);
 
             BLACK_BACKROW = Board.GetHeight() - 2;
             BLACK_PAWNROW = Board.GetHeight() - 3;
@@ -95,13 +95,13 @@ namespace ChessGameModes {
         protected override bool TryPerformCastlingMove(ChessPiece mover) {
             if (mover.MoveCount == 1) {
                 if (mover.GetBoardPosition().x == 4) {
-                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(2, mover.GetBoardPosition().y)).GetOccupier();
+                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(2, mover.GetBoardPosition().y)).GetAliveOccupier();
                     UpdatePiecePositionAndOccupance(castlingPiece, new BoardCoord(5, mover.GetBoardPosition().y));
                     SetLastMoveNotationToQueenSideCastle();
                     return true;
 
                 } else if (mover.GetBoardPosition().x == 8) {
-                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(9, mover.GetBoardPosition().y)).GetOccupier();
+                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(9, mover.GetBoardPosition().y)).GetAliveOccupier();
                     UpdatePiecePositionAndOccupance(castlingPiece, new BoardCoord(7, mover.GetBoardPosition().y));
                     SetLastMoveNotationToKingSideCastle();
                     return true;
@@ -121,7 +121,7 @@ namespace ChessGameModes {
                     while (Board.ContainsCoord(mover.GetRelativeBoardCoord(i, y))) {
                         BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, y));
                         if (Board.ContainsCoord(coord)) {
-                            ChessPiece piece = Board.GetCoordInfo(coord).GetOccupier();
+                            ChessPiece piece = Board.GetCoordInfo(coord).GetAliveOccupier();
                             if (piece != null) {
                                 if (piece is Pawn && CheckEnPassantVulnerability((Pawn)piece)) {
                                     if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
@@ -145,7 +145,7 @@ namespace ChessGameModes {
             int y = -1;
 
             while (Board.ContainsCoord(mover.GetRelativeBoardCoord(0, y))) {
-                ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(0, y)).GetOccupier();
+                ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(0, y)).GetAliveOccupier();
 
                 if (occupier != null) {
                     if (IsThreat(mover, occupier.GetBoardPosition())) {

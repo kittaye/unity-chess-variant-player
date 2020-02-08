@@ -24,7 +24,7 @@ namespace ChessGameModes {
         private Piece[] limitedPromotionOptions;
 
         public Balbo() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-            Board.RemoveBoardCoordinates(new string[]
+            Board.RemoveAndDestroyBoardCoordinates(new string[]
             { "a1", "a2", "a3", "a4", "a7", "a8", "a9", "a10",
               "b1", "b2", "b3", "b8", "b9", "b10",
               "c1", "c2", "c9", "c10",

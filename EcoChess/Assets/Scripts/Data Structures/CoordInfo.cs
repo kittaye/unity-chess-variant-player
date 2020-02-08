@@ -41,7 +41,7 @@ public class CoordInfo {
         return occupiers.Remove(piece);
     }
 
-    public ChessPiece GetOccupier() {
+    public ChessPiece GetAliveOccupier() {
         if (cachedActiveOccupier != null && cachedActiveOccupier.IsAlive) {
             return cachedActiveOccupier;
         }

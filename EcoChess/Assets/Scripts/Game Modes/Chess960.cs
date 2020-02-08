@@ -149,7 +149,7 @@ namespace ChessGameModes {
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
             bool kingCastlingThisMove = false;
 
-            ChessPiece destinationOccupier = Board.GetCoordInfo(destination).GetOccupier();
+            ChessPiece destinationOccupier = Board.GetCoordInfo(destination).GetAliveOccupier();
             // If the selected destination has a friendly rook occupying it, the move is a castling move.
             if (mover == currentRoyalPiece && mover.MoveCount == 0 && destinationOccupier is Rook) {
                 // Switch the destination from the rook's position to the king's final castle position.
@@ -228,7 +228,7 @@ namespace ChessGameModes {
 
                     // Check every square left and right of the king
                     while (Board.ContainsCoord(coord)) {
-                        ChessPiece piece = Board.GetCoordInfo(coord).GetOccupier();
+                        ChessPiece piece = Board.GetCoordInfo(coord).GetAliveOccupier();
                         if (piece != null) {
                             // Count the pieces inbetween the king's starting position to its ending position
                             if((i == LEFT && coord.x >= CASTLE_KINGPOS.x) || (i == RIGHT && coord.x <= CASTLE_KINGPOS.x)) {
@@ -259,8 +259,8 @@ namespace ChessGameModes {
 
                     // There must be only 1 piece obstructor or less and a castling rook found to continue
                     if(castlingRook != null && validCastle) {
-                        ChessPiece currentRookPosOccupier = Board.GetCoordInfo(CASTLE_ROOKPOS).GetOccupier();
-                        ChessPiece currentKingPosOccupier = Board.GetCoordInfo(CASTLE_KINGPOS).GetOccupier();
+                        ChessPiece currentRookPosOccupier = Board.GetCoordInfo(CASTLE_ROOKPOS).GetAliveOccupier();
+                        ChessPiece currentKingPosOccupier = Board.GetCoordInfo(CASTLE_KINGPOS).GetAliveOccupier();
 
                         // If the final rook and king positions are either null, or occupied by a friendly king or castling rook, the castle is valid.
                         if (IsAlly(currentRookPosOccupier, CASTLE_ROOKPOS) && currentRookPosOccupier != castlingRook && currentRookPosOccupier != king) {

@@ -23,7 +23,7 @@ namespace ChessGameModes {
         private List<BoardCoord> promotionSquares;
 
         public LadderChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-            Board.RemoveBoardCoordinates(new string[]
+            Board.RemoveAndDestroyBoardCoordinates(new string[]
             { "b1", "c1", "d1", "e1",
               "c2", "d2", "e2",
               "d3", "e3",

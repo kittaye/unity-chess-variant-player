@@ -19,7 +19,7 @@ namespace ChessGameModes {
         private new const int BOARD_HEIGHT = 9;
 
         public ShiftedChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-            Board.RemoveBoardCoordinates(new string[]
+            Board.RemoveAndDestroyBoardCoordinates(new string[]
             { "a1", "a2", "a3", "a4", "a9",
               "b9", "c9", "d9",
               "e5",
@@ -122,13 +122,13 @@ namespace ChessGameModes {
         protected override bool TryPerformCastlingMove(ChessPiece mover) {
             if (mover.MoveCount == 1) {
                 if (mover.GetBoardPosition().x == 1) {
-                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).GetOccupier();
+                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).GetAliveOccupier();
                     UpdatePiecePositionAndOccupance(castlingPiece, new BoardCoord(2, mover.GetBoardPosition().y));
                     SetLastMoveNotationToQueenSideCastle();
                     return true;
 
                 } else if (mover.GetBoardPosition().x == 7) {
-                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).GetOccupier();
+                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).GetAliveOccupier();
                     UpdatePiecePositionAndOccupance(castlingPiece, new BoardCoord(6, mover.GetBoardPosition().y));
                     SetLastMoveNotationToKingSideCastle();
                     return true;

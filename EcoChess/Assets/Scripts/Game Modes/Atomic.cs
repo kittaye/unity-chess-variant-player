@@ -48,8 +48,8 @@ namespace ChessGameModes {
                 bool isValid = true;
                 for (int x = -1; x <= 1 && isValid; x++) {
                     for (int y = -1; y <= 1; y++) {
-                        BoardCoord coord = Board.GetCoordInfo(templateMoves[i]).GetOccupier().GetRelativeBoardCoord(x, y);
-                        if (Board.ContainsCoord(coord) && (x != 0 && y != 0) && Board.GetCoordInfo(coord).GetOccupier() == currentRoyalPiece) {
+                        BoardCoord coord = Board.GetCoordInfo(templateMoves[i]).GetAliveOccupier().GetRelativeBoardCoord(x, y);
+                        if (Board.ContainsCoord(coord) && (x != 0 && y != 0) && Board.GetCoordInfo(coord).GetAliveOccupier() == currentRoyalPiece) {
                             isValid = false;
                             break;
                         }
@@ -76,8 +76,8 @@ namespace ChessGameModes {
                     for (int x = -1; x <= 1; x++) {
                         for (int y = -1; y <= 1; y++) {
                             BoardCoord coord = mover.GetRelativeBoardCoord(x, y);
-                            if (Board.ContainsCoord(coord) && ((Board.GetCoordInfo(coord).GetOccupier() is Pawn) == false) && coord != mover.GetBoardPosition()) {
-                                KillPiece(Board.GetCoordInfo(coord).GetOccupier());
+                            if (Board.ContainsCoord(coord) && ((Board.GetCoordInfo(coord).GetAliveOccupier() is Pawn) == false) && coord != mover.GetBoardPosition()) {
+                                KillPiece(Board.GetCoordInfo(coord).GetAliveOccupier());
                             }
                         }
                     }
@@ -122,14 +122,14 @@ namespace ChessGameModes {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
                     if (Board.ContainsCoord(coord)) {
-                        ChessPiece piece = Board.GetCoordInfo(coord).GetOccupier();
+                        ChessPiece piece = Board.GetCoordInfo(coord).GetAliveOccupier();
                         if (piece is Pawn && CheckEnPassantVulnerability((Pawn)piece)) {
                             if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
                                 bool isValid = true;
                                 for (int x = -1; x <= 1 && isValid; x++) {
                                     for (int y = -1; y <= 1; y++) {
                                         BoardCoord coord2 = piece.GetRelativeBoardCoord(x, y);
-                                        if (Board.ContainsCoord(coord2) && (x != 0 && y != 0) && Board.GetCoordInfo(coord2).GetOccupier() == currentRoyalPiece) {
+                                        if (Board.ContainsCoord(coord2) && (x != 0 && y != 0) && Board.GetCoordInfo(coord2).GetAliveOccupier() == currentRoyalPiece) {
                                             isValid = false;
                                             break;
                                         }

@@ -255,14 +255,14 @@ namespace ChessGameModes {
             if (mover.MoveCount == 1) {
                 // If the king moved to the left to castle, grab the rook on the left-side of the board to castle with and move it.
                 if (mover.GetBoardPosition().x == 2) {
-                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).GetOccupier();
+                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).GetAliveOccupier();
                     UpdatePiecePositionAndOccupance(castlingPiece, new BoardCoord(3, mover.GetBoardPosition().y));
                     SetLastMoveNotationToQueenSideCastle();
                     return true;
 
                     // Else the king moved right, so grab the right rook instead.
                 } else if (mover.GetBoardPosition().x == 6) {
-                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).GetOccupier();
+                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).GetAliveOccupier();
                     UpdatePiecePositionAndOccupance(castlingPiece, new BoardCoord(5, mover.GetBoardPosition().y));
                     SetLastMoveNotationToKingSideCastle();
                     return true;
@@ -271,10 +271,13 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected void UpdatePiecePositionAndOccupance(ChessPiece piece, BoardCoord newPos) {
-            UpdateSquareOccupiers(piece.GetBoardPosition(), newPos);
-            piece.SetBoardPosition(newPos);
-            piece.gameObject.transform.position = newPos;
+        protected void UpdatePiecePositionAndOccupance(ChessPiece piece, BoardCoord newPosition) {
+            BoardCoord previousPosition = piece.GetBoardPosition();
+
+            UpdateSquareOccupiers(piece, previousPosition, newPosition);
+
+            piece.SetBoardPosition(newPosition);
+            piece.gameObject.transform.position = newPosition;
         }
 
         /// <summary>
@@ -292,7 +295,7 @@ namespace ChessGameModes {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
                     if (Board.ContainsCoord(coord)) {
-                        ChessPiece piece = Board.GetCoordInfo(coord).GetOccupier();
+                        ChessPiece piece = Board.GetCoordInfo(coord).GetAliveOccupier();
                         if (piece is Pawn && CheckEnPassantVulnerability((Pawn)piece)) {
                             if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
                                 enpassantMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1)));
@@ -322,7 +325,7 @@ namespace ChessGameModes {
             BoardCoord newPos = mover.GetBoardPosition();
 
             if (Board.ContainsCoord(mover.GetRelativeBoardCoord(0, -1)) && IsThreat(mover, mover.GetRelativeBoardCoord(0, -1))) {
-                ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(0, -1)).GetOccupier();
+                ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(0, -1)).GetAliveOccupier();
                 if (occupier != null && occupier is Pawn && CheckEnPassantVulnerability((Pawn)occupier)) {
                     mover.CaptureCount++;
                     KillPiece(occupier);
@@ -430,7 +433,7 @@ namespace ChessGameModes {
 
                 while (Board.ContainsCoord(coord)) {
                     if (IsThreat(pieceToCheck, coord)) {
-                        possibleCheckThreats.Add(Board.GetCoordInfo(coord).GetOccupier());
+                        possibleCheckThreats.Add(Board.GetCoordInfo(coord).GetAliveOccupier());
                     }
                     coord.x += xModifier;
                     coord.y += yModifier;
@@ -477,7 +480,7 @@ namespace ChessGameModes {
                     BoardCoord coord = new BoardCoord(x, y);
 
                     while (Board.ContainsCoord(coord)) {
-                        ChessPiece occupier = Board.GetCoordInfo(coord).GetOccupier();
+                        ChessPiece occupier = Board.GetCoordInfo(coord).GetAliveOccupier();
                         if (occupier != null) {
                             bool validCastler = false;
                             for (int j = 0; j < castlerOptions.Length; j++) {
@@ -702,7 +705,7 @@ namespace ChessGameModes {
         }
 
         protected virtual bool IsAlly(ChessPiece mover, BoardCoord coord) {
-            ChessPiece occupier = Board.GetCoordInfo(coord).GetOccupier();
+            ChessPiece occupier = Board.GetCoordInfo(coord).GetAliveOccupier();
             if (occupier != null) {
                 return !IsThreat(mover, occupier);
             }
@@ -714,7 +717,7 @@ namespace ChessGameModes {
         }
 
         protected virtual bool IsThreat(ChessPiece mover, BoardCoord coord) {
-            ChessPiece occupier = Board.GetCoordInfo(coord).GetOccupier();
+            ChessPiece occupier = Board.GetCoordInfo(coord).GetAliveOccupier();
             if (occupier != null) {
                 return IsThreat(mover, occupier);
             }
@@ -762,14 +765,9 @@ namespace ChessGameModes {
         /// <summary>
         /// Used to update the occupiers of affected squares after a move is played.
         /// </summary>
-        private void UpdateSquareOccupiers(BoardCoord previousPosition, BoardCoord newPosition) {
-            if (AssertContainsCoord(previousPosition) && AssertContainsCoord(newPosition)) {
-                ChessPiece oldCoordOccupier = Board.GetCoordInfo(previousPosition).GetOccupier();
-                if (oldCoordOccupier != null) {
-                    Board.GetCoordInfo(previousPosition).RemoveOccupier(oldCoordOccupier);
-                    Board.GetCoordInfo(newPosition).AddOccupier(oldCoordOccupier);
-                }
-            }
+        private void UpdateSquareOccupiers(ChessPiece piece, BoardCoord previousPosition, BoardCoord newPosition) {
+            Board.GetCoordInfo(previousPosition).RemoveOccupier(piece);
+            Board.GetCoordInfo(newPosition).AddOccupier(piece);
         }
 
         /// <summary>
@@ -794,7 +792,7 @@ namespace ChessGameModes {
                 }
 
                 if (attackingThreat) {
-                    KillPiece(Board.GetCoordInfo(destination).GetOccupier());
+                    KillPiece(Board.GetCoordInfo(destination).GetAliveOccupier());
 
                     if (mover is Pawn) {
                         moveNotation.Append(Board.GetCoordInfo(previousPosition).file);
@@ -939,6 +937,10 @@ namespace ChessGameModes {
 
                     PieceMoveState pieceMoveStateToRestore = piece.MoveStateHistory[GameMoveNotations.Count];
 
+                    // Undo alive status.
+                    piece.IsAlive = pieceMoveStateToRestore.wasAlive;
+                    piece.gameObject.SetActive(piece.IsAlive);
+
                     // Undo position & occupance.
                     UpdatePiecePositionAndOccupance(piece, pieceMoveStateToRestore.position);
 
@@ -946,9 +948,6 @@ namespace ChessGameModes {
                     piece.MoveCount = pieceMoveStateToRestore.moveCount;
                     piece.CaptureCount = pieceMoveStateToRestore.captureCount;
 
-                    // Undo alive status.
-                    piece.IsAlive = pieceMoveStateToRestore.wasAlive;
-                    piece.gameObject.SetActive(piece.IsAlive);
                 } else if (piece.MoveStateHistory.Count == 1 && piece.IsAlive) {
                     // This occurs for promoted pieces. A promoted pawn is considered a new piece, so once the new piece has no states left,
                     // we completely remove it from the game and bring back the pawn.
@@ -992,11 +991,11 @@ namespace ChessGameModes {
         private bool CheckValidPlacement(ChessPiece piece) {
             if (AssertContainsCoord(piece.GetBoardPosition()) == false) {
                 return false;
-            } else if (Board.GetCoordInfo(piece.GetBoardPosition()).GetOccupier() != null && Board.GetCoordInfo(piece.GetBoardPosition()).GetOccupier().IsAlive) {
+            } else if (Board.GetCoordInfo(piece.GetBoardPosition()).GetAliveOccupier() != null && Board.GetCoordInfo(piece.GetBoardPosition()).GetAliveOccupier().IsAlive) {
                 CoordInfo posInfo = Board.GetCoordInfo(piece.GetBoardPosition());
                 Debug.LogErrorFormat("OCCUPIED EXCEPTION :: " +
                     "{0} failed to instantiate because a {1} is already at it's position! Location: {3}."
-                    , piece.ToString(), posInfo.GetOccupier().ToString(), posInfo.algebraicKey, piece.GetBoardPosition().ToString());
+                    , piece.ToString(), posInfo.GetAliveOccupier().ToString(), posInfo.algebraicKey, piece.GetBoardPosition().ToString());
                 return false;
             }
             return true;

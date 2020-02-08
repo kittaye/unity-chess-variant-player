@@ -98,7 +98,7 @@ namespace ChessGameModes {
         }
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            ChessPiece capturedPiece = Board.GetCoordInfo(destination).GetOccupier();
+            ChessPiece capturedPiece = Board.GetCoordInfo(destination).GetAliveOccupier();
 
             // Try make the move
             if (MakeDirectMove(mover, destination)) {

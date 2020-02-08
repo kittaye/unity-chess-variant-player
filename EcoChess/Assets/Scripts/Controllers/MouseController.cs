@@ -73,7 +73,7 @@ public class MouseController : MonoBehaviour {
             }
 
             // If we clicked on an empty square or on a piece that is inactive, deselect.
-            if (selectedCoord.GetOccupier() == null || !selectedCoord.GetOccupier().gameObject.activeInHierarchy) {
+            if (selectedCoord.GetAliveOccupier() == null || !selectedCoord.GetAliveOccupier().gameObject.activeInHierarchy) {
                 DeSelect();
                 return;
             }
@@ -85,14 +85,14 @@ public class MouseController : MonoBehaviour {
             //Debug.Log(temp);
 
             // Otherwise, check if the selected piece is on the current mover's team.
-            if (chessGame.IsMoversTurn(selectedCoord.GetOccupier())) {
+            if (chessGame.IsMoversTurn(selectedCoord.GetAliveOccupier())) {
                 DeSelect();
 
                 // If so, calculate it's moves and display visual graphics for moving it around.
-                List<BoardCoord> selectedOccupierMoves = chessGame.CalculateAvailableMoves(selectedCoord.GetOccupier());
+                List<BoardCoord> selectedOccupierMoves = chessGame.CalculateAvailableMoves(selectedCoord.GetAliveOccupier());
                 if (selectedOccupierMoves.Count > 0) {
                     hasSelection = true;
-                    lastSelectedOccupier = selectedCoord.GetOccupier();
+                    lastSelectedOccupier = selectedCoord.GetAliveOccupier();
                     lastSelectedOccupierAvailableMoves = selectedOccupierMoves;
                     lastSelectedOccupier.gameObject.SetActive(false);
 

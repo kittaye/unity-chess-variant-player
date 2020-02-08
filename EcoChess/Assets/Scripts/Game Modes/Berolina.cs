@@ -60,7 +60,7 @@ namespace ChessGameModes {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
                     if (Board.ContainsCoord(coord)) {
-                        ChessPiece piece = Board.GetCoordInfo(coord).GetOccupier();
+                        ChessPiece piece = Board.GetCoordInfo(coord).GetAliveOccupier();
                         if (piece is Pawn && CheckEnPassantVulnerability((Pawn)piece)) {
                             if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(0, 1)) == false) {
                                 enpassantMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(0, 1)));
@@ -81,7 +81,7 @@ namespace ChessGameModes {
 
             for (int i = LEFT; i <= RIGHT; i += 2) {
                 if (Board.ContainsCoord(mover.GetRelativeBoardCoord(i, -1)) && IsThreat(mover, mover.GetRelativeBoardCoord(i, -1))) {
-                    ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(i, -1)).GetOccupier();
+                    ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(i, -1)).GetAliveOccupier();
                     if (occupier != null && occupier is Pawn && CheckEnPassantVulnerability((Pawn)occupier)) {
                         mover.CaptureCount++;
                         KillPiece(occupier);
