@@ -6,68 +6,90 @@ public abstract class ChessPiece {
     private BoardCoord m_BoardPosition;
 
     protected Piece m_pieceType;
+    protected BoardCoord[] m_SpecificMoveSet;
+
     public GameObject gameObject;
     public int MoveCount { get; set; }
     public int CaptureCount { get; set; }
     public bool IsAlive { get; set; }
     public bool HasXWrapping { get; private set; }
     public bool HasYWrapping { get; private set; }
-    public Dictionary<int, PieceMoveState> MoveStateHistory { get; set; }
+    public List<PieceStateSnapshot> StateHistory { get; set; }
 
     protected ChessGameModes.Chess chessGame;
 
     public ChessPiece(Team team, BoardCoord position) {
-        chessGame = GameManager.Instance.ChessGame;
+        Init();
+
         m_Team = team;
         m_BoardPosition = position;
-        MoveCount = 0;
-        IsAlive = false;
         HasXWrapping = false;
         HasYWrapping = false;
-        MoveStateHistory = new Dictionary<int, PieceMoveState>();
     }
 
     public ChessPiece(Team team, string algebraicKeyPosition) {
-        chessGame = GameManager.Instance.ChessGame;
+        Init();
+
         m_Team = team;
         BoardCoord position = BoardCoord.NULL;
         if(chessGame.Board.TryGetCoordWithKey(algebraicKeyPosition, out position)) {
             m_BoardPosition = position;
         }
-        MoveCount = 0;
-        IsAlive = false;
         HasXWrapping = false;
         HasYWrapping = false;
-        MoveStateHistory = new Dictionary<int, PieceMoveState>();
     }
 
     public ChessPiece(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping) {
-        chessGame = GameManager.Instance.ChessGame;
+        Init();
+
         m_Team = team;
         m_BoardPosition = position;
-        MoveCount = 0;
-        IsAlive = false;
         this.HasXWrapping = allowXWrapping;
         this.HasYWrapping = allowYWrapping;
-        MoveStateHistory = new Dictionary<int, PieceMoveState>();
     }
 
     public ChessPiece(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping) {
-        chessGame = GameManager.Instance.ChessGame;
+        Init();
+
         m_Team = team;
         BoardCoord position = BoardCoord.NULL;
         if (chessGame.Board.TryGetCoordWithKey(algebraicKeyPosition, out position)) {
             m_BoardPosition = position;
         }
-        MoveCount = 0;
-        IsAlive = false;
         this.HasXWrapping = allowXWrapping;
         this.HasYWrapping = allowYWrapping;
-        MoveStateHistory = new Dictionary<int, PieceMoveState>();
     }
 
-    public void UpdatePieceMoveStateHistory(int gameTurnNumber) {
-        MoveStateHistory.Add(gameTurnNumber, new PieceMoveState(m_BoardPosition, IsAlive, MoveCount, CaptureCount));
+    private void Init() {
+        chessGame = GameManager.Instance.ChessGame;
+        MoveCount = 0;
+        IsAlive = false;
+        StateHistory = new List<PieceStateSnapshot>();
+        InitSpecificMoveSet();
+    }
+
+    public void UpdateStateHistory() {
+        StateHistory.Add(new PieceStateSnapshot(m_BoardPosition, IsAlive, MoveCount, CaptureCount));
+    }
+
+    protected virtual void InitSpecificMoveSet() {
+        m_SpecificMoveSet = new BoardCoord[0];
+    }
+
+    protected List<BoardCoord> TryGetTemplateMovesFromSpecificMoveSet(bool threatsOnly = false) {
+        List<BoardCoord> moves = new List<BoardCoord>();
+
+        for (int i = 0; i < m_SpecificMoveSet.Length; i++) {
+            BoardCoord relativeSpecificMove = GetRelativeBoardCoord(m_SpecificMoveSet[i]);
+
+            if (chessGame.Board.ContainsCoord(relativeSpecificMove)) {
+                if ((threatsOnly && chessGame.IsThreat(this, relativeSpecificMove)) || chessGame.IsAlly(this, relativeSpecificMove) == false) {
+                    moves.Add(relativeSpecificMove);
+                }
+            }
+        }
+
+        return moves;
     }
 
     public abstract List<BoardCoord> CalculateTemplateMoves();
@@ -96,6 +118,10 @@ public abstract class ChessPiece {
 
     public BoardCoord GetRelativeBoardCoord(int x, int y) {
         return new BoardCoord(GetBoardPosition().x + TeamSensitiveMove(x), GetBoardPosition().y + TeamSensitiveMove(y));
+    }
+
+    public BoardCoord GetRelativeBoardCoord(BoardCoord coord) {
+        return new BoardCoord(GetBoardPosition().x + TeamSensitiveMove(coord.x), GetBoardPosition().y + TeamSensitiveMove(coord.y));
     }
 
     public int TeamSensitiveMove(int x) {

@@ -7,7 +7,7 @@ public class Knight : ChessPiece {
     public Knight(Team team, string algebraicKeyPosition) : base(team, algebraicKeyPosition) {
         m_pieceType = Piece.Knight;
     }
-    public Knight(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping) 
+    public Knight(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping)
         : base(team, position, allowXWrapping, allowYWrapping) {
         m_pieceType = Piece.Knight;
     }
@@ -20,24 +20,33 @@ public class Knight : ChessPiece {
         return GetTeam() + "_Knight";
     }
 
-    public override List<BoardCoord> CalculateTemplateMoves() {
-        List<BoardCoord> moves = new List<BoardCoord>();
-        // Vertical "L" movements
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 1, 2, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -1, 2, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 1, -2, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -1, -2, moveCap: 1));
-
-        // Horizontal "L" movements
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 2, 1, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -2, 1, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 2, -1, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -2, -1, moveCap: 1));
-
-        return moves;
-    }
-
     public override string GetLetterNotation() {
         return "N";
+    }
+
+    public static BoardCoord[] moveset = new BoardCoord[8] {
+            // Vertical "L" movements
+            new BoardCoord(1, 2),
+            new BoardCoord(-1, 2),
+            new BoardCoord(1, -2),
+            new BoardCoord(-1, -2),
+
+            // Horizontal "L" movements
+            new BoardCoord(2, 1),
+            new BoardCoord(-2, 1),
+            new BoardCoord(2, -1),
+            new BoardCoord(-2, -1)
+    };
+
+    protected override void InitSpecificMoveSet() {
+        m_SpecificMoveSet = moveset;
+    }
+
+    public override List<BoardCoord> CalculateTemplateMoves() {
+        List<BoardCoord> moves = new List<BoardCoord>();
+
+        moves.AddRange(TryGetTemplateMovesFromSpecificMoveSet());
+        
+        return moves;
     }
 }

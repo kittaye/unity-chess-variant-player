@@ -34,7 +34,7 @@ namespace ChessGameModes {
             if (mover is King && mover.MoveCount == 0) {
                 List<BoardCoord> kingFirstMoves = new List<BoardCoord>();
                 for (int i = 0; i <= 7; i++) {
-                    kingFirstMoves.AddRange(TryGetDirectionalMoves(mover, (MoveDirection)i));
+                    kingFirstMoves.AddRange(TryGetDirectionalTemplateMoves(mover, (MoveDirection)i));
                 }
                 templateMoves = kingFirstMoves.ToArray();
             } else {
@@ -69,12 +69,15 @@ namespace ChessGameModes {
             return false;
         }
 
-        public override void UndoLastMove() {
-            base.UndoLastMove();
+        public override bool UndoLastMove() {
+            if (base.UndoLastMove()) {
+                foreach (ChessPiece piece in GetAlivePiecesOfType<ChessPiece>()) {
+                    Board.GetCoordInfo(piece.GetBoardPosition()).boardChunk.SetActive(true);
+                }
 
-            foreach (ChessPiece piece in GetAlivePiecesOfType<ChessPiece>()) {
-                Board.GetCoordInfo(piece.GetBoardPosition()).boardChunk.SetActive(true);
+                return true;
             }
+            return false;
         }
     }
 }

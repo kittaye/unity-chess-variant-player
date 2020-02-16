@@ -19,16 +19,32 @@ public class King : ChessPiece {
     public override string ToString() {
         return GetTeam() + "_King";
     }
-    
-    public override List<BoardCoord> CalculateTemplateMoves() {
-        List<BoardCoord> moves = new List<BoardCoord>();
-        for (int i = 0; i <= 7; i++) {
-            moves.AddRange(chessGame.TryGetDirectionalMoves(this, (MoveDirection)i, 1));
-        }
-        return moves;
-    }
 
     public override string GetLetterNotation() {
         return "K";
+    }
+
+    protected override void InitSpecificMoveSet() {
+        m_SpecificMoveSet = new BoardCoord[8] {
+            // Right, left, up, down
+            new BoardCoord(0, 1),
+            new BoardCoord(0, -1),
+            new BoardCoord(1, 0),
+            new BoardCoord(-1, 0),
+
+            // Diagonals
+            new BoardCoord(1, 1),
+            new BoardCoord(1, -1),
+            new BoardCoord(-1, 1),
+            new BoardCoord(-1, -1)
+        };
+    }
+
+    public override List<BoardCoord> CalculateTemplateMoves() {
+        List<BoardCoord> moves = new List<BoardCoord>();
+
+        moves.AddRange(TryGetTemplateMovesFromSpecificMoveSet());
+
+        return moves;
     }
 }

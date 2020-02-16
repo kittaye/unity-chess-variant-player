@@ -64,8 +64,8 @@
     <Compile Include="Assets\Scripts\Controllers\MouseController.cs" />
     <Compile Include="Assets\Scripts\Data Structures\BoardCoord.cs" />
     <Compile Include="Assets\Scripts\Data Structures\CoordInfo.cs" />
-    <Compile Include="Assets\Scripts\Data Structures\PieceMoveState.cs" />
-    <Compile Include="Assets\Scripts\Data Structures\TeamTurnState.cs" />
+    <Compile Include="Assets\Scripts\Data Structures\GameStateSnapshot.cs" />
+    <Compile Include="Assets\Scripts\Data Structures\PieceStateSnapshot.cs" />
     <Compile Include="Assets\Scripts\Data Structures\VariantHelpDetails.cs" />
     <Compile Include="Assets\Scripts\Factories\ChessPieceFactory.cs" />
     <Compile Include="Assets\Scripts\Factories\GameModeFactory.cs" />

@@ -20,28 +20,19 @@ public class Amazon : ChessPiece {
         return GetTeam() + "_Amazon";
     }
 
-    public override List<BoardCoord> CalculateTemplateMoves() {
-        List<BoardCoord> moves = new List<BoardCoord>();
-        for (int i = 0; i <= 7; i++) {
-            moves.AddRange(chessGame.TryGetDirectionalMoves(this, (MoveDirection)i));
-        }
-
-        // Vertical "L" movements
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 1, 2, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -1, 2, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 1, -2, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -1, -2, moveCap: 1));
-
-        // Horizontal "L" movements
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 2, 1, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -2, 1, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 2, -1, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -2, -1, moveCap: 1));
-
-        return moves;
-    }
-
     public override string GetLetterNotation() {
         return "A";
+    }
+
+    public override List<BoardCoord> CalculateTemplateMoves() {
+        List<BoardCoord> moves = new List<BoardCoord>();
+
+        for (int i = 0; i <= 7; i++) {
+            moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, (MoveDirection)i));
+        }
+
+        moves.AddRange(Knight.moveset);
+
+        return moves;
     }
 }

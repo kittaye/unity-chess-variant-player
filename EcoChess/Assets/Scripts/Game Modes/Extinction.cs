@@ -101,7 +101,7 @@ namespace ChessGameModes {
             ChessPiece capturedPiece = Board.GetCoordInfo(destination).GetAliveOccupier();
 
             // Try make the move
-            if (MakeDirectMove(mover, destination)) {
+            if (MakeBaseMove(mover, destination)) {
                 // Check castling moves
                 if (IsRoyal(mover)) {
                     TryPerformCastlingMove(mover);

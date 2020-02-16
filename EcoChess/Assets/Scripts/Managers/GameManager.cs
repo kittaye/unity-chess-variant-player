@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour {
         ChessGame = GameModeFactory.Create((GameMode)modeIndex);
         //ChessGame = new DummyVariant();
         ChessGame.PopulateBoard();
-        ChessGame.UpdateGameStateHistory();
+        ChessGame.IncrementGameAndPieceStateHistory();
     }
 
     private void Start() {
@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviour {
 
     public void OnMoveComplete() {
         ChessGame.OnMoveComplete();
-        ChessGame.UpdateGameStateHistory();
+        ChessGame.IncrementGameAndPieceStateHistory();
 
         if (ChessGame.CheckWinState()) {
             if (_OnGameFinished != null) _OnGameFinished.Invoke();
@@ -89,8 +89,7 @@ public class GameManager : MonoBehaviour {
     }
 
     public void UndoLastGameMove() {
-        if (ChessGame.GameMoveNotations.Count > 0) {
-            ChessGame.UndoLastMove();
+        if (ChessGame.UndoLastMove()) {
             ui.OnUndoLastGameMove();
         }
     }

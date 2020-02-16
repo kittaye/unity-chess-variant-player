@@ -52,7 +52,7 @@ namespace ChessGameModes {
         }
 
         private bool IsPieceInCheckMateAfterThisMove(ChessPiece pieceToCheck, ChessPiece mover, BoardCoord destination) {
-            if (AssertContainsCoord(destination)) {
+            if (Board.ContainsCoord(destination)) {
                 if (checkingForCheckmate) return false;
 
                 SimulateMove(mover, destination);

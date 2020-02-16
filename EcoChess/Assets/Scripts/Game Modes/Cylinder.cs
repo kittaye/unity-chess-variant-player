@@ -56,10 +56,9 @@ namespace ChessGameModes {
         protected override List<ChessPiece> GetAllPossibleCheckThreats(ChessPiece pieceToCheck) {
             List<ChessPiece> possibleCheckThreats = new List<ChessPiece>();
 
-            for (int i = (int)MoveDirection.Up; i <= (int)MoveDirection.DownRight; i++) {
-                int xModifier, yModifier;
-                GetMoveDirectionModifiers(pieceToCheck, (MoveDirection)i, out xModifier, out yModifier);
-                BoardCoord coord = pieceToCheck.GetBoardPosition() + new BoardCoord(xModifier, yModifier);
+            for (int i = 0; i <= 7; i++) {
+                BoardCoord coordStep = GetCoordStepInDirection(pieceToCheck, (MoveDirection)i, true);
+                BoardCoord coord = pieceToCheck.GetBoardPosition() + coordStep;
 
                 int failsafe = 0;
                 while (pieceToCheck.GetBoardPosition() != coord || failsafe < 9) {
@@ -68,8 +67,7 @@ namespace ChessGameModes {
                     if (IsThreat(pieceToCheck, coord)) {
                         possibleCheckThreats.Add(Board.GetCoordInfo(coord).GetAliveOccupier());
                     }
-                    coord.x += xModifier;
-                    coord.y += yModifier;
+                    coord += coordStep;
                     coord.x = MathExtensions.mod(coord.x, BOARD_WIDTH);
                     failsafe++;
                 }
@@ -88,12 +86,18 @@ namespace ChessGameModes {
             if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     int modulusRelativeX = MathExtensions.mod(i, BOARD_WIDTH);
-                    BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(modulusRelativeX, 0), threatOnly: true);
-                    if (Board.ContainsCoord(coord)) {
-                        ChessPiece piece = Board.GetCoordInfo(coord).GetAliveOccupier();
+                    BoardCoord sidewaysCoord = mover.GetRelativeBoardCoord(modulusRelativeX, 0);
+
+                    if (Board.ContainsCoord(sidewaysCoord) && IsThreat(mover, sidewaysCoord)) {
+                        ChessPiece piece = Board.GetCoordInfo(sidewaysCoord).GetAliveOccupier();
+
                         if (piece is Pawn && CheckEnPassantVulnerability((Pawn)piece)) {
-                            if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(modulusRelativeX, 1)) == false) {
-                                enpassantMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(modulusRelativeX, 1)));
+                            BoardCoord enpassantCoord = mover.GetRelativeBoardCoord(modulusRelativeX, 1);
+
+                            if (Board.ContainsCoord(enpassantCoord)) {
+                                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, enpassantCoord) == false) {
+                                    enpassantMoves.Add(enpassantCoord);
+                                }
                             }
                         }
                     }

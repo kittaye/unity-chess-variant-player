@@ -94,6 +94,7 @@ public class MouseController : MonoBehaviour {
                     hasSelection = true;
                     lastSelectedOccupier = selectedCoord.GetAliveOccupier();
                     lastSelectedOccupierAvailableMoves = selectedOccupierMoves;
+
                     lastSelectedOccupier.gameObject.SetActive(false);
 
                     selectedObject.GetComponent<SpriteRenderer>().sprite = lastSelectedOccupier.gameObject.GetComponent<SpriteRenderer>().sprite;

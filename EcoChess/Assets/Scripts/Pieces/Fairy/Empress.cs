@@ -21,30 +21,38 @@ public class Empress : ChessPiece {
         return GetTeam() + "_Empress";
     }
 
-    public override List<BoardCoord> CalculateTemplateMoves() {
-        List<BoardCoord> moves = new List<BoardCoord>();
-        // Rook movements
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Left));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Down));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Right));
-
-        // Vertical "L" movements
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 1, 2, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -1, 2, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 1, -2, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -1, -2, moveCap: 1));
-
-        // Horizontal "L" movements
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 2, 1, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -2, 1, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 2, -1, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -2, -1, moveCap: 1));
-
-        return moves;
-    }
-
     public override string GetLetterNotation() {
         return "E";
+    }
+
+    protected override void InitSpecificMoveSet() {
+        m_SpecificMoveSet = new BoardCoord[8] {
+            // Vertical "L" movements
+            new BoardCoord(1, 2),
+            new BoardCoord(-1, 2),
+            new BoardCoord(1, -2),
+            new BoardCoord(-1, -2),
+
+            // Horizontal "L" movements
+            new BoardCoord(2, 1),
+            new BoardCoord(-2, 1),
+            new BoardCoord(2, -1),
+            new BoardCoord(-2, -1)
+        };
+    }
+
+    public override List<BoardCoord> CalculateTemplateMoves() {
+        List<BoardCoord> moves = new List<BoardCoord>();
+
+        // Rook movements
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Up));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Left));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Down));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Right));
+
+        // Knight movements
+        moves.AddRange(TryGetTemplateMovesFromSpecificMoveSet());
+
+        return moves;
     }
 }

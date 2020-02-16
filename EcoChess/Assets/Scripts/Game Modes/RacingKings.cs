@@ -92,7 +92,7 @@ namespace ChessGameModes {
         }
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            return MakeDirectMove(mover, destination);
+            return MakeBaseMove(mover, destination);
         }
 
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
@@ -108,7 +108,7 @@ namespace ChessGameModes {
         }
 
         private bool IsAKingInCheckAfterThisMove(ChessPiece mover, BoardCoord destination) {
-            if (AssertContainsCoord(destination)) {
+            if (Board.ContainsCoord(destination)) {
                 SimulateMove(mover, destination);
 
                 bool kingChecked = IsPieceInCheck(currentRoyalPiece) || IsPieceInCheck(opposingRoyalPiece);

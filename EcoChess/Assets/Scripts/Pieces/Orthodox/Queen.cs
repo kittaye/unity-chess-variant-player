@@ -20,15 +20,23 @@ public class Queen : ChessPiece {
         return GetTeam() + "_Queen";
     }
 
-    public override List<BoardCoord> CalculateTemplateMoves() {
-        List<BoardCoord> moves = new List<BoardCoord>();
-        for (int i = 0; i <= 7; i++) {
-            moves.AddRange(chessGame.TryGetDirectionalMoves(this, (MoveDirection)i));
-        }
-        return moves;
-    }
-
     public override string GetLetterNotation() {
         return "Q";
+    }
+
+    public override List<BoardCoord> CalculateTemplateMoves() {
+        List<BoardCoord> moves = new List<BoardCoord>();
+
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpRight));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpLeft));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.DownLeft));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.DownRight));
+
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Up));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Left));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Down));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Right));
+
+        return moves;
     }
 }

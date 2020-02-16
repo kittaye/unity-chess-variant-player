@@ -163,7 +163,7 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override bool IsThreat(ChessPiece mover, BoardCoord coord) {
+        public override bool IsThreat(ChessPiece mover, BoardCoord coord) {
             ChessPiece occupier = Board.GetCoordInfo(coord).GetAliveOccupier();
             if (occupier != null) {
                 if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
@@ -177,7 +177,7 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override bool IsAlly(ChessPiece mover, BoardCoord coord) {
+        public override bool IsAlly(ChessPiece mover, BoardCoord coord) {
             ChessPiece occupier = Board.GetCoordInfo(coord).GetAliveOccupier();
             if (occupier != null) {
                 if (whiteControlledColours.Contains(GetChessPieceColour(mover))) {
@@ -476,7 +476,7 @@ namespace ChessGameModes {
             Color movedFromColour = Board.GetCoordInfo(oldPos).boardChunk.GetComponent<MeshRenderer>().material.color;
 
             // Try make the move
-            if (MakeDirectMove(mover, destination)) {
+            if (MakeBaseMove(mover, destination)) {
                 if (mover is King) {
                     if (kingHasDoubleMoveDefection) kingHasDoubleMoveDefection = false;
 
@@ -636,7 +636,9 @@ namespace ChessGameModes {
                                     }
                                 }
                                 while(occupierStop != occupier) {
-                                    castleMoves.Add(TryGetSpecificMove(king, coord));
+                                    if (Board.ContainsCoord(coord) && IsAlly(king, coord) == false) {
+                                        castleMoves.Add(coord);
+                                    }
                                     coord.x += i;
                                     occupierStop = Board.GetCoordInfo(coord).GetAliveOccupier();
                                 }

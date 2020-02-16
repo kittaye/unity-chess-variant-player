@@ -58,12 +58,18 @@ namespace ChessGameModes {
 
             if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
-                    BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
-                    if (Board.ContainsCoord(coord)) {
-                        ChessPiece piece = Board.GetCoordInfo(coord).GetAliveOccupier();
+                    BoardCoord sidewaysCoord = mover.GetRelativeBoardCoord(i, 0);
+
+                    if (Board.ContainsCoord(sidewaysCoord) && IsThreat(mover, sidewaysCoord)) {
+                        ChessPiece piece = Board.GetCoordInfo(sidewaysCoord).GetAliveOccupier();
+
                         if (piece is Pawn && CheckEnPassantVulnerability((Pawn)piece)) {
-                            if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(0, 1)) == false) {
-                                enpassantMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(0, 1)));
+                            BoardCoord enpassantCoord = mover.GetRelativeBoardCoord(0, 1);
+
+                            if (Board.ContainsCoord(enpassantCoord)) {
+                                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, enpassantCoord) == false) {
+                                    enpassantMoves.Add(enpassantCoord);
+                                }
                             }
                         }
                     }
@@ -76,7 +82,7 @@ namespace ChessGameModes {
             const int LEFT = -1;
             const int RIGHT = 1;
 
-            BoardCoord oldPos = mover.MoveStateHistory[GameMoveNotations.Count - 1].position;
+            BoardCoord oldPos = mover.StateHistory[mover.StateHistory.Count - 1].position;
             BoardCoord newPos = mover.GetBoardPosition();
 
             for (int i = LEFT; i <= RIGHT; i += 2) {

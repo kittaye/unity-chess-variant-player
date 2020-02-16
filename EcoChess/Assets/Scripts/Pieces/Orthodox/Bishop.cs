@@ -20,18 +20,18 @@ public class Bishop : ChessPiece {
         return GetTeam() +"_Bishop";
     }
 
+    public override string GetLetterNotation() {
+        return "B";
+    }
+
     public override List<BoardCoord> CalculateTemplateMoves() {
         List<BoardCoord> moves = new List<BoardCoord>();
 
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownLeft));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.DownRight));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpRight));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpLeft));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.DownLeft));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.DownRight));
 
         return moves;
-    }
-
-    public override string GetLetterNotation() {
-        return "B";
     }
 }

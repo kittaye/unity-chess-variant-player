@@ -71,7 +71,7 @@ namespace ChessGameModes {
             bool pieceCaptured = IsThreat(mover, destination);
 
             // Try make the move.
-            if (MakeDirectMove(mover, destination)) {
+            if (MakeBaseMove(mover, destination)) {
                 if (pieceCaptured) {
                     for (int x = -1; x <= 1; x++) {
                         for (int y = -1; y <= 1; y++) {
@@ -120,23 +120,28 @@ namespace ChessGameModes {
 
             if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
-                    BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
-                    if (Board.ContainsCoord(coord)) {
-                        ChessPiece piece = Board.GetCoordInfo(coord).GetAliveOccupier();
+                    BoardCoord sidewaysCoord = mover.GetRelativeBoardCoord(i, 0);
+
+                    if (Board.ContainsCoord(sidewaysCoord) && IsThreat(mover, sidewaysCoord)) {
+                        ChessPiece piece = Board.GetCoordInfo(sidewaysCoord).GetAliveOccupier();
+
                         if (piece is Pawn && CheckEnPassantVulnerability((Pawn)piece)) {
                             if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
+
                                 bool isValid = true;
                                 for (int x = -1; x <= 1 && isValid; x++) {
                                     for (int y = -1; y <= 1; y++) {
-                                        BoardCoord coord2 = piece.GetRelativeBoardCoord(x, y);
-                                        if (Board.ContainsCoord(coord2) && (x != 0 && y != 0) && Board.GetCoordInfo(coord2).GetAliveOccupier() == currentRoyalPiece) {
+                                        BoardCoord coord = piece.GetRelativeBoardCoord(x, y);
+                                        if (Board.ContainsCoord(coord) && (x != 0 && y != 0) && Board.GetCoordInfo(coord).GetAliveOccupier() == currentRoyalPiece) {
                                             isValid = false;
                                             break;
                                         }
                                     }
                                 }
-                                if (isValid) {
-                                    enpassantMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1)));
+
+                                BoardCoord enpassantMove = mover.GetRelativeBoardCoord(i, 1);
+                                if (isValid && Board.ContainsCoord(enpassantMove) && IsAlly(mover, enpassantMove) == false) {
+                                    enpassantMoves.Add(enpassantMove);
                                 }
                             }
                         }

@@ -132,14 +132,21 @@ namespace ChessGameModes {
             if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     int y = 0;
+
                     while(Board.ContainsCoord(mover.GetRelativeBoardCoord(i, y))) {
-                        BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, y));
-                        if (Board.ContainsCoord(coord)) {
-                            ChessPiece piece = Board.GetCoordInfo(coord).GetAliveOccupier();
+                        BoardCoord sidewaysCoord = mover.GetRelativeBoardCoord(i, y);
+
+                        if (Board.ContainsCoord(sidewaysCoord) && IsThreat(mover, sidewaysCoord)) {
+                            ChessPiece piece = Board.GetCoordInfo(sidewaysCoord).GetAliveOccupier();
+
                             if (piece != null) {
                                 if (piece is Pawn && CheckEnPassantVulnerability((Pawn)piece)) {
-                                    if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
-                                        enpassantMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1)));
+                                    BoardCoord enpassantCoord = mover.GetRelativeBoardCoord(i, 1);
+
+                                    if (Board.ContainsCoord(enpassantCoord)) {
+                                        if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, enpassantCoord) == false) {
+                                            enpassantMoves.Add(enpassantCoord);
+                                        }
                                     }
                                 } else {
                                     break;
@@ -154,7 +161,7 @@ namespace ChessGameModes {
         }
 
         protected override Pawn TryPerformPawnEnPassantCapture(Pawn mover) {
-            BoardCoord oldPos = mover.MoveStateHistory[GameMoveNotations.Count - 1].position;
+            BoardCoord oldPos = mover.StateHistory[GameMoveNotations.Count - 1].position;
             BoardCoord newPos = mover.GetBoardPosition();
             int y = -1;
 

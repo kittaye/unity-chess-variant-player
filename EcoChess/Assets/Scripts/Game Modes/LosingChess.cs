@@ -95,11 +95,16 @@ namespace ChessGameModes {
 
             if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
-                    BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
-                    if (Board.ContainsCoord(coord)) {
-                        ChessPiece piece = Board.GetCoordInfo(coord).GetAliveOccupier();
+                    BoardCoord sidewaysCoord = mover.GetRelativeBoardCoord(i, 0);
+
+                    if (Board.ContainsCoord(sidewaysCoord) && IsThreat(mover, sidewaysCoord)) {
+                        ChessPiece piece = Board.GetCoordInfo(sidewaysCoord).GetAliveOccupier();
+
                         if (piece is Pawn && CheckEnPassantVulnerability((Pawn)piece)) {
-                            enpassantMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1)));
+                            BoardCoord enpassantCoord = mover.GetRelativeBoardCoord(i, 1);
+                            if (Board.ContainsCoord(enpassantCoord)) {
+                                enpassantMoves.Add(enpassantCoord);
+                            }
                         }
                     }
                 }

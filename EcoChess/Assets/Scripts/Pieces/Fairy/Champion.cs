@@ -21,28 +21,34 @@ public class Champion : ChessPiece {
         return GetTeam() + "_Champion";
     }
 
-    public override List<BoardCoord> CalculateTemplateMoves() {
-        List<BoardCoord> moves = new List<BoardCoord>();
-
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 0, 1, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 0, -1, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 1, 0, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -1, 0, moveCap: 1));
-
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 0, 2, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 0, -2, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 2, 0, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -2, 0, moveCap: 1));
-
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 2, 2, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -2, 2, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, 2, -2, moveCap: 1));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, -2, -2, moveCap: 1));
-
-        return moves;
-    }
-
     public override string GetLetterNotation() {
         return "C";
+    }
+
+    protected override void InitSpecificMoveSet() {
+        m_SpecificMoveSet = new BoardCoord[12] {
+            new BoardCoord(0, 1),
+            new BoardCoord(0, -1),
+            new BoardCoord(1, 0),
+            new BoardCoord(-1, 0),
+
+            new BoardCoord(0, 2),
+            new BoardCoord(0, -2),
+            new BoardCoord(2, 0),
+            new BoardCoord(-2, 0),
+
+            new BoardCoord(2, 2),
+            new BoardCoord(-2, 2),
+            new BoardCoord(2, -2),
+            new BoardCoord(-2, -2)
+        };
+    }
+
+    public override List<BoardCoord> CalculateTemplateMoves() {
+        List<BoardCoord> moves = new List<BoardCoord>(12);
+
+        moves.AddRange(TryGetTemplateMovesFromSpecificMoveSet());
+
+        return moves;
     }
 }

@@ -164,7 +164,7 @@ namespace ChessGameModes {
             }
 
             // Try make the move
-            if (MakeDirectMove(mover, destination)) {
+            if (MakeBaseMove(mover, destination)) {
                 if (kingCastlingThisMove) {
                     TryPerformCastlingMove((King)mover);
                 } else if (mover is Pawn) {

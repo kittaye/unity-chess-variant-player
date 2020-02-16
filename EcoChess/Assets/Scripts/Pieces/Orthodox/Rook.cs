@@ -21,18 +21,18 @@ public class Rook : ChessPiece {
         return GetTeam() + "_Rook";
     }
 
+    public override string GetLetterNotation() {
+        return "R";
+    }
+
     public override List<BoardCoord> CalculateTemplateMoves() {
         List<BoardCoord> moves = new List<BoardCoord>();
 
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Left));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Down));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Right));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Up));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Left));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Down));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Right));
 
         return moves;
-    }
-
-    public override string GetLetterNotation() {
-        return "R";
     }
 }

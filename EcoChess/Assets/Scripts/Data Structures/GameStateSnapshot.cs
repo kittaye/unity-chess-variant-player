@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TeamTurnState
+public class GameStateSnapshot
 {
     public Team currentTeam;
     public Team opposingTeam;
@@ -12,7 +12,7 @@ public class TeamTurnState
     public ChessPiece lastMovedBlackPiece;
     public uint numConsequtiveCapturelessMoves;
 
-    public TeamTurnState(Team currentTeam, Team opposingTeam, ChessPiece currentRoyalPiece, ChessPiece opposingRoyalPiece, 
+    public GameStateSnapshot(Team currentTeam, Team opposingTeam, ChessPiece currentRoyalPiece, ChessPiece opposingRoyalPiece, 
         ChessPiece lastMovedWhitePiece, ChessPiece lastMovedBlackPiece, uint conseqCaptureless) {
         this.currentTeam = currentTeam;
         this.opposingTeam = opposingTeam;

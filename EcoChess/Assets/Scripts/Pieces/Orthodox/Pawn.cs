@@ -37,10 +37,10 @@ public class Pawn : ChessPiece {
 
         uint moveCap = (MoveCount == 0) ? initialMoveLimit : 1;
 
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.Up, moveCap: moveCap, threatAttackLimit: 0));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Up, moveCap: moveCap, threatAttackLimit: 0));
 
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpLeft, moveCap: 1, threatsOnly: true));
-        moves.AddRange(chessGame.TryGetDirectionalMoves(this, MoveDirection.UpRight, moveCap: 1, threatsOnly: true));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpLeft, moveCap: 1, threatsOnly: true));
+        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpRight, moveCap: 1, threatsOnly: true));
 
         return moves;
     }
