@@ -225,4 +225,42 @@ public class Board {
             }
         }
     }
+
+    /// <summary>
+    /// Loops indefinitely in a step pattern to get moves for a piece.
+    /// </summary>
+    public BoardCoord[] GetMovesInStepPattern(ChessPiece mover, BoardCoord coordStep, uint cap = 0, uint threatAttackLimit = 1, bool threatsOnly = false) {
+        uint iter = 0;
+        uint threats = 0;
+        List<BoardCoord> moves = new List<BoardCoord>();
+        BoardCoord coord = mover.GetBoardPosition();
+
+        while (true) {
+            coord += coordStep;
+            if (mover.HasXWrapping) coord.x = MathExtensions.mod(coord.x, GetWidth());
+            if (mover.HasYWrapping) coord.y = MathExtensions.mod(coord.y, GetHeight());
+
+            if (ContainsCoord(coord) == false) break;
+
+            ChessPiece occupier = GetCoordInfo(coord).GetAliveOccupier();
+            if (occupier != null) {
+                if (mover.GetTeam() == occupier.GetTeam()) {
+                    break;
+                } else {
+                    if (threatAttackLimit == 0) break;
+                    moves.Add(coord);
+                    threats++;
+                    if (threats == threatAttackLimit) break;
+                }
+            } else {
+                if (threatsOnly) break;
+                moves.Add(coord);
+            }
+
+            iter++;
+            if (iter == cap) break;
+        }
+
+        return moves.ToArray();
+    }
 }

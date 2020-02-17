@@ -17,8 +17,12 @@ public class BerolinaPawn : Pawn {
         m_pieceType = Piece.BerolinaPawn;
     }
 
-    public override string ToString() {
-        return GetTeam() + "_BerolinaPawn";
+    public override string GetCanonicalName() {
+        return "BerolinaPawn";
+    }
+
+    public override string GetLetterNotation() {
+        return "BP";
     }
 
     public override List<BoardCoord> CalculateTemplateMoves() {
@@ -32,9 +36,5 @@ public class BerolinaPawn : Pawn {
         moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Up, moveCap: 1, threatsOnly: true));
 
         return moves;
-    }
-
-    public override string GetLetterNotation() {
-        return "BP";
     }
 }

@@ -17,8 +17,8 @@ public class Champion : ChessPiece {
         m_pieceType = Piece.Champion;
     }
 
-    public override string ToString() {
-        return GetTeam() + "_Champion";
+    public override string GetCanonicalName() {
+        return "Champion";
     }
 
     public override string GetLetterNotation() {

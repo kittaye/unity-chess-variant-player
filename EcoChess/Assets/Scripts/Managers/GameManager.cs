@@ -23,8 +23,8 @@ public class GameManager : MonoBehaviour {
             Instance = this;
         }
 
-        ChessGame = GameModeFactory.Create((GameMode)modeIndex);
-        //ChessGame = new DummyVariant();
+        //ChessGame = GameModeFactory.Create((GameMode)modeIndex);
+        ChessGame = new SovereignChess();
         ChessGame.PopulateBoard();
         ChessGame.IncrementGameAndPieceStateHistory();
     }
@@ -105,7 +105,13 @@ public class GameManager : MonoBehaviour {
         piece.gameObject.SetActive(true);
         piece.gameObject.name = piece.ToString();
         piece.gameObject.transform.SetParent(ChessGame.Board.gameBoardObj.transform);
-        piece.gameObject.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>(piece.ToString());
+
+        // For neutral pieces in sovereign chess.
+        if (piece.GetTeam() == Team.NONE) {
+            piece.gameObject.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("WHITE_" + piece.GetCanonicalName());
+        } else {
+            piece.gameObject.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>(piece.ToString());
+        }
     }
 
     public void DestroyChessPiece(ChessPiece piece) {

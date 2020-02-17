@@ -17,8 +17,12 @@ public class Grasshopper : ChessPiece {
         m_pieceType = Piece.Grasshopper;
     }
 
-    public override string ToString() {
-        return GetTeam() + "_Grasshopper";
+    public override string GetCanonicalName() {
+        return "Grasshopper";
+    }
+
+    public override string GetLetterNotation() {
+        return "G";
     }
 
     public override List<BoardCoord> CalculateTemplateMoves() {
@@ -43,9 +47,5 @@ public class Grasshopper : ChessPiece {
         }
 
         return moves;
-    }
-
-    public override string GetLetterNotation() {
-        return "G";
     }
 }

@@ -16,8 +16,8 @@ public class King : ChessPiece {
         m_pieceType = Piece.King;
     }
 
-    public override string ToString() {
-        return GetTeam() + "_King";
+    public override string GetCanonicalName() {
+        return "King";
     }
 
     public override string GetLetterNotation() {

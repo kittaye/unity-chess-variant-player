@@ -17,8 +17,8 @@ public class Rook : ChessPiece {
         m_pieceType = Piece.Rook;
     }
 
-    public override string ToString() {
-        return GetTeam() + "_Rook";
+    public override string GetCanonicalName() {
+        return "Rook";
     }
 
     public override string GetLetterNotation() {

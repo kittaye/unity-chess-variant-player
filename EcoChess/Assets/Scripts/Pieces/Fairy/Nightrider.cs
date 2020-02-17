@@ -17,8 +17,8 @@ public class Nightrider : ChessPiece {
         m_pieceType = Piece.Nightrider;
     }
 
-    public override string ToString() {
-        return GetTeam() + "_Nightrider";
+    public override string GetCanonicalName() {
+        return "Nightrider";
     }
 
     public override string GetLetterNotation() {

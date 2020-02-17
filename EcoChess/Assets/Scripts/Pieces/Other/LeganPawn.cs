@@ -15,6 +15,14 @@ public class LeganPawn : Pawn {
         : base(team, algebraicKeyPosition, allowXWrapping, allowYWrapping) {
     }
 
+    public override string GetCanonicalName() {
+        return "Pawn";
+    }
+
+    public override string GetLetterNotation() {
+        return "LP";
+    }
+
     public override List<BoardCoord> CalculateTemplateMoves() {
         List<BoardCoord> moves = new List<BoardCoord>();
 
@@ -24,9 +32,5 @@ public class LeganPawn : Pawn {
         moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Left, moveCap: 1, threatsOnly: true));
 
         return moves;
-    }
-
-    public override string GetLetterNotation() {
-        return "LP";
     }
 }

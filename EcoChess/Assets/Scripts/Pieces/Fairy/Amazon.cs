@@ -16,8 +16,8 @@ public class Amazon : ChessPiece {
         m_pieceType = Piece.Amazon;
     }
 
-    public override string ToString() {
-        return GetTeam() + "_Amazon";
+    public override string GetCanonicalName() {
+        return "Amazon";
     }
 
     public override string GetLetterNotation() {

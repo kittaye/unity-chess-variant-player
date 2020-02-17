@@ -16,6 +16,14 @@ public class SovereignPawn : Pawn {
         this.pieceQuadrant = quadrant;
     }
 
+    public override string GetCanonicalName() {
+        return "Pawn";
+    }
+
+    public override string GetLetterNotation() {
+        return "SP";
+    }
+
     public void ChangePieceQuadrant(Quadrant quadrant) {
         pieceQuadrant = quadrant;
     }
@@ -144,9 +152,5 @@ public class SovereignPawn : Pawn {
                 break;
         }
         return moves;
-    }
-
-    public override string GetLetterNotation() {
-        return "SP";
     }
 }

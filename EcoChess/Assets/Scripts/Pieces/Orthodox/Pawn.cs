@@ -28,8 +28,12 @@ public class Pawn : ChessPiece {
         this.initialMoveLimit = initialMoveLimit;
     }
 
-    public override string ToString() {
-        return GetTeam() + "_Pawn";
+    public override string GetCanonicalName() {
+        return "Pawn";
+    }
+
+    public override string GetLetterNotation() {
+        return string.Empty;
     }
 
     public override List<BoardCoord> CalculateTemplateMoves() {
@@ -43,9 +47,5 @@ public class Pawn : ChessPiece {
         moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpRight, moveCap: 1, threatsOnly: true));
 
         return moves;
-    }
-
-    public override string GetLetterNotation() {
-        return string.Empty;
     }
 }

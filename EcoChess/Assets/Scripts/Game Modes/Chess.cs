@@ -3,7 +3,7 @@ using UnityEngine;
 using System;
 using System.Text;
 
-public enum Team { WHITE, BLACK }
+public enum Team { WHITE, BLACK, NONE }
 public enum MoveDirection { Up, Down, Left, Right, UpLeft, UpRight, DownLeft, DownRight }
 
 namespace ChessGameModes {
@@ -724,7 +724,7 @@ namespace ChessGameModes {
             return selectedArmy;
         }
 
-        public virtual bool IsAlly(ChessPiece mover, BoardCoord coord) {
+        public bool IsAlly(ChessPiece mover, BoardCoord coord) {
             ChessPiece occupier = Board.GetCoordInfo(coord).GetAliveOccupier();
             if (occupier != null) {
                 return !IsThreat(mover, occupier);
@@ -732,11 +732,11 @@ namespace ChessGameModes {
             return false;
         }
 
-        private bool IsAlly(ChessPiece mover, ChessPiece target) {
-            return !IsThreat(mover, target);
+        public bool IsAlly(ChessPiece mover, ChessPiece target) {
+            return !IsThreat(mover, target) && target.GetTeam() != Team.NONE;
         }
 
-        public virtual bool IsThreat(ChessPiece mover, BoardCoord coord) {
+        public bool IsThreat(ChessPiece mover, BoardCoord coord) {
             ChessPiece occupier = Board.GetCoordInfo(coord).GetAliveOccupier();
             if (occupier != null) {
                 return IsThreat(mover, occupier);
@@ -744,8 +744,8 @@ namespace ChessGameModes {
             return false;
         }
 
-        private bool IsThreat(ChessPiece mover, ChessPiece target) {
-            return target.GetTeam() != mover.GetTeam();
+        public bool IsThreat(ChessPiece mover, ChessPiece target) {
+            return target.GetTeam() != mover.GetTeam() && target.GetTeam() != Team.NONE;
         }
 
         /// <summary>
@@ -862,7 +862,7 @@ namespace ChessGameModes {
         /// <summary>
         /// Updates all pieces' state histories to be up to date with the total move count. Is called by GameManager when a move is completed.
         /// </summary>
-        public void IncrementGameAndPieceStateHistory() {
+        public virtual void IncrementGameAndPieceStateHistory() {
             gameStateHistory.Push(new GameStateSnapshot(currentTeamTurn, opposingTeamTurn, currentRoyalPiece, opposingRoyalPiece,
                 GetLastMovedPiece(opposingTeamTurn), GetLastMovedPiece(currentTeamTurn), (uint)GetNumConseqCapturelessMoves()));
 
@@ -1091,7 +1091,7 @@ namespace ChessGameModes {
         /// <returns></returns>
         public BoardCoord[] TryGetDirectionalTemplateMoves(ChessPiece mover, MoveDirection direction, uint moveCap = 0, uint threatAttackLimit = 1, bool threatsOnly = false, bool teamSensitive = true) {
             BoardCoord coordStep = GetCoordStepInDirection(mover, direction, teamSensitive);
-            return GetMovesInStepPattern(mover, coordStep, moveCap, threatAttackLimit, threatsOnly);
+            return Board.GetMovesInStepPattern(mover, coordStep, moveCap, threatAttackLimit, threatsOnly);
         }
 
         /// <summary>
@@ -1103,40 +1103,7 @@ namespace ChessGameModes {
             if (teamSensitive) {
                 coordStep = new BoardCoord(mover.TeamSensitiveMove(coordStep.x), mover.TeamSensitiveMove(coordStep.y));
             }
-            return GetMovesInStepPattern(mover, coordStep, moveCap, threatAttackLimit, threatsOnly);
-        }
-
-        /// <summary>
-        /// Loops indefinitely in a step pattern to get moves for a piece.
-        /// </summary>
-        private BoardCoord[] GetMovesInStepPattern(ChessPiece mover, BoardCoord coordStep, uint cap = 0, uint threatAttackLimit = 1, bool threatsOnly = false) {
-            uint iter = 0;
-            uint threats = 0;
-            List<BoardCoord> moves = new List<BoardCoord>();
-            BoardCoord coord = mover.GetBoardPosition();
-
-            while (true) {
-                coord += coordStep;
-                if (mover.HasXWrapping) coord.x = MathExtensions.mod(coord.x, Board.GetWidth());
-                if (mover.HasYWrapping) coord.y = MathExtensions.mod(coord.y, Board.GetHeight());
-
-                if (Board.ContainsCoord(coord) == false) break;
-                if (IsAlly(mover, coord)) break;
-                if (IsThreat(mover, coord)) {
-                    if (threatAttackLimit == 0) break;
-                    moves.Add(coord);
-                    threats++;
-                    if (threats == threatAttackLimit) break;
-                } else {
-                    if (threatsOnly) break;
-                    moves.Add(coord);
-                }
-
-                iter++;
-                if (iter == cap) break;
-            }
-
-            return moves.ToArray();
+            return Board.GetMovesInStepPattern(mover, coordStep, moveCap, threatAttackLimit, threatsOnly);
         }
 
         /// <summary>

@@ -16,8 +16,8 @@ public class Bishop : ChessPiece {
         m_pieceType = Piece.Bishop;
     }
 
-    public override string ToString() {
-        return GetTeam() +"_Bishop";
+    public override string GetCanonicalName() {
+        return "Bishop";
     }
 
     public override string GetLetterNotation() {

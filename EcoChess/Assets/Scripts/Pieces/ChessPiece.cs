@@ -96,6 +96,8 @@ public abstract class ChessPiece {
 
     public abstract string GetLetterNotation();
 
+    public abstract string GetCanonicalName();
+
     public BoardCoord GetBoardPosition() {
         return m_BoardPosition;
     }
@@ -104,12 +106,23 @@ public abstract class ChessPiece {
         m_BoardPosition = pos;
     }
 
+    public override string ToString() {
+        return GetTeam() + "_" + GetCanonicalName();
+    }
+
     public Piece GetPieceType() {
         return m_pieceType;
     }
 
     public Team GetTeam() {
         return m_Team;
+    }
+
+    /// <summary>
+    /// Sets the piece's team. This is only needed for sovereign chess where neutral pieces exist.
+    /// </summary>
+    public void SetTeam(Team team) {
+        m_Team = team;
     }
 
     public Team GetOpposingTeam() {
