@@ -1,19 +1,10 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 public class Princess : ChessPiece {
-    public Princess(Team team, BoardCoord position) : base(team, position) {
+    public Princess(Team team, BoardCoord position, Board board) : base(team, position, board) {
         m_pieceType = Piece.Princess;
     }
-    public Princess(Team team, string algebraicKeyPosition) : base(team, algebraicKeyPosition) {
-        m_pieceType = Piece.Princess;
-    }
-    public Princess(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping) 
-        : base(team, position, allowXWrapping, allowYWrapping) {
-        m_pieceType = Piece.Princess;
-    }
-    public Princess(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping)
-    : base(team, algebraicKeyPosition, allowXWrapping, allowYWrapping) {
+    public Princess(Team team, string algebraicKeyPosition, Board board) : base(team, algebraicKeyPosition, board) {
         m_pieceType = Piece.Princess;
     }
 
@@ -45,10 +36,10 @@ public class Princess : ChessPiece {
         List<BoardCoord> moves = new List<BoardCoord>();
 
         // Bishop movements
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpRight));
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpLeft));
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.DownRight));
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.DownLeft));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.UpRight));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.UpLeft));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.DownRight));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.DownLeft));
 
         // Knight movements
         moves.AddRange(TryGetTemplateMovesFromSpecificMoveSet());

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-
+﻿
 namespace ChessGameModes {
     /// <summary>
     /// Board layout:
@@ -36,10 +34,10 @@ namespace ChessGameModes {
         public override void PopulateBoard() {
             base.PopulateBoard();
 
-            AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(BOARD_WIDTH - 1, WHITE_PAWNROW)));
-            AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(BOARD_WIDTH - 1, BLACK_PAWNROW)));
-            AddPieceToBoard(new Queen(Team.WHITE, new BoardCoord(BOARD_WIDTH - 1, WHITE_BACKROW)));
-            AddPieceToBoard(new Queen(Team.BLACK, new BoardCoord(BOARD_WIDTH - 1, BLACK_BACKROW)));
+            AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(BOARD_WIDTH - 1, WHITE_PAWNROW));
+            AddNewPieceToBoard(Piece.Pawn, Team.BLACK, new BoardCoord(BOARD_WIDTH - 1, BLACK_PAWNROW));
+            AddNewPieceToBoard(Piece.Queen, Team.WHITE, new BoardCoord(BOARD_WIDTH - 1, WHITE_BACKROW));
+            AddNewPieceToBoard(Piece.Queen, Team.BLACK, new BoardCoord(BOARD_WIDTH - 1, BLACK_BACKROW));
         }
     }
 }

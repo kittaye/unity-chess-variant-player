@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
@@ -61,7 +59,7 @@ namespace ChessGameModes {
 
             if (canCaptureThisTurn) {
                 for (int i = 0; i < templateMoves.Length; i++) {
-                    if (IsThreat(mover, templateMoves[i])) {
+                    if (mover.IsThreatTowards(templateMoves[i])) {
                         availableMoves.Add(templateMoves[i]);
                     }
                 }
@@ -80,7 +78,7 @@ namespace ChessGameModes {
             foreach (ChessPiece piece in GetAlivePiecesOfType<ChessPiece>(GetCurrentTeamTurn())) {
                 BoardCoord[] templateMoves = piece.CalculateTemplateMoves().ToArray();
                 for (int i = 0; i < templateMoves.Length; i++) {
-                    if (IsThreat(piece, templateMoves[i])) {
+                    if (piece.IsThreatTowards(templateMoves[i])) {
                         return true;
                     }
                 }
@@ -97,7 +95,7 @@ namespace ChessGameModes {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     BoardCoord sidewaysCoord = mover.GetRelativeBoardCoord(i, 0);
 
-                    if (Board.ContainsCoord(sidewaysCoord) && IsThreat(mover, sidewaysCoord)) {
+                    if (Board.ContainsCoord(sidewaysCoord) && mover.IsThreatTowards(sidewaysCoord)) {
                         ChessPiece piece = Board.GetCoordInfo(sidewaysCoord).GetAliveOccupier();
 
                         if (piece is Pawn && CheckEnPassantVulnerability((Pawn)piece)) {

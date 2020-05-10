@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Controllers\CameraControl.cs" />
     <Compile Include="Assets\Scripts\Controllers\MouseController.cs" />
+    <Compile Include="Assets\Scripts\Data Structures\BoardColour.cs" />
     <Compile Include="Assets\Scripts\Data Structures\BoardCoord.cs" />
     <Compile Include="Assets\Scripts\Data Structures\CoordInfo.cs" />
     <Compile Include="Assets\Scripts\Data Structures\GameStateSnapshot.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="Assets\Scripts\Game Modes\ThreeCheck.cs" />
     <Compile Include="Assets\Scripts\Game Modes\UpsideDown.cs" />
     <Compile Include="Assets\Scripts\Game Modes\Weak.cs" />
+    <Compile Include="Assets\Scripts\Managers\ChessDebugLogger.cs" />
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\Scripts\Managers\UIManager.cs" />
     <Compile Include="Assets\Scripts\Misc\Board.cs" />

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
@@ -40,7 +39,7 @@ namespace ChessGameModes {
                 if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i])) {
                     continue;
                 }
-                if (IsThreat(mover, templateMoves[i]) == false) {
+                if (mover.IsThreatTowards(templateMoves[i]) == false) {
                     availableMoves.Add(templateMoves[i]);
                     continue;
                 }
@@ -68,7 +67,7 @@ namespace ChessGameModes {
         }
 
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            bool pieceCaptured = IsThreat(mover, destination);
+            bool pieceCaptured = mover.IsThreatTowards(destination);
 
             // Try make the move.
             if (MakeBaseMove(mover, destination)) {
@@ -77,11 +76,11 @@ namespace ChessGameModes {
                         for (int y = -1; y <= 1; y++) {
                             BoardCoord coord = mover.GetRelativeBoardCoord(x, y);
                             if (Board.ContainsCoord(coord) && ((Board.GetCoordInfo(coord).GetAliveOccupier() is Pawn) == false) && coord != mover.GetBoardPosition()) {
-                                KillPiece(Board.GetCoordInfo(coord).GetAliveOccupier());
+                                CapturePiece(Board.GetCoordInfo(coord).GetAliveOccupier());
                             }
                         }
                     }
-                    KillPiece(mover);
+                    CapturePiece(mover);
                 } else {
                     if (IsRoyal(mover)) {
                         TryPerformCastlingMove(mover);
@@ -122,7 +121,7 @@ namespace ChessGameModes {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     BoardCoord sidewaysCoord = mover.GetRelativeBoardCoord(i, 0);
 
-                    if (Board.ContainsCoord(sidewaysCoord) && IsThreat(mover, sidewaysCoord)) {
+                    if (Board.ContainsCoord(sidewaysCoord) && mover.IsThreatTowards(sidewaysCoord)) {
                         ChessPiece piece = Board.GetCoordInfo(sidewaysCoord).GetAliveOccupier();
 
                         if (piece is Pawn && CheckEnPassantVulnerability((Pawn)piece)) {
@@ -140,7 +139,7 @@ namespace ChessGameModes {
                                 }
 
                                 BoardCoord enpassantMove = mover.GetRelativeBoardCoord(i, 1);
-                                if (isValid && Board.ContainsCoord(enpassantMove) && IsAlly(mover, enpassantMove) == false) {
+                                if (isValid && Board.ContainsCoord(enpassantMove) && mover.IsAllyTowards(enpassantMove) == false) {
                                     enpassantMoves.Add(enpassantMove);
                                 }
                             }

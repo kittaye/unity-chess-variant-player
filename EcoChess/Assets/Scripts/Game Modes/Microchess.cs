@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
@@ -35,20 +34,20 @@ namespace ChessGameModes {
         }
 
         public override void PopulateBoard() {
-            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(0, BLACK_BACKROW)));
-            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(3, WHITE_BACKROW)));
+            opposingRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.BLACK, new BoardCoord(0, BLACK_BACKROW));
+            currentRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.WHITE, new BoardCoord(3, WHITE_BACKROW));
 
-            AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(0, BLACK_PAWNROW), initialMoveLimit: 1));
-            AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(0, WHITE_BACKROW)));
+            ((Pawn)AddNewPieceToBoard(Piece.Pawn, Team.BLACK, new BoardCoord(0, BLACK_PAWNROW))).initialMoveLimit = 1;
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, new BoardCoord(0, WHITE_BACKROW));
 
-            AddPieceToBoard(new Bishop(Team.WHITE, new BoardCoord(1, WHITE_BACKROW)));
-            AddPieceToBoard(new Knight(Team.BLACK, new BoardCoord(1, BLACK_BACKROW)));
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, new BoardCoord(1, WHITE_BACKROW));
+            AddNewPieceToBoard(Piece.Knight, Team.BLACK, new BoardCoord(1, BLACK_BACKROW));
 
-            AddPieceToBoard(new Knight(Team.WHITE, new BoardCoord(2, WHITE_BACKROW)));
-            AddPieceToBoard(new Bishop(Team.BLACK, new BoardCoord(2, BLACK_BACKROW)));
+            AddNewPieceToBoard(Piece.Knight, Team.WHITE, new BoardCoord(2, WHITE_BACKROW));
+            AddNewPieceToBoard(Piece.Bishop, Team.BLACK, new BoardCoord(2, BLACK_BACKROW));
 
-            AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(3, WHITE_PAWNROW), initialMoveLimit: 1));
-            AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(3, BLACK_BACKROW)));
+            ((Pawn)AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(3, WHITE_PAWNROW))).initialMoveLimit = 1;
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, new BoardCoord(3, BLACK_BACKROW));
         }
 
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {

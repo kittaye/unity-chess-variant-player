@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
@@ -39,32 +38,32 @@ namespace ChessGameModes {
         }
 
         public override void PopulateBoard() {
-            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, "e1"));
-            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, "e8"));
+            currentRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.WHITE, "e1");
+            opposingRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.BLACK, "e8");
 
-            AddPieceToBoard(new Empress(Team.WHITE, "a1"));
-            AddPieceToBoard(new Empress(Team.BLACK, "a8"));
-            AddPieceToBoard(new Rook(Team.WHITE, "h1"));
-            AddPieceToBoard(new Rook(Team.BLACK, "h8"));
+            AddNewPieceToBoard(Piece.Empress, Team.WHITE, "a1");
+            AddNewPieceToBoard(Piece.Empress, Team.BLACK, "a8");
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, "h1");
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, "h8");
 
-            AddPieceToBoard(new Princess(Team.WHITE, "b1"));
-            AddPieceToBoard(new Princess(Team.BLACK, "b8"));
+            AddNewPieceToBoard(Piece.Princess, Team.WHITE, "b1");
+            AddNewPieceToBoard(Piece.Princess, Team.BLACK, "b8");
 
-            AddPieceToBoard(new Queen(Team.WHITE, "c1"));
-            AddPieceToBoard(new Queen(Team.BLACK, "c8"));
+            AddNewPieceToBoard(Piece.Queen, Team.WHITE, "c1");
+            AddNewPieceToBoard(Piece.Queen, Team.BLACK, "c8");
 
-            AddPieceToBoard(new Amazon(Team.WHITE, "d1"));
-            AddPieceToBoard(new Amazon(Team.BLACK, "d8"));
+            AddNewPieceToBoard(Piece.Amazon, Team.WHITE, "d1");
+            AddNewPieceToBoard(Piece.Amazon, Team.BLACK, "d8");
 
-            AddPieceToBoard(new Bishop(Team.WHITE, "f1"));
-            AddPieceToBoard(new Bishop(Team.BLACK, "f8"));
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, "f1");
+            AddNewPieceToBoard(Piece.Bishop, Team.BLACK, "f8");
 
-            AddPieceToBoard(new Knight(Team.WHITE, "g1"));
-            AddPieceToBoard(new Knight(Team.BLACK, "g8"));
+            AddNewPieceToBoard(Piece.Knight, Team.WHITE, "g1");
+            AddNewPieceToBoard(Piece.Knight, Team.BLACK, "g8");
 
             for (int x = 0; x < BOARD_WIDTH; x++) {
-                AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, WHITE_PAWNROW)));
-                AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(x, BLACK_PAWNROW)));
+                AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(x, WHITE_PAWNROW));
+                AddNewPieceToBoard(Piece.Pawn, Team.BLACK, new BoardCoord(x, BLACK_PAWNROW));
             }
         }
 

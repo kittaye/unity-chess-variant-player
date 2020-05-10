@@ -1,29 +1,19 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 public class CoordInfo {
     public string algebraicKey;
     public string file;
     public string rank;
-    public readonly GameObject boardChunk;
+    public object graphicalObject;
 
     private List<ChessPiece> occupiers;
     private ChessPiece cachedActiveOccupier;
 
-    public CoordInfo(string key, GameObject boardChunk) {
-        this.algebraicKey = key;
-        this.occupiers = new List<ChessPiece>();
-        this.boardChunk = boardChunk;
-        cachedActiveOccupier = null;
-
-        file = key[0].ToString();
-        rank = key.Substring(1);
-    }
 
     public CoordInfo(string key) {
         this.algebraicKey = key;
         this.occupiers = new List<ChessPiece>();
-        this.boardChunk = null;
+        this.graphicalObject = null;
         cachedActiveOccupier = null;
 
         file = key[0].ToString();

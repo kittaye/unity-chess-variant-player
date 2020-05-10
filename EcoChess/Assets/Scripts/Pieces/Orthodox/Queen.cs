@@ -1,18 +1,10 @@
 ﻿using System.Collections.Generic;
 
 public class Queen : ChessPiece {
-    public Queen(Team team, BoardCoord position) : base(team, position) {
+    public Queen(Team team, BoardCoord position, Board board) : base(team, position, board) {
         m_pieceType = Piece.Queen;
     }
-    public Queen(Team team, string algebraicKeyPosition) : base(team, algebraicKeyPosition) {
-        m_pieceType = Piece.Queen;
-    }
-    public Queen(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping) 
-        : base(team, position, allowXWrapping, allowYWrapping) {
-        m_pieceType = Piece.Queen;
-    }
-    public Queen(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping)
-    : base(team, algebraicKeyPosition, allowXWrapping, allowYWrapping) {
+    public Queen(Team team, string algebraicKeyPosition, Board board) : base(team, algebraicKeyPosition, board) {
         m_pieceType = Piece.Queen;
     }
 
@@ -27,15 +19,14 @@ public class Queen : ChessPiece {
     public override List<BoardCoord> CalculateTemplateMoves() {
         List<BoardCoord> moves = new List<BoardCoord>();
 
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpRight));
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpLeft));
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.DownLeft));
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.DownRight));
-
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Up));
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Left));
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Down));
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Right));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.UpRight));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.UpLeft));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.DownLeft));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.DownRight));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Up));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Left));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Down));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Right));
 
         return moves;
     }

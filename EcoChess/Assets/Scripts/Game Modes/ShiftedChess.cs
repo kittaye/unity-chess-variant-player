@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
@@ -44,44 +43,44 @@ namespace ChessGameModes {
         }
 
         public override void PopulateBoard() {
-            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, "f2"));
-            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, "d8"));
+            currentRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.WHITE, "f2");
+            opposingRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.BLACK, "d8");
 
-            AddPieceToBoard(new Queen(Team.WHITE, "e1"));
-            AddPieceToBoard(new Queen(Team.BLACK, "e9"));
+            AddNewPieceToBoard(Piece.Queen, Team.WHITE, "e1");
+            AddNewPieceToBoard(Piece.Queen, Team.BLACK, "e9");
 
-            AddPieceToBoard(new Bishop(Team.WHITE, "c1"));
-            AddPieceToBoard(new Bishop(Team.BLACK, "b8"));
-            AddPieceToBoard(new Bishop(Team.WHITE, "g2"));
-            AddPieceToBoard(new Bishop(Team.BLACK, "f9"));
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, "c1");
+            AddNewPieceToBoard(Piece.Bishop, Team.BLACK, "b8");
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, "g2");
+            AddNewPieceToBoard(Piece.Bishop, Team.BLACK, "f9");
 
-            AddPieceToBoard(new Knight(Team.WHITE, "d1"));
-            AddPieceToBoard(new Knight(Team.BLACK, "c8"));
-            AddPieceToBoard(new Knight(Team.WHITE, "h2"));
-            AddPieceToBoard(new Knight(Team.BLACK, "g9"));
+            AddNewPieceToBoard(Piece.Knight, Team.WHITE, "d1");
+            AddNewPieceToBoard(Piece.Knight, Team.BLACK, "c8");
+            AddNewPieceToBoard(Piece.Knight, Team.WHITE, "h2");
+            AddNewPieceToBoard(Piece.Knight, Team.BLACK, "g9");
 
-            AddPieceToBoard(new Rook(Team.WHITE, "b1"));
-            AddPieceToBoard(new Rook(Team.BLACK, "a8"));
-            AddPieceToBoard(new Rook(Team.WHITE, "i2"));
-            AddPieceToBoard(new Rook(Team.BLACK, "h9"));
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, "b1");
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, "a8");
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, "i2");
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, "h9");
 
-            AddPieceToBoard(new Pawn(Team.WHITE, "b2"));
-            AddPieceToBoard(new Pawn(Team.WHITE, "c2"));
-            AddPieceToBoard(new Pawn(Team.WHITE, "d2"));
-            AddPieceToBoard(new Pawn(Team.WHITE, "e2"));
-            AddPieceToBoard(new Pawn(Team.WHITE, "f3"));
-            AddPieceToBoard(new Pawn(Team.WHITE, "g3"));
-            AddPieceToBoard(new Pawn(Team.WHITE, "h3"));
-            AddPieceToBoard(new Pawn(Team.WHITE, "i3"));
+            AddNewPieceToBoard(Piece.Pawn, Team.WHITE, "b2");
+            AddNewPieceToBoard(Piece.Pawn, Team.WHITE, "c2");
+            AddNewPieceToBoard(Piece.Pawn, Team.WHITE, "d2");
+            AddNewPieceToBoard(Piece.Pawn, Team.WHITE, "e2");
+            AddNewPieceToBoard(Piece.Pawn, Team.WHITE, "f3");
+            AddNewPieceToBoard(Piece.Pawn, Team.WHITE, "g3");
+            AddNewPieceToBoard(Piece.Pawn, Team.WHITE, "h3");
+            AddNewPieceToBoard(Piece.Pawn, Team.WHITE, "i3");
 
-            AddPieceToBoard(new Pawn(Team.BLACK, "a7"));
-            AddPieceToBoard(new Pawn(Team.BLACK, "b7"));
-            AddPieceToBoard(new Pawn(Team.BLACK, "c7"));
-            AddPieceToBoard(new Pawn(Team.BLACK, "d7"));
-            AddPieceToBoard(new Pawn(Team.BLACK, "e8"));
-            AddPieceToBoard(new Pawn(Team.BLACK, "f8"));
-            AddPieceToBoard(new Pawn(Team.BLACK, "g8"));
-            AddPieceToBoard(new Pawn(Team.BLACK, "h8"));
+            AddNewPieceToBoard(Piece.Pawn, Team.BLACK, "a7");
+            AddNewPieceToBoard(Piece.Pawn, Team.BLACK, "b7");
+            AddNewPieceToBoard(Piece.Pawn, Team.BLACK, "c7");
+            AddNewPieceToBoard(Piece.Pawn, Team.BLACK, "d7");
+            AddNewPieceToBoard(Piece.Pawn, Team.BLACK, "e8");
+            AddNewPieceToBoard(Piece.Pawn, Team.BLACK, "f8");
+            AddNewPieceToBoard(Piece.Pawn, Team.BLACK, "g8");
+            AddNewPieceToBoard(Piece.Pawn, Team.BLACK, "h8");
         }
 
         protected override bool IsAPromotionMove(BoardCoord move) {

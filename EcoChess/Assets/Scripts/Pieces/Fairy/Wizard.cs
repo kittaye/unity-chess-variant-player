@@ -1,19 +1,10 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 public class Wizard : ChessPiece {
-    public Wizard(Team team, BoardCoord position) : base(team, position) {
+    public Wizard(Team team, BoardCoord position, Board board) : base(team, position, board) {
         m_pieceType = Piece.Wizard;
     }
-    public Wizard(Team team, string algebraicKeyPosition) : base(team, algebraicKeyPosition) {
-        m_pieceType = Piece.Wizard;
-    }
-    public Wizard(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping) 
-        : base(team, position, allowXWrapping, allowYWrapping) {
-        m_pieceType = Piece.Wizard;
-    }
-    public Wizard(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping)
-    : base(team, algebraicKeyPosition, allowXWrapping, allowYWrapping) {
+    public Wizard(Team team, string algebraicKeyPosition, Board board) : base(team, algebraicKeyPosition, board) {
         m_pieceType = Piece.Wizard;
     }
 

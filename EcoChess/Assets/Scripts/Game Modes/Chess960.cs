@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
@@ -99,11 +98,11 @@ namespace ChessGameModes {
             { 960, new Piece[]{ Piece.Queen, Piece.Knight, Piece.Knight, Piece.Rook, Piece.King, Piece.Rook } },
         };
 
-        private List<Vector2> BishopsTable = new List<Vector2> {
-            new Vector2(0,1), new Vector2(0,3), new Vector2(0,5), new Vector2(0,7), new Vector2(1,2),
-            new Vector2(2,3), new Vector2(2,5), new Vector2(2,7), new Vector2(1,4), new Vector2(3,4),
-            new Vector2(4,5), new Vector2(4,7), new Vector2(1,6), new Vector2(3,6), new Vector2(5,6),
-            new Vector2(6,7),
+        private List<BoardCoord> BishopsTable = new List<BoardCoord> {
+            new BoardCoord(0,1), new BoardCoord(0,3), new BoardCoord(0,5), new BoardCoord(0,7), new BoardCoord(1,2),
+            new BoardCoord(2,3), new BoardCoord(2,5), new BoardCoord(2,7), new BoardCoord(1,4), new BoardCoord(3,4),
+            new BoardCoord(4,5), new BoardCoord(4,7), new BoardCoord(1,6), new BoardCoord(3,6), new BoardCoord(5,6),
+            new BoardCoord(6,7),
         };
 
         private Piece[] GetStartingPosition(int SPseed) {
@@ -111,7 +110,7 @@ namespace ChessGameModes {
             int remainder = SPseed % 16;
             int factorof16 = SPseed - remainder;
 
-            Vector2 bishopPositions = BishopsTable[remainder];
+            BoardCoord bishopPositions = BishopsTable[remainder];
             Piece[] piecePositions = KingsTable[factorof16];
 
             Piece[] pieceOrder = new Piece[8];
@@ -128,20 +127,22 @@ namespace ChessGameModes {
         }
 
         public override void PopulateBoard() {
-            int SPseed = Random.Range(0, 960);
+            int SPseed = new System.Random().Next(0, 960);
+
+            RaiseEventOnLogInfoMessage(SPseed.ToString());
+
             Piece[] randomPieceOrder = GetStartingPosition(SPseed);
-            Debug.Log(SPseed);
 
             for (int x = 0; x < BOARD_WIDTH; x++) {
-                AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, WHITE_PAWNROW)));
-                AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(x, BLACK_PAWNROW)));
+                AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(x, WHITE_PAWNROW));
+                AddNewPieceToBoard(Piece.Pawn, Team.BLACK, new BoardCoord(x, BLACK_PAWNROW));
 
                 if (randomPieceOrder[x] == Piece.King) {
-                    currentRoyalPiece = (King)AddPieceToBoard(ChessPieceFactory.Create(randomPieceOrder[x], Team.WHITE, new BoardCoord(x, WHITE_BACKROW)));
-                    opposingRoyalPiece = (King)AddPieceToBoard(ChessPieceFactory.Create(randomPieceOrder[x], Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
+                    currentRoyalPiece = (King)AddNewPieceToBoard(randomPieceOrder[x], Team.WHITE, new BoardCoord(x, WHITE_BACKROW));
+                    opposingRoyalPiece = (King)AddNewPieceToBoard(randomPieceOrder[x], Team.BLACK, new BoardCoord(x, BLACK_BACKROW));
                 } else {
-                    AddPieceToBoard(ChessPieceFactory.Create(randomPieceOrder[x], Team.WHITE, new BoardCoord(x, WHITE_BACKROW)));
-                    AddPieceToBoard(ChessPieceFactory.Create(randomPieceOrder[x], Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
+                    AddNewPieceToBoard(randomPieceOrder[x], Team.WHITE, new BoardCoord(x, WHITE_BACKROW));
+                    AddNewPieceToBoard(randomPieceOrder[x], Team.BLACK, new BoardCoord(x, BLACK_BACKROW));
                 }
             }
         }
@@ -239,7 +240,7 @@ namespace ChessGameModes {
                                 }
                             }
                             // If a friendly rook is found, it is the castling rook
-                            if (piece is Rook && piece.MoveCount == 0 && IsAlly(king, piece.GetBoardPosition())) {
+                            if (piece is Rook && piece.MoveCount == 0 && king.IsAllyTowards(piece)) {
                                 castlingRook = (Rook)piece;
                                 if (castlingRook.GetBoardPosition() == CASTLE_KINGPOS) break;
                             } else {
@@ -263,7 +264,7 @@ namespace ChessGameModes {
                         ChessPiece currentKingPosOccupier = Board.GetCoordInfo(CASTLE_KINGPOS).GetAliveOccupier();
 
                         // If the final rook and king positions are either null, or occupied by a friendly king or castling rook, the castle is valid.
-                        if (IsAlly(currentRookPosOccupier, CASTLE_ROOKPOS) && currentRookPosOccupier != castlingRook && currentRookPosOccupier != king) {
+                        if (currentRookPosOccupier.IsAllyTowards(CASTLE_ROOKPOS) && currentRookPosOccupier != castlingRook && currentRookPosOccupier != king) {
                             continue;
                         } else if (currentKingPosOccupier == null || currentKingPosOccupier == castlingRook || currentKingPosOccupier == king) {
                             castleMoves.Add(castlingRook.GetBoardPosition());

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-
+﻿
 namespace ChessGameModes {
     /// <summary>
     /// Board layout:
@@ -49,29 +47,29 @@ namespace ChessGameModes {
         }
 
         public override void PopulateBoard() {
-            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(4, WHITE_BACKROW)));
-            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(4, BLACK_BACKROW)));
+            currentRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.WHITE, new BoardCoord(4, WHITE_BACKROW));
+            opposingRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.BLACK, new BoardCoord(4, BLACK_BACKROW));
 
-            AddPieceToBoard(new Queen(Team.WHITE, "d1"));
-            AddPieceToBoard(new Bishop(Team.WHITE, "c1"));
-            AddPieceToBoard(new Bishop(Team.WHITE, "f1"));
-            AddPieceToBoard(new Knight(Team.WHITE, "b1"));
-            AddPieceToBoard(new Knight(Team.WHITE, "g1"));
-            AddPieceToBoard(new Rook(Team.WHITE, "a1"));
-            AddPieceToBoard(new Rook(Team.WHITE, "h1"));
+            AddNewPieceToBoard(Piece.Queen, Team.WHITE, "d1");
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, "c1");
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, "f1");
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, "b1");
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, "g1");
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, "a1");
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, "h1");
 
-            AddPieceToBoard(new Pawn(Team.BLACK, "c6", initialMoveLimit: 1));
-            AddPieceToBoard(new Pawn(Team.BLACK, "f6", initialMoveLimit: 1));
+            ((Pawn)AddNewPieceToBoard(Piece.Pawn, Team.BLACK, "c6")).initialMoveLimit = 1;
+            ((Pawn)AddNewPieceToBoard(Piece.Pawn, Team.BLACK, "f6")).initialMoveLimit = 1;
 
             for (int x = 0; x < BOARD_WIDTH; x++) {
-                AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, WHITE_PAWNROW)));
-                AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(x, BLACK_PAWNROW)));
+                AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(x, WHITE_PAWNROW));
+                AddNewPieceToBoard(Piece.Pawn, Team.BLACK, new BoardCoord(x, BLACK_PAWNROW));
 
-                if(x != 4) {
-                    AddPieceToBoard(new Knight(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
+                if (x != 4) {
+                    AddNewPieceToBoard(Piece.Knight, Team.BLACK, new BoardCoord(x, BLACK_BACKROW));
                 }
-                if(x >= 1 && x <= BOARD_WIDTH - 2) {
-                    AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(x, BLACK_PAWNROW - 2), initialMoveLimit: 1));
+                if (x >= 1 && x <= BOARD_WIDTH - 2) {
+                    ((Pawn)AddNewPieceToBoard(Piece.Pawn, Team.BLACK, new BoardCoord(x, BLACK_PAWNROW - 2))).initialMoveLimit = 1;
                 }
             }
         }

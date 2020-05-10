@@ -1,31 +1,20 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 public class Pawn : ChessPiece {
-    public readonly uint initialMoveLimit;
-    public readonly bool canEnPassantCapture;
+    public uint initialMoveLimit;
+    public bool canEnPassantCapture;
 
-    public Pawn(Team team, BoardCoord position, bool canEnPassantCapture = true, uint initialMoveLimit = 2) : base(team, position) {
-        m_pieceType = Piece.Pawn;
-        this.canEnPassantCapture = canEnPassantCapture;
-        this.initialMoveLimit = initialMoveLimit;
+    public Pawn(Team team, BoardCoord position, Board board) : base(team, position, board) {
+        Init();
     }
-    public Pawn(Team team, string algebraicKeyPosition, bool canEnPassantCapture = true, uint initialMoveLimit = 2) : base(team, algebraicKeyPosition) {
-        m_pieceType = Piece.Pawn;
-        this.canEnPassantCapture = canEnPassantCapture;
-        this.initialMoveLimit = initialMoveLimit;
+    public Pawn(Team team, string algebraicKeyPosition, Board board) : base(team, algebraicKeyPosition, board) {
+        Init();
     }
-    public Pawn(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping, bool canEnPassantCapture = true, uint initialMoveLimit = 2) 
-        : base(team, position, allowXWrapping, allowYWrapping) {
+
+    private void Init() {
         m_pieceType = Piece.Pawn;
-        this.canEnPassantCapture = canEnPassantCapture;
-        this.initialMoveLimit = initialMoveLimit;
-    }
-    public Pawn(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping, bool canEnPassantCapture = true, uint initialMoveLimit = 2)
-    : base(team, algebraicKeyPosition, allowXWrapping, allowYWrapping) {
-        m_pieceType = Piece.Pawn;
-        this.canEnPassantCapture = canEnPassantCapture;
-        this.initialMoveLimit = initialMoveLimit;
+        this.canEnPassantCapture = true;
+        this.initialMoveLimit = 2;
     }
 
     public override string GetCanonicalName() {
@@ -41,10 +30,10 @@ public class Pawn : ChessPiece {
 
         uint moveCap = (MoveCount == 0) ? initialMoveLimit : 1;
 
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Up, moveCap: moveCap, threatAttackLimit: 0));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Up, moveCap: moveCap, threatAttackLimit: 0));
 
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpLeft, moveCap: 1, threatsOnly: true));
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpRight, moveCap: 1, threatsOnly: true));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.UpLeft, moveCap: 1, threatsOnly: true));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.UpRight, moveCap: 1, threatsOnly: true));
 
         return moves;
     }

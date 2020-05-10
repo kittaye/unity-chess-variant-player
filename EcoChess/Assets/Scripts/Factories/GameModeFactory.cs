@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-
+﻿
 namespace ChessGameModes {
     public enum GameMode {
         ActiveChess, AdvanceChess, AlmostChess, AmazonChess, AndernachChess, AtomicChess, BalboChess, BerolinaChess, CapablancaChess,
@@ -114,7 +113,6 @@ namespace ChessGameModes {
                 case GameMode.Weak:
                     return new Weak();
                 default:
-                    Debug.LogError("Game mode: " + mode.ToString() + ", is not supported!");
                     return null;
             }
         }

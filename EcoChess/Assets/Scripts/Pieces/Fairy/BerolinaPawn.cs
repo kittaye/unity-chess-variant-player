@@ -1,19 +1,10 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 public class BerolinaPawn : Pawn {
-    public BerolinaPawn(Team team, BoardCoord position) : base(team, position) {
+    public BerolinaPawn(Team team, BoardCoord position, Board board) : base(team, position, board) {
         m_pieceType = Piece.BerolinaPawn;
     }
-    public BerolinaPawn(Team team, string algebraicKeyPosition) : base(team, algebraicKeyPosition) {
-        m_pieceType = Piece.BerolinaPawn;
-    }
-    public BerolinaPawn(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping) 
-        : base(team, position, allowXWrapping, allowYWrapping) {
-        m_pieceType = Piece.BerolinaPawn;
-    }
-    public BerolinaPawn(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping)
-    : base(team, algebraicKeyPosition, allowXWrapping, allowYWrapping) {
+    public BerolinaPawn(Team team, string algebraicKeyPosition, Board board) : base(team, algebraicKeyPosition, board) {
         m_pieceType = Piece.BerolinaPawn;
     }
 
@@ -30,10 +21,10 @@ public class BerolinaPawn : Pawn {
 
         uint moveCap = (MoveCount == 0) ? initialMoveLimit : 1;
 
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpRight, moveCap: moveCap, threatAttackLimit: 0));
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpLeft, moveCap: moveCap, threatAttackLimit: 0));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.UpRight, moveCap: moveCap, threatAttackLimit: 0));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.UpLeft, moveCap: moveCap, threatAttackLimit: 0));
 
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Up, moveCap: 1, threatsOnly: true));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Up, moveCap: 1, threatsOnly: true));
 
         return moves;
     }

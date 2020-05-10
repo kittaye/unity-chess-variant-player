@@ -1,18 +1,10 @@
 ﻿using System.Collections.Generic;
 
 public class Bishop : ChessPiece {
-    public Bishop(Team team, BoardCoord position) : base(team, position) {
+    public Bishop(Team team, BoardCoord position, Board board) : base(team, position, board) {
         m_pieceType = Piece.Bishop;
     }
-    public Bishop(Team team, string algebraicKeyPosition) : base(team, algebraicKeyPosition) {
-        m_pieceType = Piece.Bishop;
-    }
-    public Bishop(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping) 
-        : base(team, position, allowXWrapping, allowYWrapping) {
-        m_pieceType = Piece.Bishop;
-    }
-    public Bishop(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping)
-    : base(team, algebraicKeyPosition, allowXWrapping, allowYWrapping) {
+    public Bishop(Team team, string algebraicKeyPosition, Board board) : base(team, algebraicKeyPosition, board) {
         m_pieceType = Piece.Bishop;
     }
 
@@ -27,10 +19,10 @@ public class Bishop : ChessPiece {
     public override List<BoardCoord> CalculateTemplateMoves() {
         List<BoardCoord> moves = new List<BoardCoord>();
 
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpRight));
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpLeft));
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.DownLeft));
-        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.DownRight));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.UpRight));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.UpLeft));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.DownLeft));
+        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.DownRight));
 
         return moves;
     }

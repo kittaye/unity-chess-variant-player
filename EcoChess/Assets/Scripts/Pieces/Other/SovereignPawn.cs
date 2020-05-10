@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 /// <summary>
 /// Sovereign Pawns are specific only to the Sovereign Chess variant and should not be used elsewhere.
@@ -9,11 +8,11 @@ public class SovereignPawn : Pawn {
     private enum ClosestEdge { Bottom, Left, Right, Top }
     public Quadrant pieceQuadrant;
 
-    public SovereignPawn(Team team, BoardCoord position, Quadrant quadrant) : base(team, position) {
-        this.pieceQuadrant = quadrant;
+    public SovereignPawn(Team team, BoardCoord position, Board board) : base(team, position, board) {
+        m_pieceType = Piece.SovereignPawn;
     }
-    public SovereignPawn(Team team, string algebraicKeyPosition, Quadrant quadrant) : base(team, algebraicKeyPosition) {
-        this.pieceQuadrant = quadrant;
+    public SovereignPawn(Team team, string algebraicKeyPosition, Board board) : base(team, algebraicKeyPosition, board) {
+        m_pieceType = Piece.SovereignPawn;
     }
 
     public override string GetCanonicalName() {
@@ -46,7 +45,7 @@ public class SovereignPawn : Pawn {
                 if (pos.y > pos.x) return ClosestEdge.Top;
                 else return ClosestEdge.Right;
             default:
-                Debug.LogError("Error! Quadrant: " + pieceQuadrant.ToString() + " is not supported.");
+                // Should not happen!
                 return ClosestEdge.Bottom;
         }
     }
@@ -60,93 +59,93 @@ public class SovereignPawn : Pawn {
 
         switch (pieceQuadrant) {
             case Quadrant.BottomLeft:
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpRight, moveCap: 1, threatsOnly: true, teamSensitive: false));
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpLeft, moveCap: 1, threatsOnly: true, teamSensitive: false));
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.DownRight, moveCap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.UpRight, moveCap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.UpLeft, moveCap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.DownRight, moveCap: 1, threatsOnly: true, teamSensitive: false));
 
                 if (hasInitialMove) {
                     edge = GetClosestEdge();
 
                     if(edge == ClosestEdge.Bottom) {
-                        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Up, moveCap: 2, threatAttackLimit: 0, teamSensitive: false));
-                        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Right, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
+                        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Up, moveCap: 2, threatAttackLimit: 0, teamSensitive: false));
+                        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Right, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
                         break;
                     } else { // == ClosestEdge.Left
-                        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Right, moveCap: 2, threatAttackLimit: 0, teamSensitive: false));
-                        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Up, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
+                        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Right, moveCap: 2, threatAttackLimit: 0, teamSensitive: false));
+                        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Up, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
                         break;
                     }
                 }
 
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Up, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Right, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Up, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Right, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
                 break;
 
             case Quadrant.BottomRight:
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpRight, moveCap: 1, threatsOnly: true, teamSensitive: false));
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpLeft, moveCap: 1, threatsOnly: true, teamSensitive: false));
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.DownLeft, moveCap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.UpRight, moveCap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.UpLeft, moveCap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.DownLeft, moveCap: 1, threatsOnly: true, teamSensitive: false));
 
                 if (hasInitialMove) {
                     edge = GetClosestEdge();
 
                     if (edge == ClosestEdge.Bottom) {
-                        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Up, moveCap: 2, threatAttackLimit: 0, teamSensitive: false));
-                        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Left, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
+                        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Up, moveCap: 2, threatAttackLimit: 0, teamSensitive: false));
+                        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Left, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
                         break;
                     } else { // == ClosestEdge.Right {
-                        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Left, moveCap: 2, threatAttackLimit: 0, teamSensitive: false));
-                        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Up, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
+                        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Left, moveCap: 2, threatAttackLimit: 0, teamSensitive: false));
+                        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Up, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
                         break;
                     }
                 }
 
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Up, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Left, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Up, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Left, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
                 break;
             case Quadrant.TopLeft:
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpRight, moveCap: 1, threatsOnly: true, teamSensitive: false));
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.DownLeft, moveCap: 1, threatsOnly: true, teamSensitive: false));
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.DownRight, moveCap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.UpRight, moveCap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.DownLeft, moveCap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.DownRight, moveCap: 1, threatsOnly: true, teamSensitive: false));
 
                 if (hasInitialMove) {
                     edge = GetClosestEdge();
 
                     if (edge == ClosestEdge.Top) {
-                        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Down, moveCap: 2, threatAttackLimit: 0, teamSensitive: false));
-                        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Right, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
+                        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Down, moveCap: 2, threatAttackLimit: 0, teamSensitive: false));
+                        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Right, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
                         break;
                     } else { // == ClosestEdge.Left
-                        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Right, moveCap: 2, threatAttackLimit: 0, teamSensitive: false));
-                        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Down, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
+                        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Right, moveCap: 2, threatAttackLimit: 0, teamSensitive: false));
+                        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Down, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
                         break;
                     }
                 }
 
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Down, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Right, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Down, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Right, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
                 break;
             case Quadrant.TopRight:
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.UpLeft, moveCap: 1, threatsOnly: true, teamSensitive: false));
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.DownLeft, moveCap: 1, threatsOnly: true, teamSensitive: false));
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.DownRight, moveCap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.UpLeft, moveCap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.DownLeft, moveCap: 1, threatsOnly: true, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.DownRight, moveCap: 1, threatsOnly: true, teamSensitive: false));
 
                 if (hasInitialMove) {
                     edge = GetClosestEdge();
 
                     if (edge == ClosestEdge.Top) {
-                        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Down, moveCap: 2, threatAttackLimit: 0, teamSensitive: false));
-                        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Left, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
+                        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Down, moveCap: 2, threatAttackLimit: 0, teamSensitive: false));
+                        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Left, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
                         break;
                     } else { // == ClosestEdge.Right
-                        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Left, moveCap: 2, threatAttackLimit: 0, teamSensitive: false));
-                        moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Down, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
+                        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Left, moveCap: 2, threatAttackLimit: 0, teamSensitive: false));
+                        moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Down, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
                         break;
                     }
                 }
 
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Down, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
-                moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, MoveDirection.Left, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Down, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
+                moves.AddRange(TryGetDirectionalTemplateMoves(MoveDirection.Left, moveCap: 1, threatAttackLimit: 0, teamSensitive: false));
                 break;
             default:
                 break;

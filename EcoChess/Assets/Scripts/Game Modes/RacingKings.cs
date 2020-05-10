@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
@@ -39,26 +37,26 @@ namespace ChessGameModes {
         }
 
         public override void PopulateBoard() {
-            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(0, 1)));
-            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(7, 1)));
+            opposingRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.BLACK, new BoardCoord(0, 1));
+            currentRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.WHITE, new BoardCoord(7, 1));
 
-            AddPieceToBoard(new Queen(Team.BLACK, new BoardCoord(0, 0)));
-            AddPieceToBoard(new Queen(Team.WHITE, new BoardCoord(7, 0)));
+            AddNewPieceToBoard(Piece.Queen, Team.BLACK, new BoardCoord(0, 0));
+            AddNewPieceToBoard(Piece.Queen, Team.WHITE, new BoardCoord(7, 0));
 
-            AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(1, 0)));
-            AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(1, 1)));
-            AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(6, 0)));
-            AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(6, 1)));
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, new BoardCoord(1, 0));
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, new BoardCoord(1, 1));
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, new BoardCoord(6, 0));
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, new BoardCoord(6, 1));
 
-            AddPieceToBoard(new Bishop(Team.BLACK, new BoardCoord(2, 0)));
-            AddPieceToBoard(new Bishop(Team.BLACK, new BoardCoord(2, 1)));
-            AddPieceToBoard(new Bishop(Team.WHITE, new BoardCoord(5, 0)));
-            AddPieceToBoard(new Bishop(Team.WHITE, new BoardCoord(5, 1)));
+            AddNewPieceToBoard(Piece.Bishop, Team.BLACK, new BoardCoord(2, 0));
+            AddNewPieceToBoard(Piece.Bishop, Team.BLACK, new BoardCoord(2, 1));
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, new BoardCoord(5, 0));
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, new BoardCoord(5, 1));
 
-            AddPieceToBoard(new Knight(Team.BLACK, new BoardCoord(3, 0)));
-            AddPieceToBoard(new Knight(Team.BLACK, new BoardCoord(3, 1)));
-            AddPieceToBoard(new Knight(Team.WHITE, new BoardCoord(4, 0)));
-            AddPieceToBoard(new Knight(Team.WHITE, new BoardCoord(4, 1)));
+            AddNewPieceToBoard(Piece.Knight, Team.BLACK, new BoardCoord(3, 0));
+            AddNewPieceToBoard(Piece.Knight, Team.BLACK, new BoardCoord(3, 1));
+            AddNewPieceToBoard(Piece.Knight, Team.WHITE, new BoardCoord(4, 0));
+            AddNewPieceToBoard(Piece.Knight, Team.WHITE, new BoardCoord(4, 1));
         }
 
         public override bool CheckWinState() {

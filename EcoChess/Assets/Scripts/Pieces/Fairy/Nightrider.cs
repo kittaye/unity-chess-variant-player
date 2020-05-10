@@ -1,19 +1,10 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 public class Nightrider : ChessPiece {
-    public Nightrider(Team team, BoardCoord position) : base(team, position) {
+    public Nightrider(Team team, BoardCoord position, Board board) : base(team, position, board) {
         m_pieceType = Piece.Nightrider;
     }
-    public Nightrider(Team team, string algebraicKeyPosition) : base(team, algebraicKeyPosition) {
-        m_pieceType = Piece.Nightrider;
-    }
-    public Nightrider(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping) 
-        : base(team, position, allowXWrapping, allowYWrapping) {
-        m_pieceType = Piece.Nightrider;
-    }
-    public Nightrider(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping)
-    : base(team, algebraicKeyPosition, allowXWrapping, allowYWrapping) {
+    public Nightrider(Team team, string algebraicKeyPosition, Board board) : base(team, algebraicKeyPosition, board) {
         m_pieceType = Piece.Nightrider;
     }
 
@@ -46,7 +37,7 @@ public class Nightrider : ChessPiece {
 
         // Infinitely extended knight movements
         for (int i = 0; i < m_SpecificMoveSet.Length; i++) {
-            moves.AddRange(chessGame.TryGetDirectionalTemplateMoves(this, m_SpecificMoveSet[i]));
+            moves.AddRange(TryGetDirectionalTemplateMoves(m_SpecificMoveSet[i]));
         }
 
         return moves;

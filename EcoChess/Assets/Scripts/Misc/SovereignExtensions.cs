@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public enum ColourName { Red, Blue, Yellow, Green, Pink, Purple, Grey, Silver, Orange, Lightblue, White, Black }
 
