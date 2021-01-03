@@ -184,7 +184,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0684ba2f14b52c4b8f72eb32494ea89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camera: {fileID: 810617030}
   variantHelpDialog: {fileID: 1552341150}
   notationLinePrefab: {fileID: 7251642604797751115, guid: 8afd66017318da244998db3d790b0de6,
     type: 3}
@@ -2223,7 +2222,6 @@ GameObject:
   - component: {fileID: 810617034}
   - component: {fileID: 810617032}
   - component: {fileID: 810617031}
-  - component: {fileID: 810617036}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2304,19 +2302,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &810617036
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 810617030}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ebe9fc1705920640ae631bb3262c282, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 3
 --- !u!1 &873335073
 GameObject:
   m_ObjectHideFlags: 0
