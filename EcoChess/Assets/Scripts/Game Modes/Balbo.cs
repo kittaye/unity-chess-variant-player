@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
@@ -24,7 +23,7 @@ namespace ChessGameModes {
         private Piece[] limitedPromotionOptions;
 
         public Balbo() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-            Board.RemoveBoardCoordinates(new string[]
+            Board.RemoveAndDestroyBoardCoordinates(new string[]
             { "a1", "a2", "a3", "a4", "a7", "a8", "a9", "a10",
               "b1", "b2", "b3", "b8", "b9", "b10",
               "c1", "c2", "c9", "c10",
@@ -82,85 +81,68 @@ namespace ChessGameModes {
             }
         }
 
-        protected override bool CanPromote(Pawn mover, BoardCoord[] availableMoves) {
-            for (int i = 0; i < availableMoves.Length; i++) {
-                if (promotionSquares.Contains(availableMoves[i])) {
-                    return true;
-                }
-            }
-            return false;
+        protected override bool IsAPromotionMove(BoardCoord move) {
+            return promotionSquares.Contains(move);
         }
 
-        protected override ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
-            if (promotionSquares.Contains(mover.GetBoardPosition())) {
-                KillPiece(mover);
+        protected override bool PerformedAPromotionMove(Pawn mover) {
+            return promotionSquares.Contains(mover.GetBoardPosition());
+        }
 
-                ChessPiece newPromotedPiece = ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition());
-                moveNotation += string.Format("={0}", newPromotedPiece.GetLetterNotation());
+        public override void DisplayPromotionOptionsUIIfCanPromote(ChessPiece mover, BoardCoord[] availableMoves) {
+            if (IsPromotionMoveAvailable((Pawn)mover, availableMoves)) {
+                SelectedPawnPromotion = Piece.Queen;
+                PawnPromotionOptions = allPromotionOptions;
 
-                return AddPieceToBoard(newPromotedPiece);
+                for (int i = 0; i < availableMoves.Length; i++) {
+                    if (availableMoves[i] == new BoardCoord(2, 2) || availableMoves[i] == new BoardCoord(2, 7)
+                        || availableMoves[i] == new BoardCoord(8, 2) || availableMoves[i] == new BoardCoord(8, 7)) {
+                        SelectedPawnPromotion = Piece.Bishop;
+                        PawnPromotionOptions = limitedPromotionOptions;
+                        break;
+                    }
+                }
+
+                OnDisplayPromotionUI(true);
             }
-            return null;
         }
 
         public override List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
+            List<BoardCoord> availableMoves = new List<BoardCoord>();
 
-            for (int i = 0; i < templateMoves.Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
-                }
-            }
+            availableMoves.AddRange(GetLegalTemplateMoves(mover));
 
-            if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 0) {
+            if (IsRoyal(mover)) {
                 availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions));
             } else if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    // This is where the code differs from the base method. More specific pawn promotion mechanics.
-                    SelectedPawnPromotion = Piece.Queen;
-                    PawnPromotionOptions = allPromotionOptions;
-                    for (int i = 0; i < availableMoves.Count; i++) {
-                        if (availableMoves[i] == new BoardCoord(2, 2) || availableMoves[i] == new BoardCoord(2, 7)
-                            || availableMoves[i] == new BoardCoord(8, 2) || availableMoves[i] == new BoardCoord(8, 7)) {
-                            SelectedPawnPromotion = Piece.Bishop;
-                            PawnPromotionOptions = limitedPromotionOptions;
-                            break;
-                        }
-                    }
-                    OnDisplayPromotionUI(true);
-                }
+                availableMoves.AddRange(TryAddAvailableEnPassantMoves((Pawn)mover));
             }
 
             return availableMoves;
         }
 
         public override void PopulateBoard() {
-            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(6, WHITE_BACKROW)));
-            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(6, BLACK_BACKROW)));
+            currentRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.WHITE, new BoardCoord(6, WHITE_BACKROW));
+            opposingRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.BLACK, new BoardCoord(6, BLACK_BACKROW));
 
-            AddPieceToBoard(new Queen(Team.WHITE, new BoardCoord(4, WHITE_BACKROW)));
-            AddPieceToBoard(new Queen(Team.BLACK, new BoardCoord(4, BLACK_BACKROW)));
+            AddNewPieceToBoard(Piece.Queen, Team.WHITE, new BoardCoord(4, WHITE_BACKROW));
+            AddNewPieceToBoard(Piece.Queen, Team.BLACK, new BoardCoord(4, BLACK_BACKROW));
 
-            AddPieceToBoard(new Bishop(Team.WHITE, new BoardCoord(5, WHITE_BACKROW)));
-            AddPieceToBoard(new Bishop(Team.BLACK, new BoardCoord(5, BLACK_BACKROW)));
-            AddPieceToBoard(new Bishop(Team.WHITE, new BoardCoord(5, WHITE_BACKROW + 1)));
-            AddPieceToBoard(new Bishop(Team.BLACK, new BoardCoord(5, BLACK_BACKROW - 1)));
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, new BoardCoord(5, WHITE_BACKROW));
+            AddNewPieceToBoard(Piece.Bishop, Team.BLACK, new BoardCoord(5, BLACK_BACKROW));
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, new BoardCoord(5, WHITE_BACKROW + 1));
+            AddNewPieceToBoard(Piece.Bishop, Team.BLACK, new BoardCoord(5, BLACK_BACKROW - 1));
 
             for (int x = 2; x < 9; x++) {
-                AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, WHITE_PAWNROW)));
-                AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(x, BLACK_PAWNROW)));
+                AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(x, WHITE_PAWNROW));
+                AddNewPieceToBoard(Piece.Pawn, Team.BLACK, new BoardCoord(x, BLACK_PAWNROW));
 
                 if (x == 4 || x == 6) {
-                    AddPieceToBoard(new Knight(Team.WHITE, new BoardCoord(x, WHITE_BACKROW + 1)));
-                    AddPieceToBoard(new Knight(Team.BLACK, new BoardCoord(x, BLACK_BACKROW - 1)));
+                    AddNewPieceToBoard(Piece.Knight, Team.WHITE, new BoardCoord(x, WHITE_BACKROW + 1));
+                    AddNewPieceToBoard(Piece.Knight, Team.BLACK, new BoardCoord(x, BLACK_BACKROW - 1));
                 } else if (x == 3 || x == 7) {
-                    AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(x, WHITE_BACKROW + 1)));
-                    AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(x, BLACK_BACKROW - 1)));
+                    AddNewPieceToBoard(Piece.Rook, Team.WHITE, new BoardCoord(x, WHITE_BACKROW + 1));
+                    AddNewPieceToBoard(Piece.Rook, Team.BLACK, new BoardCoord(x, BLACK_BACKROW - 1));
                 }
             }
         }

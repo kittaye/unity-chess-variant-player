@@ -1,13 +1,14 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
     /// Board layout: FIDE standard.
     /// </summary>
     public class CheshireCat : Chess {
+        private HashSet<BoardCoord> vanishedSquares;
 
         public CheshireCat() : base() {
+            vanishedSquares = new HashSet<BoardCoord>();
             AllowCastling = false;
         }
 
@@ -34,7 +35,7 @@ namespace ChessGameModes {
             if (mover is King && mover.MoveCount == 0) {
                 List<BoardCoord> kingFirstMoves = new List<BoardCoord>();
                 for (int i = 0; i <= 7; i++) {
-                    kingFirstMoves.AddRange(TryGetDirectionalMoves(mover, (MoveDirection)i));
+                    kingFirstMoves.AddRange(mover.TryGetDirectionalTemplateMoves((MoveDirection)i));
                 }
                 templateMoves = kingFirstMoves.ToArray();
             } else {
@@ -44,21 +45,14 @@ namespace ChessGameModes {
             List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
 
             for (int i = 0; i < templateMoves.Length; i++) {
-                if (Board.GetCoordInfo(templateMoves[i]).boardChunk.activeInHierarchy
-                    && IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
+                if (!IsSquareVanished(templateMoves[i]) && !IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i])) {
                     availableMoves.Add(templateMoves[i]);
                 }
             }
 
             // This code remains the same from the base method.
             if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    OnDisplayPromotionUI(true);
-                }
+                availableMoves.AddRange(TryAddAvailableEnPassantMoves((Pawn)mover));
             }
 
             return availableMoves;
@@ -68,19 +62,43 @@ namespace ChessGameModes {
             BoardCoord oldPos = mover.GetBoardPosition();
 
             if (base.MovePiece(mover, destination)) {
-                Board.GetCoordInfo(oldPos).boardChunk.SetActive(false);
+                VanishSquare(oldPos);
                 return true;
             }
 
             return false;
         }
 
-        public override void UndoLastGameMove() {
-            base.UndoLastGameMove();
+        public override bool UndoLastMove() {
+            if (base.UndoLastMove()) {
+                foreach (ChessPiece piece in GetAlivePiecesOfType<ChessPiece>()) {
+                    UndoVanishedSquare(piece.GetBoardPosition());
+                }
 
-            foreach (ChessPiece piece in GetPieces(aliveOnly: false)) {
-                Board.GetCoordInfo(piece.GetBoardPosition()).boardChunk.SetActive(true);
+                return true;
             }
+            return false;
+        }
+
+        private bool VanishSquare(BoardCoord coord) {
+            if (!IsSquareVanished(coord)) {
+                vanishedSquares.Add(coord);
+                Board.RaiseEventHideBoardChunkObject(Board.GetCoordInfo(coord).graphicalObject);
+                return true;
+            }
+            return false;
+        }
+
+        private bool UndoVanishedSquare(BoardCoord coord) {
+            if (vanishedSquares.Remove(coord)) {
+                Board.RaiseEventShowBoardChunkObject(Board.GetCoordInfo(coord).graphicalObject);
+                return true;
+            }
+            return false;
+        }
+
+        private bool IsSquareVanished(BoardCoord coord) {
+            return vanishedSquares.Contains(coord);
         }
     }
 }

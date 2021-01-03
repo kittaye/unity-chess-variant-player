@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿
 namespace ChessGameModes {
     /// <summary>
     /// Board layout: FIDE standard.
@@ -28,14 +25,14 @@ namespace ChessGameModes {
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
             int currentCaptures = mover.CaptureCount;
 
-            if(base.MovePiece(mover, destination)) {
+            if (base.MovePiece(mover, destination)) {
                 if (mover != currentRoyalPiece && mover.CaptureCount != currentCaptures) {
-                    KillPiece(mover);
-                    RemovePieceFromActiveTeam(mover);
-                    if(mover is Pawn) {
-                        AddPieceToBoard(new Pawn(mover.GetOpposingTeam(), destination, initialMoveLimit: 1));
+                    CapturePiece(mover);
+                    RemovePieceFromTeam(mover);
+                    if (mover is Pawn) {
+                        ((Pawn)AddNewPieceToBoard(Piece.Pawn, mover.GetOpposingTeam(), destination)).initialMoveLimit = 1;
                     } else {
-                        AddPieceToBoard(ChessPieceFactory.Create(mover.GetPieceType(), mover.GetOpposingTeam(), destination));
+                        AddNewPieceToBoard(mover.GetPieceType(), mover.GetOpposingTeam(), destination);
                     }
                 }
                 return true;

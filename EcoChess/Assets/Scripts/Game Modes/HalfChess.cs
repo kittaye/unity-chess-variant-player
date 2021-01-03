@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-
+﻿
 namespace ChessGameModes {
     /// <summary>
     /// Board layout:
@@ -33,26 +31,26 @@ namespace ChessGameModes {
         }
 
         public override void PopulateBoard() {
-            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, "h2"));
-            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, "a2"));
+            currentRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.WHITE, "h2");
+            opposingRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.BLACK, "a2");
 
-            AddPieceToBoard(new Queen(Team.WHITE, "h3"));
-            AddPieceToBoard(new Queen(Team.BLACK, "a3"));
+            AddNewPieceToBoard(Piece.Queen, Team.WHITE, "h3");
+            AddNewPieceToBoard(Piece.Queen, Team.BLACK, "a3");
 
-            AddPieceToBoard(new Rook(Team.WHITE, "h1"));
-            AddPieceToBoard(new Rook(Team.WHITE, "h4"));
-            AddPieceToBoard(new Rook(Team.BLACK, "a1"));
-            AddPieceToBoard(new Rook(Team.BLACK, "a4"));
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, "h1");
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, "h4");
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, "a1");
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, "a4");
+        
+            AddNewPieceToBoard(Piece.Knight, Team.WHITE, "g1");
+            AddNewPieceToBoard(Piece.Knight, Team.WHITE, "g4");
+            AddNewPieceToBoard(Piece.Knight, Team.BLACK, "b1");
+            AddNewPieceToBoard(Piece.Knight, Team.BLACK, "b4");
 
-            AddPieceToBoard(new Knight(Team.WHITE, "g1"));
-            AddPieceToBoard(new Knight(Team.WHITE, "g4"));
-            AddPieceToBoard(new Knight(Team.BLACK, "b1"));
-            AddPieceToBoard(new Knight(Team.BLACK, "b4"));
-
-            AddPieceToBoard(new Bishop(Team.WHITE, "g2"));
-            AddPieceToBoard(new Bishop(Team.WHITE, "g3"));
-            AddPieceToBoard(new Bishop(Team.BLACK, "b2"));
-            AddPieceToBoard(new Bishop(Team.BLACK, "b3"));
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, "g2");
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, "g3");
+            AddNewPieceToBoard(Piece.Bishop, Team.BLACK, "b2");
+            AddNewPieceToBoard(Piece.Bishop, Team.BLACK, "b3");
         }
     }
 }

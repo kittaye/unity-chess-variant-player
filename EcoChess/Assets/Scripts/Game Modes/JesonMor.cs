@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
@@ -41,8 +40,8 @@ namespace ChessGameModes {
 
         public override void PopulateBoard() {
             for(int i = 0; i < BOARD_WIDTH; i++) {
-                AddPieceToBoard(new Knight(Team.WHITE, new BoardCoord(i, 0)));
-                AddPieceToBoard(new Knight(Team.BLACK, new BoardCoord(i, BOARD_HEIGHT - 1)));
+                AddNewPieceToBoard(Piece.Knight, Team.WHITE, new BoardCoord(i, 0));
+                AddNewPieceToBoard(Piece.Knight, Team.BLACK, new BoardCoord(i, BOARD_HEIGHT - 1));
             }
         }
 
@@ -50,7 +49,7 @@ namespace ChessGameModes {
             if (gameFinished) {
                 UIManager.Instance.LogCustom("Team " + GetOpposingTeamTurn().ToString() + " has left e5 -- Team " + GetOpposingTeamTurn().ToString() + " wins!");
                 return true;
-            } else if (GetPieces(GetCurrentTeamTurn()).TrueForAll((x) => (x.IsAlive == false))) {
+            } else if (GetAlivePiecesOfType<ChessPiece>(GetCurrentTeamTurn()).Count == 0) {
                 UIManager.Instance.LogCustom("Team " + GetOpposingTeamTurn().ToString() + " wins by elimination!");
                 return true;
             }
@@ -62,7 +61,7 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override bool IsPieceInCheckAfterThisMove(ChessPiece pieceToCheck, ChessPiece mover, BoardCoord dest) {
+        protected override bool IsPieceInCheckAfterThisMove(ChessPiece pieceToCheck, ChessPiece mover, BoardCoord destination) {
             return false;
         }
 
@@ -73,12 +72,10 @@ namespace ChessGameModes {
         public override bool MovePiece(ChessPiece mover, BoardCoord destination) {
             BoardCoord oldPos = mover.GetBoardPosition();
 
-            string moveNotation = MakeDirectMove(mover, destination);
-            if (moveNotation != null) {
+            if (MakeBaseMove(mover, destination)) {
                 if (oldPos == centerSquare) {
                     gameFinished = true;
                 }
-                GameMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;

@@ -1,28 +1,47 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections.Generic;
 
 public class CoordInfo {
     public string algebraicKey;
     public string file;
     public string rank;
-    public readonly GameObject boardChunk;
-    public ChessPiece occupier;
+    public object graphicalObject;
 
-    public CoordInfo(string key, GameObject boardChunk, ChessPiece pieceOccupee = null) {
+    private List<ChessPiece> occupiers;
+    private ChessPiece cachedActiveOccupier;
+
+
+    public CoordInfo(string key) {
         this.algebraicKey = key;
-        this.occupier = pieceOccupee;
-        this.boardChunk = boardChunk;
+        this.occupiers = new List<ChessPiece>();
+        this.graphicalObject = null;
+        cachedActiveOccupier = null;
 
         file = key[0].ToString();
         rank = key.Substring(1);
     }
 
-    public CoordInfo(string key, ChessPiece pieceOccupee = null) {
-        this.algebraicKey = key;
-        this.occupier = pieceOccupee;
-        this.boardChunk = null;
+    public void AddOccupier(ChessPiece piece) {
+        occupiers.Add(piece);
+    }
 
-        file = key[0].ToString();
-        rank = key.Substring(1);
+    public bool RemoveOccupier(ChessPiece piece) {
+        if (cachedActiveOccupier == piece) {
+            cachedActiveOccupier = null;
+        }
+        return occupiers.Remove(piece);
+    }
+
+    public ChessPiece GetAliveOccupier() {
+        if (cachedActiveOccupier != null && cachedActiveOccupier.IsAlive) {
+            return cachedActiveOccupier;
+        }
+
+        foreach (ChessPiece piece in occupiers) {
+            if (piece.IsAlive) {
+                cachedActiveOccupier = piece;
+                return piece;
+            }
+        }
+        return null;
     }
 }

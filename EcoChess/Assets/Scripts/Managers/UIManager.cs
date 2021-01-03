@@ -7,7 +7,6 @@ public enum GameResults { Checkmate, Stalemate };
 public class UIManager : MonoBehaviour {
     public static UIManager Instance;
 
-    public GameObject camera;
     public VariantHelpDialog variantHelpDialog;
     public GameObject notationLinePrefab;
 
@@ -45,7 +44,7 @@ public class UIManager : MonoBehaviour {
 
         promotionOptions = new List<GameObject>();
         GameManager._OnGameFinished += OnGameFinished;
-        ChessGameModes.Chess._DisplayPromotionUI += OnDisplayPromotionOptions;
+        ChessGameModes.Chess.OnDisplayPromotionOptions += OnDisplayPromotionOptions;
 
         foreach (Text aText in mainCanvas.GetComponentsInChildren<Text>()) {
             if (aText.name.Equals("TeamTurn_lbl")) {
@@ -96,7 +95,7 @@ public class UIManager : MonoBehaviour {
 
     void OnDestroy() {
         GameManager._OnGameFinished -= OnGameFinished;
-        ChessGameModes.Chess._DisplayPromotionUI -= OnDisplayPromotionOptions;
+        ChessGameModes.Chess.OnDisplayPromotionOptions -= OnDisplayPromotionOptions;
 
         if (chessGame is ChessGameModes.SovereignChess) {
             ChessGameModes.SovereignChess._DisplayDefectionUI -= OnDisplayDefectionOptions;
@@ -196,7 +195,7 @@ public class UIManager : MonoBehaviour {
     }
 
     public void SelectDefectOption(Color value) {
-        if (GameManager.Instance.ChessGame is ChessGameModes.SovereignChess) {
+        if (chessGame is ChessGameModes.SovereignChess) {
             defectToLbl.text = "Click the king again to defect to team\n<b>" + SovereignExtensions.GetColourName(value) + "</b>";
             ((ChessGameModes.SovereignChess)chessGame).SetDefectOptionTo(value);
         }
@@ -264,6 +263,6 @@ public class UIManager : MonoBehaviour {
     }
 
     public void OnToggleFlipBoard() {
-        GameManager.Instance.ChessGame.Board.allowFlipping = !GameManager.Instance.ChessGame.Board.allowFlipping;
+        chessGame.Board.allowFlipping = !chessGame.Board.allowFlipping;
     }
 }

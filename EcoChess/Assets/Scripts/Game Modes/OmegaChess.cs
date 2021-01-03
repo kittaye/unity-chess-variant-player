@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 namespace ChessGameModes {
     /// <summary>
@@ -22,17 +21,17 @@ namespace ChessGameModes {
         private new const int WHITE_PAWNROW = 2;
 
         public OmegaChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-            Board.RemoveBoardCoordinates(new string[] { "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9", "a10", "a11" });
-            Board.RemoveBoardCoordinates(new string[] { "l2", "l3", "l4", "l5", "l6", "l7", "l8", "l9", "l10", "l11" });
-            Board.RemoveBoardCoordinates(new string[] { "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1", "j1", "k1" });
-            Board.RemoveBoardCoordinates(new string[] { "b12", "c12", "d12", "e12", "f12", "g12", "h12", "i12", "j12", "k12" });
+            Board.RemoveAndDestroyBoardCoordinates(new string[] { "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9", "a10", "a11" });
+            Board.RemoveAndDestroyBoardCoordinates(new string[] { "l2", "l3", "l4", "l5", "l6", "l7", "l8", "l9", "l10", "l11" });
+            Board.RemoveAndDestroyBoardCoordinates(new string[] { "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1", "j1", "k1" });
+            Board.RemoveAndDestroyBoardCoordinates(new string[] { "b12", "c12", "d12", "e12", "f12", "g12", "h12", "i12", "j12", "k12" });
 
-            Board.SetCustomBoardCoordinateKey("a1", "W1");
-            Board.SetCustomBoardCoordinateKey("l1", "W2");
-            Board.SetCustomBoardCoordinateKey("a12", "W3");
-            Board.SetCustomBoardCoordinateKey("l12", "W4");
+            Board.SetCustomBoardAlgebraicKey("a1", "W1");
+            Board.SetCustomBoardAlgebraicKey("l1", "W2");
+            Board.SetCustomBoardAlgebraicKey("a12", "W3");
+            Board.SetCustomBoardAlgebraicKey("l12", "W4");
 
-            Board.ResetAlgebraicKeys("b2", 10, 10);
+            Board.SetCustomBoardAlgebraicKeys("b2", 10, 10);
 
             BLACK_BACKROW = Board.GetHeight() - 2;
             BLACK_PAWNROW = Board.GetHeight() - 3;
@@ -59,73 +58,80 @@ namespace ChessGameModes {
         }
 
         public override void PopulateBoard() {
-            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, "f1"));
-            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, "f10"));
+            currentRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.WHITE, "f1");
+            opposingRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.BLACK, "f10");
 
-            AddPieceToBoard(new Queen(Team.WHITE, "e1"));
-            AddPieceToBoard(new Queen(Team.BLACK, "e10"));
+            AddNewPieceToBoard(Piece.Queen, Team.WHITE, "e1");
+            AddNewPieceToBoard(Piece.Queen, Team.BLACK, "e10");
 
-            AddPieceToBoard(new Rook(Team.WHITE, "b1"));
-            AddPieceToBoard(new Rook(Team.WHITE, "i1"));
-            AddPieceToBoard(new Rook(Team.BLACK, "b10"));
-            AddPieceToBoard(new Rook(Team.BLACK, "i10"));
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, "b1");
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, "i1");
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, "b10");
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, "i10");
 
-            AddPieceToBoard(new Wizard(Team.WHITE, "W1"));
-            AddPieceToBoard(new Wizard(Team.WHITE, "W2"));
-            AddPieceToBoard(new Wizard(Team.BLACK, "W3"));
-            AddPieceToBoard(new Wizard(Team.BLACK, "W4"));
+            AddNewPieceToBoard(Piece.Wizard, Team.WHITE, "W1");
+            AddNewPieceToBoard(Piece.Wizard, Team.WHITE, "W2");
+            AddNewPieceToBoard(Piece.Wizard, Team.BLACK, "W3");
+            AddNewPieceToBoard(Piece.Wizard, Team.BLACK, "W4");
 
             for (int x = 1; x < BOARD_WIDTH - 1; x++) {
-                AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, WHITE_PAWNROW), initialMoveLimit: 3));
-                AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(x, BLACK_PAWNROW), initialMoveLimit: 3));
+                ((Pawn)AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(x, WHITE_PAWNROW))).initialMoveLimit = 3;
+                ((Pawn)AddNewPieceToBoard(Piece.Pawn, Team.BLACK, new BoardCoord(x, BLACK_PAWNROW))).initialMoveLimit = 3;
 
                 if(x == 1 || x == BOARD_WIDTH - 2) {
-                    AddPieceToBoard(new Champion(Team.WHITE, new BoardCoord(x, WHITE_BACKROW)));
-                    AddPieceToBoard(new Champion(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
+                    AddNewPieceToBoard(Piece.Champion, Team.WHITE, new BoardCoord(x, WHITE_BACKROW));
+                    AddNewPieceToBoard(Piece.Champion, Team.BLACK, new BoardCoord(x, BLACK_BACKROW));
                 } else if (x == 3 || x == BOARD_WIDTH - 4) {
-                    AddPieceToBoard(new Knight(Team.WHITE, new BoardCoord(x, WHITE_BACKROW)));
-                    AddPieceToBoard(new Knight(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
+                    AddNewPieceToBoard(Piece.Knight, Team.WHITE, new BoardCoord(x, WHITE_BACKROW));
+                    AddNewPieceToBoard(Piece.Knight, Team.BLACK, new BoardCoord(x, BLACK_BACKROW));
                 } else if (x == 4 || x == BOARD_WIDTH - 5) {
-                    AddPieceToBoard(new Bishop(Team.WHITE, new BoardCoord(x, WHITE_BACKROW)));
-                    AddPieceToBoard(new Bishop(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
+                    AddNewPieceToBoard(Piece.Bishop, Team.WHITE, new BoardCoord(x, WHITE_BACKROW));
+                    AddNewPieceToBoard(Piece.Bishop, Team.BLACK, new BoardCoord(x, BLACK_BACKROW));
                 }
             }
         }
 
-        protected override bool TryPerformCastlingRookMoves(ChessPiece mover, ref string moveNotation) {
-            if (mover.MoveCount == 1 && mover == currentRoyalPiece) {
-
+        protected override bool TryPerformCastlingMove(ChessPiece mover) {
+            if (mover.MoveCount == 1) {
                 if (mover.GetBoardPosition().x == 4) {
-                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(2, mover.GetBoardPosition().y)).occupier;
-                    MakeDirectMove(castlingPiece, new BoardCoord(5, mover.GetBoardPosition().y), false);
-                    moveNotation = "O-O-O";
+                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(2, mover.GetBoardPosition().y)).GetAliveOccupier();
+                    UpdatePiecePositionAndOccupance(castlingPiece, new BoardCoord(5, mover.GetBoardPosition().y));
+                    SetLastMoveNotationToQueenSideCastle();
                     return true;
 
                 } else if (mover.GetBoardPosition().x == 8) {
-                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(9, mover.GetBoardPosition().y)).occupier;
-                    MakeDirectMove(castlingPiece, new BoardCoord(7, mover.GetBoardPosition().y), false);
-                    moveNotation = "O-O";
+                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(9, mover.GetBoardPosition().y)).GetAliveOccupier();
+                    UpdatePiecePositionAndOccupance(castlingPiece, new BoardCoord(7, mover.GetBoardPosition().y));
+                    SetLastMoveNotationToKingSideCastle();
                     return true;
                 }
             }
             return false;
         }
 
-        protected override BoardCoord TryAddAvailableEnPassantMove(Pawn mover) {
+        protected override BoardCoord[] TryAddAvailableEnPassantMoves(Pawn mover) {
             const int LEFT = -1;
             const int RIGHT = 1;
+            List<BoardCoord> enpassantMoves = new List<BoardCoord>(1);
 
             if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     int y = 0;
+
                     while (Board.ContainsCoord(mover.GetRelativeBoardCoord(i, y))) {
-                        BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, y));
-                        if (Board.ContainsCoord(coord)) {
-                            ChessPiece piece = Board.GetCoordInfo(coord).occupier;
+                        BoardCoord sidewaysCoord = mover.GetRelativeBoardCoord(i, y);
+
+                        if (Board.ContainsCoord(sidewaysCoord) && mover.IsThreatTowards(sidewaysCoord)) {
+                            ChessPiece piece = Board.GetCoordInfo(sidewaysCoord).GetAliveOccupier();
+
                             if (piece != null) {
-                                if (piece is Pawn && piece == GetLastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
-                                    if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
-                                        return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1));
+                                if (piece is Pawn && CheckEnPassantVulnerability((Pawn)piece)) {
+                                    BoardCoord enpassantCoord = mover.GetRelativeBoardCoord(i, 1);
+
+                                    if (Board.ContainsCoord(enpassantCoord)) {
+                                        if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, enpassantCoord) == false) {
+                                            enpassantMoves.Add(enpassantCoord);
+                                        }
                                     }
                                 } else {
                                     break;
@@ -136,20 +142,24 @@ namespace ChessGameModes {
                     }
                 }
             }
-            return BoardCoord.NULL;
+            return enpassantMoves.ToArray();
         }
 
-        protected override Pawn CheckPawnEnPassantCapture(Pawn mover, BoardCoord moverPreviousPosition, ref string moveNotation) {
+        protected override Pawn TryPerformPawnEnPassantCapture(Pawn mover) {
+            BoardCoord oldPos = mover.StateHistory[GameMoveNotations.Count - 1].position;
+            BoardCoord newPos = mover.GetBoardPosition();
             int y = -1;
+
             while (Board.ContainsCoord(mover.GetRelativeBoardCoord(0, y))) {
-                ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(0, y)).occupier;
+                ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(0, y)).GetAliveOccupier();
 
                 if (occupier != null) {
-                    if (IsThreat(mover, occupier.GetBoardPosition())) {
-                        if (occupier is Pawn && ((Pawn)occupier).validEnPassant) {
+                    if (mover.IsThreatTowards(occupier)) {
+                        if (occupier is Pawn && CheckEnPassantVulnerability((Pawn)occupier)) {
                             mover.CaptureCount++;
-                            KillPiece(occupier);
-                            moveNotation = Board.GetCoordInfo(moverPreviousPosition).file + "x" + Board.GetCoordInfo(mover.GetBoardPosition()).algebraicKey + "e.p.";
+                            CapturePiece(occupier);
+
+                            SetLastMoveNotationToEnPassant(oldPos, newPos);
                             return (Pawn)occupier;
                         } else {
                             return null;
@@ -166,8 +176,8 @@ namespace ChessGameModes {
         protected override List<ChessPiece> GetAllPossibleCheckThreats(ChessPiece pieceToCheck) {
             List<ChessPiece> possibleCheckThreats = base.GetAllPossibleCheckThreats(pieceToCheck);
 
-            GetPiecesOfType<Wizard>(pieceToCheck.GetOpposingTeam()).ForEach(x => { possibleCheckThreats.Add(x); });
-            GetPiecesOfType<Champion>(pieceToCheck.GetOpposingTeam()).ForEach(x => { possibleCheckThreats.Add(x); });
+            possibleCheckThreats.AddRange(GetAlivePiecesOfType<Wizard>(pieceToCheck.GetOpposingTeam()));
+            possibleCheckThreats.AddRange(GetAlivePiecesOfType<Champion>(pieceToCheck.GetOpposingTeam()));
 
             return possibleCheckThreats;
         }

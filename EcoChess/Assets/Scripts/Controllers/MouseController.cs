@@ -12,6 +12,7 @@ public class MouseController : MonoBehaviour {
     private GameObject selectedObject;
     private bool gameFinished = false;
     private Collider hoveredObj = null;
+    private List<BoardCoord> highlightedCoords;
     private List<BoardCoord> lastSelectedOccupierAvailableMoves = new List<BoardCoord>();
     private Vector3 lastMousePos;
     private readonly Color defaultColor = new Color(0.001f, 0.001f, 0.001f, 1f);
@@ -24,6 +25,8 @@ public class MouseController : MonoBehaviour {
         } else {
             Instance = this;
         }
+
+        highlightedCoords = new List<BoardCoord>();
 
         GameManager._OnGameFinished += OnGameFinished;
     }
@@ -73,31 +76,28 @@ public class MouseController : MonoBehaviour {
             }
 
             // If we clicked on an empty square or on a piece that is inactive, deselect.
-            if (selectedCoord.occupier == null || !selectedCoord.occupier.gameObject.activeInHierarchy) {
+            if (selectedCoord.GetAliveOccupier() == null || !((GameObject)selectedCoord.GetAliveOccupier().graphicalObject).activeInHierarchy) {
                 DeSelect();
                 return;
             }
 
-            string temp = "";
-            for (int i = 0; i < selectedCoord.occupier.MoveStateHistory.ToArray().Length; i++) {
-                temp += chessGame.Board.GetCoordInfo(selectedCoord.occupier.MoveStateHistory.ToArray()[i].position).algebraicKey + ", ";
-            }
-            Debug.Log(temp);
-
             // Otherwise, check if the selected piece is on the current mover's team.
-            if (chessGame.IsMoversTurn(selectedCoord.occupier)) {
+            if (chessGame.IsMoversTurn(selectedCoord.GetAliveOccupier())) {
                 DeSelect();
 
                 // If so, calculate it's moves and display visual graphics for moving it around.
-                List<BoardCoord> selectedOccupierMoves = chessGame.CalculateAvailableMoves(selectedCoord.occupier);
+                List<BoardCoord> selectedOccupierMoves = chessGame.CalculateAvailableMoves(selectedCoord.GetAliveOccupier());
                 if (selectedOccupierMoves.Count > 0) {
                     hasSelection = true;
-                    lastSelectedOccupier = selectedCoord.occupier;
+                    lastSelectedOccupier = selectedCoord.GetAliveOccupier();
                     lastSelectedOccupierAvailableMoves = selectedOccupierMoves;
-                    lastSelectedOccupier.gameObject.SetActive(false);
 
-                    selectedObject.GetComponent<SpriteRenderer>().sprite = lastSelectedOccupier.gameObject.GetComponent<SpriteRenderer>().sprite;
-                    selectedObject.GetComponent<SpriteRenderer>().material.color = lastSelectedOccupier.gameObject.GetComponent<SpriteRenderer>().material.color;
+                    GameObject lastSelectedOccupierGameObject = (GameObject)lastSelectedOccupier.graphicalObject;
+
+                    lastSelectedOccupierGameObject.SetActive(false);
+
+                    selectedObject.GetComponent<SpriteRenderer>().sprite = lastSelectedOccupierGameObject.GetComponent<SpriteRenderer>().sprite;
+                    selectedObject.GetComponent<SpriteRenderer>().material.color = lastSelectedOccupierGameObject.GetComponent<SpriteRenderer>().material.color;
                     UpdateSelectedObjPosition();
                     selectedObject.gameObject.transform.rotation = Quaternion.identity;
                     if (chessGame.Board.isFlipped) {
@@ -105,7 +105,11 @@ public class MouseController : MonoBehaviour {
                     }
                     selectedObject.SetActive(true);
 
-                    chessGame.Board.HighlightCoordinates(selectedOccupierMoves.ToArray());
+                    HighlightCoordinates(selectedOccupierMoves.ToArray());
+
+                    if (chessGame.AllowPawnPromotion && lastSelectedOccupier is Pawn) {
+                        chessGame.DisplayPromotionOptionsUIIfCanPromote(lastSelectedOccupier, lastSelectedOccupierAvailableMoves.ToArray());
+                    }
                 }
                 return;
             }
@@ -119,9 +123,11 @@ public class MouseController : MonoBehaviour {
     }
 
     public void CalculateLastOccupierAvailableMoves() {
-        chessGame.Board.RemoveHighlightedCoordinates();
+        RemoveHighlightedCoordinates();
+
         lastSelectedOccupierAvailableMoves = chessGame.CalculateAvailableMoves(lastSelectedOccupier);
-        chessGame.Board.HighlightCoordinates(lastSelectedOccupierAvailableMoves.ToArray());
+
+        HighlightCoordinates(lastSelectedOccupierAvailableMoves.ToArray());
     }
 
     private void UpdateHoveredObj() {
@@ -155,14 +161,14 @@ public class MouseController : MonoBehaviour {
         selectedObject.SetActive(false);
 
         if (lastSelectedOccupier != null && lastSelectedOccupier.IsAlive) {
-            lastSelectedOccupier.gameObject.SetActive(true);
+            ((GameObject)lastSelectedOccupier.graphicalObject).SetActive(true);
             lastSelectedOccupierAvailableMoves.Clear();
         }
 
         UIManager.Instance.OnDisplayPromotionOptions(false);
         UIManager.Instance.OnDisplayDefectionOptions(false);
 
-        chessGame.Board.RemoveHighlightedCoordinates();
+        RemoveHighlightedCoordinates();
     }
 
     private BoardCoord GetHoveredBoardCoord() {
@@ -174,5 +180,25 @@ public class MouseController : MonoBehaviour {
         }
         Debug.LogWarning("No board value is currently selected! Returning (-1,-1)...");
         return BoardCoord.NULL;
+    }
+
+    public void HighlightCoordinates(BoardCoord[] coords) {
+        RemoveHighlightedCoordinates();
+
+        highlightedCoords.AddRange(coords);
+        for (int i = 0; i < coords.Length; i++) {
+            if (chessGame.Board.ContainsCoord(coords[i])) {
+                ((GameObject)chessGame.Board.GetCoordInfo(coords[i]).graphicalObject).GetComponentInChildren<SpriteRenderer>().enabled = true;
+            }
+        }
+    }
+
+    public void RemoveHighlightedCoordinates() {
+        for (int i = 0; i < highlightedCoords.Count; i++) {
+            if (chessGame.Board.ContainsCoord(highlightedCoords[i])) {
+                ((GameObject)chessGame.Board.GetCoordInfo(highlightedCoords[i]).graphicalObject).GetComponentInChildren<SpriteRenderer>().enabled = false;
+            }
+        }
+        highlightedCoords.Clear();
     }
 }

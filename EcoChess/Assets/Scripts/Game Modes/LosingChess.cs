@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
@@ -32,7 +30,7 @@ namespace ChessGameModes {
         }
 
         public override bool CheckWinState() {
-            if (GetPieces(GetCurrentTeamTurn()).TrueForAll(x => x.IsAlive == false)) {
+            if (GetAlivePiecesOfType<ChessPiece>(GetCurrentTeamTurn()).Count == 0) {
                 UIManager.Instance.LogCustom("Team " + GetCurrentTeamTurn().ToString() + " has lost all pieces -- Team " + GetCurrentTeamTurn().ToString() + " wins!");
                 return true;
             }
@@ -61,7 +59,7 @@ namespace ChessGameModes {
 
             if (canCaptureThisTurn) {
                 for (int i = 0; i < templateMoves.Length; i++) {
-                    if (IsThreat(mover, templateMoves[i])) {
+                    if (mover.IsThreatTowards(templateMoves[i])) {
                         availableMoves.Add(templateMoves[i]);
                     }
                 }
@@ -70,22 +68,17 @@ namespace ChessGameModes {
             }
 
             if (mover is Pawn) {
-                BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                if (enPassantMove != BoardCoord.NULL) {
-                    availableMoves.Add(enPassantMove);
-                }
-                if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                    OnDisplayPromotionUI(true);
-                }
+                availableMoves.AddRange(TryAddAvailableEnPassantMoves((Pawn)mover));
             }
+
             return availableMoves;
         }
 
         private bool CanCaptureAPiece() {
-            foreach (ChessPiece piece in GetPieces(GetCurrentTeamTurn())) {
+            foreach (ChessPiece piece in GetAlivePiecesOfType<ChessPiece>(GetCurrentTeamTurn())) {
                 BoardCoord[] templateMoves = piece.CalculateTemplateMoves().ToArray();
                 for (int i = 0; i < templateMoves.Length; i++) {
-                    if (IsThreat(piece, templateMoves[i])) {
+                    if (piece.IsThreatTowards(templateMoves[i])) {
                         return true;
                     }
                 }
@@ -93,22 +86,28 @@ namespace ChessGameModes {
             return false;
         }
 
-        protected override BoardCoord TryAddAvailableEnPassantMove(Pawn mover) {
+        protected override BoardCoord[] TryAddAvailableEnPassantMoves(Pawn mover) {
             const int LEFT = -1;
             const int RIGHT = 1;
+            List<BoardCoord> enpassantMoves = new List<BoardCoord>(1);
 
             if (mover.canEnPassantCapture) {
                 for (int i = LEFT; i <= RIGHT; i += 2) {
-                    BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
-                    if (Board.ContainsCoord(coord)) {
-                        ChessPiece piece = Board.GetCoordInfo(coord).occupier;
-                        if (piece is Pawn && piece == GetLastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
-                            return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1));
+                    BoardCoord sidewaysCoord = mover.GetRelativeBoardCoord(i, 0);
+
+                    if (Board.ContainsCoord(sidewaysCoord) && mover.IsThreatTowards(sidewaysCoord)) {
+                        ChessPiece piece = Board.GetCoordInfo(sidewaysCoord).GetAliveOccupier();
+
+                        if (piece is Pawn && CheckEnPassantVulnerability((Pawn)piece)) {
+                            BoardCoord enpassantCoord = mover.GetRelativeBoardCoord(i, 1);
+                            if (Board.ContainsCoord(enpassantCoord)) {
+                                enpassantMoves.Add(enpassantCoord);
+                            }
                         }
                     }
                 }
             }
-            return BoardCoord.NULL;
+            return enpassantMoves.ToArray();
         }
     }
 }

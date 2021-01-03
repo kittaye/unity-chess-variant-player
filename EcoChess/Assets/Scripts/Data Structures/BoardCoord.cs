@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using System;
-
+﻿
 public struct BoardCoord {
     public int x;
     public int y;
@@ -36,14 +33,6 @@ public struct BoardCoord {
 
     public static BoardCoord operator -(BoardCoord a, BoardCoord b) {
         return new BoardCoord(a.x - b.x, a.y - b.y);
-    }
-
-    public static explicit operator BoardCoord(Vector3 v) {
-        return new BoardCoord((int)v.x, (int)v.y);
-    }
-
-    public static implicit operator Vector3(BoardCoord v) {
-        return new Vector3(v.x, v.y, -1);
     }
 
     public override int GetHashCode() {

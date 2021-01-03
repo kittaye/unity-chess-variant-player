@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-
+﻿
 public class VariantHelpDetails
 {
     public static readonly string rule_NoCastling  = "- No castling.";

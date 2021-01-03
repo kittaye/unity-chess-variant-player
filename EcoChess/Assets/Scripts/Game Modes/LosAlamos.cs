@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-
+﻿
 namespace ChessGameModes {
     /// <summary>
     /// Board layout:
@@ -40,24 +38,24 @@ namespace ChessGameModes {
         }
 
         public override void PopulateBoard() {
-            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, "d1"));
-            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, "d6"));
+            currentRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.WHITE, "d1");
+            opposingRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.BLACK, "d6");
 
-            AddPieceToBoard(new Queen(Team.WHITE, "c1"));
-            AddPieceToBoard(new Queen(Team.BLACK, "c6"));
+            AddNewPieceToBoard(Piece.Queen, Team.WHITE, "c1");
+            AddNewPieceToBoard(Piece.Queen, Team.BLACK, "c6");
 
-            AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(0, WHITE_BACKROW)));
-            AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(BOARD_WIDTH - 1, WHITE_BACKROW)));
-            AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(0, BLACK_BACKROW)));
-            AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(BOARD_WIDTH - 1, BLACK_BACKROW)));
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, new BoardCoord(0, WHITE_BACKROW));
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, new BoardCoord(BOARD_WIDTH - 1, WHITE_BACKROW));
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, new BoardCoord(0, BLACK_BACKROW));
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, new BoardCoord(BOARD_WIDTH - 1, BLACK_BACKROW));
 
             for (int x = 0; x < BOARD_WIDTH; x++) {
-                AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, WHITE_PAWNROW), initialMoveLimit: 1));
-                AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(x, BLACK_PAWNROW), initialMoveLimit: 1));
+                ((Pawn)AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(x, WHITE_PAWNROW))).initialMoveLimit = 1;
+                ((Pawn)AddNewPieceToBoard(Piece.Pawn, Team.BLACK, new BoardCoord(x, BLACK_PAWNROW))).initialMoveLimit = 1;
 
                 if (x == 1 || x == BOARD_WIDTH - 2) {
-                    AddPieceToBoard(new Knight(Team.WHITE, new BoardCoord(x, WHITE_BACKROW)));
-                    AddPieceToBoard(new Knight(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
+                    AddNewPieceToBoard(Piece.Knight, Team.WHITE, new BoardCoord(x, WHITE_BACKROW));
+                    AddNewPieceToBoard(Piece.Knight, Team.BLACK, new BoardCoord(x, BLACK_BACKROW));
                 }
             }
         }

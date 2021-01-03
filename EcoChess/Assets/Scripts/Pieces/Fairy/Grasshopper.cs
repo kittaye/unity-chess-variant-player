@@ -1,50 +1,42 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 public class Grasshopper : ChessPiece {
-    public Grasshopper(Team team, BoardCoord position) : base(team, position) {
+    public Grasshopper(Team team, BoardCoord position, Board board) : base(team, position, board) {
         m_pieceType = Piece.Grasshopper;
     }
-    public Grasshopper(Team team, string algebraicKeyPosition) : base(team, algebraicKeyPosition) {
-        m_pieceType = Piece.Grasshopper;
-    }
-    public Grasshopper(Team team, BoardCoord position, bool allowXWrapping, bool allowYWrapping) 
-        : base(team, position, allowXWrapping, allowYWrapping) {
-        m_pieceType = Piece.Grasshopper;
-    }
-    public Grasshopper(Team team, string algebraicKeyPosition, bool allowXWrapping, bool allowYWrapping)
-    : base(team, algebraicKeyPosition, allowXWrapping, allowYWrapping) {
+    public Grasshopper(Team team, string algebraicKeyPosition, Board board) : base(team, algebraicKeyPosition, board) {
         m_pieceType = Piece.Grasshopper;
     }
 
-    public override string ToString() {
-        return GetTeam() + "_Grasshopper";
-    }
-
-    public override List<BoardCoord> CalculateTemplateMoves() {
-        List<BoardCoord> moves = new List<BoardCoord>();
-        int xModifier, yModifier;
-
-        for (int i = 0; i <= 7; i++) {
-            chessGame.GetMoveDirectionModifiers(this, (MoveDirection)i, out xModifier, out yModifier);
-            BoardCoord coord = GetBoardPosition() + new BoardCoord(xModifier, yModifier);
-
-            while (chessGame.Board.ContainsCoord(coord)) {
-                if(chessGame.Board.GetCoordInfo(coord).occupier != null) {
-                    BoardCoord grasshopperMove = chessGame.TryGetSpecificMove(this, coord + new BoardCoord(xModifier, yModifier));
-                    if(grasshopperMove != BoardCoord.NULL) {
-                        moves.Add(grasshopperMove);
-                    }
-                    break;
-                }
-                coord.x += xModifier;
-                coord.y += yModifier;
-            }
-        }
-        return moves;
+    public override string GetCanonicalName() {
+        return "Grasshopper";
     }
 
     public override string GetLetterNotation() {
         return "G";
+    }
+
+    public override List<BoardCoord> CalculateTemplateMoves() {
+        List<BoardCoord> moves = new List<BoardCoord>();
+
+        for (int i = 0; i <= 7; i++) {
+            BoardCoord coordStep = this.GetCoordStepInDirection((MoveDirection)i, true);
+            BoardCoord coord = this.GetBoardPosition() + coordStep;
+
+            while (m_Board.ContainsCoord(coord)) {
+                if (m_Board.GetCoordInfo(coord).GetAliveOccupier() != null) {
+                    BoardCoord hopMove = coord + coordStep;
+
+                    if (m_Board.ContainsCoord(hopMove)) {
+                        moves.Add(hopMove);
+                        break;
+                    }
+                }
+
+                coord += coordStep;
+            }
+        }
+
+        return moves;
     }
 }

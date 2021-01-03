@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using UnityEngine;
 using System;
 using System.Text;
 
-public enum Team { WHITE, BLACK }
+public enum Team { WHITE, BLACK, NONE }
 public enum MoveDirection { Up, Down, Left, Right, UpLeft, UpRight, DownLeft, DownRight }
 
 namespace ChessGameModes {
@@ -21,7 +20,16 @@ namespace ChessGameModes {
     ///     R N B Q K B N R
     /// </summary>
     public class Chess {
-        public static event Action<bool> _DisplayPromotionUI;
+        public static event Action<bool> OnDisplayPromotionOptions;
+
+        public event Action<ChessPiece, BoardCoord> OnChessPieceMoved;
+        public event Action<ChessPiece> OnChessPieceCaptured;
+        public event Action<ChessPiece> OnUndoChessPieceCapture;
+        public event Action<ChessPiece> OnChessPieceCreated;
+        public event Action<ChessPiece> OnChessPieceDestroyed;
+
+        public event Action<string> OnLogInfoMessage;
+        public event Action<string> OnLogErrorMessage;
 
         public Board Board { get; private set; }
 
@@ -49,6 +57,7 @@ namespace ChessGameModes {
         protected ChessPiece currentRoyalPiece;
         protected ChessPiece opposingRoyalPiece;
 
+        private bool checkingSimulatedMove;
         private uint numConsecutiveCapturelessMoves;
         private Team currentTeamTurn;
         private Team opposingTeamTurn;
@@ -56,19 +65,19 @@ namespace ChessGameModes {
         private List<ChessPiece> blackPieces;
         private ChessPiece lastMovedWhitePiece;
         private ChessPiece lastMovedBlackPiece;
-        private Stack<TeamTurnState> teamTurnStateHistory;
+        private Stack<GameStateSnapshot> gameStateHistory;
 
         public Chess() {
-            Board = new Board(BOARD_WIDTH, BOARD_HEIGHT, new Color(0.9f, 0.9f, 0.9f), new Color(0.1f, 0.1f, 0.1f));
+            Board = new Board(BOARD_WIDTH, BOARD_HEIGHT, new BoardColour(0.9f, 0.9f, 0.9f), new BoardColour(0.1f, 0.1f, 0.1f));
             Init();
         }
 
         public Chess(uint width, uint height) {
-            Board = new Board(width, height, new Color(0.9f, 0.9f, 0.9f), new Color(0.1f, 0.1f, 0.1f));
+            Board = new Board(width, height, new BoardColour(0.9f, 0.9f, 0.9f), new BoardColour(0.1f, 0.1f, 0.1f));
             Init();
         }
 
-        public Chess(uint width, uint height, Color primaryBoardColour, Color secondaryBoardColour) {
+        public Chess(uint width, uint height, BoardColour primaryBoardColour, BoardColour secondaryBoardColour) {
             Board = new Board(width, height, primaryBoardColour, secondaryBoardColour);
             Init();
         }
@@ -83,6 +92,7 @@ namespace ChessGameModes {
             castlingDistance = 2;
             Board.allowFlipping = false;
             checkingForCheck = false;
+            checkingSimulatedMove = false;
 
             AllowCastling = true;
             AllowEnpassantCapture = true;
@@ -104,7 +114,7 @@ namespace ChessGameModes {
             lastMovedWhitePiece = null;
             lastMovedBlackPiece = null;
             opposingTeamCheckThreats = null;
-            teamTurnStateHistory = new Stack<TeamTurnState>(30);
+            gameStateHistory = new Stack<GameStateSnapshot>(30);
         }
 
         public override string ToString() {
@@ -135,7 +145,7 @@ namespace ChessGameModes {
         }
 
         /// <summary>
-        /// Module function for the captureless move limit rule end condition.
+        /// Defines the captureless move limit rule.
         /// </summary>
         /// <returns>True if 50 turns (50 * 2 moves in FIDE chess) passes without a single capture.</returns>
         public bool CapturelessMovesLimit() {
@@ -150,100 +160,102 @@ namespace ChessGameModes {
         /// Is called after the board is instantiated. Used to place the initial chess pieces on the board. 
         /// </summary>
         public virtual void PopulateBoard() {
-            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, new BoardCoord(4, WHITE_BACKROW)));
-            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(4, BLACK_BACKROW)));
+            currentRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.WHITE, new BoardCoord(4, WHITE_BACKROW));
+            opposingRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.BLACK, new BoardCoord(4, BLACK_BACKROW));
 
-            AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(0, WHITE_BACKROW)));
-            AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(0, BLACK_BACKROW)));
-            AddPieceToBoard(new Rook(Team.WHITE, new BoardCoord(7, WHITE_BACKROW)));
-            AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(7, BLACK_BACKROW)));
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, new BoardCoord(0, WHITE_BACKROW));
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, new BoardCoord(0, BLACK_BACKROW));
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, new BoardCoord(7, WHITE_BACKROW));
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, new BoardCoord(7, BLACK_BACKROW));
 
-            AddPieceToBoard(new Queen(Team.WHITE, new BoardCoord(3, WHITE_BACKROW)));
-            AddPieceToBoard(new Queen(Team.BLACK, new BoardCoord(3, BLACK_BACKROW)));
+            AddNewPieceToBoard(Piece.Queen, Team.WHITE, new BoardCoord(3, WHITE_BACKROW));
+            AddNewPieceToBoard(Piece.Queen, Team.BLACK, new BoardCoord(3, BLACK_BACKROW));
 
             for (int x = 0; x < BOARD_WIDTH; x++) {
-                AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, WHITE_PAWNROW)));
-                AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(x, BLACK_PAWNROW)));
+                AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(x, WHITE_PAWNROW));
+                AddNewPieceToBoard(Piece.Pawn, Team.BLACK, new BoardCoord(x, BLACK_PAWNROW));
 
                 if (x == 1 || x == BOARD_WIDTH - 2) {
-                    AddPieceToBoard(new Knight(Team.WHITE, new BoardCoord(x, WHITE_BACKROW)));
-                    AddPieceToBoard(new Knight(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
+                    AddNewPieceToBoard(Piece.Knight, Team.WHITE, new BoardCoord(x, WHITE_BACKROW));
+                    AddNewPieceToBoard(Piece.Knight, Team.BLACK, new BoardCoord(x, BLACK_BACKROW));
                 } else if (x == 2 || x == BOARD_WIDTH - 3) {
-                    AddPieceToBoard(new Bishop(Team.WHITE, new BoardCoord(x, WHITE_BACKROW)));
-                    AddPieceToBoard(new Bishop(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
+                    AddNewPieceToBoard(Piece.Bishop, Team.WHITE, new BoardCoord(x, WHITE_BACKROW));
+                    AddNewPieceToBoard(Piece.Bishop, Team.BLACK, new BoardCoord(x, BLACK_BACKROW));
                 }
             }
+        }
+
+        protected void RaiseEventOnLogInfoMessage(string message) {
+            OnLogInfoMessage?.Invoke(message);
+        }
+
+        protected void RaiseEventOnLogErrorMessage(string message) {
+            OnLogErrorMessage?.Invoke(message);
+        }
+
+        /// <summary>
+        /// From the piece's template moves, get those that would not put the current royal piece in check.
+        /// </summary>
+        protected List<BoardCoord> GetLegalTemplateMoves(ChessPiece mover) {
+            List<BoardCoord> legalMoves = new List<BoardCoord>();
+            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
+
+            for (int i = 0; i < templateMoves.Length; i++) {
+                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
+                    legalMoves.Add(templateMoves[i]);
+                }
+            }
+
+            return legalMoves;
         }
 
         /// <summary>
         /// Calculates the currently available moves for a selected piece.
         /// </summary>
-        /// <param name="mover">Selected piece to calculate moves for.</param>
-        /// <returns>A list of board coordinates for each move.</returns>
         public virtual List<BoardCoord> CalculateAvailableMoves(ChessPiece mover) {
-            BoardCoord[] templateMoves = mover.CalculateTemplateMoves().ToArray();
-            List<BoardCoord> availableMoves = new List<BoardCoord>(templateMoves.Length);
+            List<BoardCoord> availableMoves = new List<BoardCoord>();
 
-            for (int i = 0; i < templateMoves.Length; i++) {
-                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, templateMoves[i]) == false) {
-                    availableMoves.Add(templateMoves[i]);
-                }
-            }
+            availableMoves.AddRange(GetLegalTemplateMoves(mover));
 
-            if (AllowCastling) {
-                if ((mover == currentRoyalPiece || mover == opposingRoyalPiece) && mover.MoveCount == 0) {
+            if (IsRoyal(mover)) {
+                if (AllowCastling) {
                     availableMoves.AddRange(TryAddAvailableCastleMoves(mover, CastlerOptions, castlingDistance));
                 }
-            }
-
-            if (mover is Pawn) {
+            } else if (mover is Pawn) {
                 if (AllowEnpassantCapture) {
-                    BoardCoord enPassantMove = TryAddAvailableEnPassantMove((Pawn)mover);
-                    if (enPassantMove != BoardCoord.NULL) {
-                        availableMoves.Add(enPassantMove);
-                    }
-                }
-
-                if (AllowPawnPromotion) {
-                    if (checkingForCheck == false && CanPromote((Pawn)mover, availableMoves.ToArray())) {
-                        OnDisplayPromotionUI(true);
-                    }
+                    availableMoves.AddRange(TryAddAvailableEnPassantMoves((Pawn)mover));
                 }
             }
 
             return availableMoves;
         }
 
+        protected bool IsRoyal(ChessPiece piece) {
+            return piece == currentRoyalPiece || piece == opposingRoyalPiece;
+        }
+
         /// <summary>
         /// Moves a selected piece to a destination.
         /// </summary>
-        /// <param name="mover">Piece to move.</param>
-        /// <param name="destination">Destination to move to.</param>
         /// <returns>True if the destination is an available move for this piece.</returns>
         public virtual bool MovePiece(ChessPiece mover, BoardCoord destination) {
-            BoardCoord oldPos = mover.GetBoardPosition();
-
-            // Try make the move
-            string moveNotation = MakeDirectMove(mover, destination);
-            if (moveNotation != null) {
-                if (AllowCastling) {
-                    if (mover.MoveCount == 1 && mover == currentRoyalPiece) {
-                        TryPerformCastlingRookMoves(mover, ref moveNotation);
+            // Make the move. If successful, try perform special cases.
+            if (MakeBaseMove(mover, destination)) {
+                if (IsRoyal(mover)) {
+                    if (AllowCastling) {
+                        TryPerformCastlingMove(mover);
                     }
                 }
 
                 if (mover is Pawn) {
                     if (AllowEnpassantCapture) {
-                        ((Pawn)mover).validEnPassant = (mover.MoveCount == 1 && mover.GetRelativeBoardCoord(0, -1) != oldPos);
-                        CheckPawnEnPassantCapture((Pawn)mover, oldPos, ref moveNotation);
+                        TryPerformPawnEnPassantCapture((Pawn)mover);
                     }
 
                     if (AllowPawnPromotion) {
-                        CheckPawnPromotion((Pawn)mover, ref moveNotation);
+                        TryPerformPawnPromotion((Pawn)mover);
                     }
                 }
-
-                GameMoveNotations.Push(moveNotation);
                 return true;
             }
             return false;
@@ -255,38 +267,94 @@ namespace ChessGameModes {
         /// <param name="mover">Piece to perform the castling move.</param>
         /// <param name="moveNotation">A reference to the current move notation.</param>
         /// <returns>True if the castle is successful.</returns>
-        protected virtual bool TryPerformCastlingRookMoves(ChessPiece mover, ref string moveNotation) {
-            // If the king moved to the left to castle, grab the rook on the left-side of the board to castle with and move it.
-            if (mover.GetBoardPosition().x == 2) {
-                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).occupier;
-                MakeDirectMove(castlingPiece, new BoardCoord(3, mover.GetBoardPosition().y), false);
-                moveNotation = "O-O-O";
-                return true;
+        protected virtual bool TryPerformCastlingMove(ChessPiece mover) {
+            if (mover.MoveCount == 1) {
+                // If the king moved to the left to castle, grab the rook on the left-side of the board to castle with and move it.
+                if (mover.GetBoardPosition().x == 2) {
+                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(0, mover.GetBoardPosition().y)).GetAliveOccupier();
+                    UpdatePiecePositionAndOccupance(castlingPiece, new BoardCoord(3, mover.GetBoardPosition().y));
+                    SetLastMoveNotationToQueenSideCastle();
+                    return true;
 
-                // Else the king moved right, so grab the right rook instead.
-            } else if (mover.GetBoardPosition().x == 6) {
-                ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).occupier;
-                MakeDirectMove(castlingPiece, new BoardCoord(5, mover.GetBoardPosition().y), false);
-                moveNotation = "O-O";
-                return true;
+                    // Else the king moved right, so grab the right rook instead.
+                } else if (mover.GetBoardPosition().x == 6) {
+                    ChessPiece castlingPiece = Board.GetCoordInfo(new BoardCoord(BOARD_WIDTH - 1, mover.GetBoardPosition().y)).GetAliveOccupier();
+                    UpdatePiecePositionAndOccupance(castlingPiece, new BoardCoord(5, mover.GetBoardPosition().y));
+                    SetLastMoveNotationToKingSideCastle();
+                    return true;
+                }
             }
             return false;
+        }
+
+        protected void UpdatePiecePositionAndOccupance(ChessPiece piece, BoardCoord newPosition) {
+            BoardCoord previousPosition = piece.GetBoardPosition();
+
+            UpdateSquareOccupiers(piece, previousPosition, newPosition);
+
+            piece.SetBoardPosition(newPosition);
+
+            // Alert listeners that the piece has moved.
+            OnChessPieceMoved?.Invoke(piece, newPosition);
+        }
+
+        /// <summary>
+        /// Called in CalculateAvailableMoves. If an enpassant move is available, returns the enpassant move.
+        /// In most cases there is only one enpassant move. The exception is in Monster chess, where a black pawn could
+        /// perform en passant on two different white pawns.
+        /// TODO: allow multiple enpassant options (Monster variant)
+        /// </summary>
+        protected virtual BoardCoord[] TryAddAvailableEnPassantMoves(Pawn mover) {
+            const int LEFT = -1;
+            const int RIGHT = 1;
+            List<BoardCoord> enpassantMoves = new List<BoardCoord>(1);
+
+            if (mover.canEnPassantCapture) {
+                for (int i = LEFT; i <= RIGHT; i += 2) {
+                    BoardCoord sidewaysCoord = mover.GetRelativeBoardCoord(i, 0);
+
+                    if (Board.ContainsCoord(sidewaysCoord) && mover.IsThreatTowards(sidewaysCoord)) {
+                        ChessPiece piece = Board.GetCoordInfo(sidewaysCoord).GetAliveOccupier();
+
+                        if (piece is Pawn && CheckEnPassantVulnerability((Pawn)piece)) {
+                            BoardCoord enpassantCoord = mover.GetRelativeBoardCoord(i, 1);
+
+                            if (Board.ContainsCoord(enpassantCoord)) {
+                                if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, enpassantCoord) == false) {
+                                    enpassantMoves.Add(enpassantCoord);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return enpassantMoves.ToArray();
+        }
+
+        /// <summary>
+        /// Checks if the pawn is a valid candidate for being en passant captured.
+        /// </summary>
+        protected bool CheckEnPassantVulnerability(Pawn piece) {
+            BoardCoord oldPos = piece.StateHistory[piece.StateHistory.Count - 1].position;
+            return (piece.MoveCount == 1 && piece == GetLastMovedPiece(piece.GetTeam()) && piece.GetRelativeBoardCoord(0, -1) != oldPos);
         }
 
         /// <summary>
         /// Called in MovePiece. If an enpassant move was made, enpassant capture is performed.
         /// </summary>
-        /// <param name="mover">Moving piece.</param>
-        /// <param name="moverPreviousPosition">TThe position of the piece before it moved.</param>
         /// <param name="moveNotation">A reference to the current move notation.</param>
         /// <returns>The piece that was removed.</returns>
-        protected virtual Pawn CheckPawnEnPassantCapture(Pawn mover, BoardCoord moverPreviousPosition, ref string moveNotation) {
-            if (Board.ContainsCoord(mover.GetRelativeBoardCoord(0, -1)) && IsThreat(mover, mover.GetRelativeBoardCoord(0, -1))) {
-                ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(0, -1)).occupier;
-                if (occupier != null && occupier is Pawn && occupier == GetLastMovedOpposingPiece(mover) && ((Pawn)occupier).validEnPassant) {
+        protected virtual Pawn TryPerformPawnEnPassantCapture(Pawn mover) {
+            BoardCoord oldPos = mover.StateHistory[mover.StateHistory.Count - 1].position;
+            BoardCoord newPos = mover.GetBoardPosition();
+
+            if (Board.ContainsCoord(mover.GetRelativeBoardCoord(0, -1)) && mover.IsThreatTowards(mover.GetRelativeBoardCoord(0, -1))) {
+                ChessPiece occupier = Board.GetCoordInfo(mover.GetRelativeBoardCoord(0, -1)).GetAliveOccupier();
+                if (occupier != null && occupier is Pawn && CheckEnPassantVulnerability((Pawn)occupier)) {
                     mover.CaptureCount++;
-                    KillPiece(occupier);
-                    moveNotation = Board.GetCoordInfo(moverPreviousPosition).file + "x" + Board.GetCoordInfo(mover.GetBoardPosition()).algebraicKey + "e.p.";
+                    CapturePiece(occupier);
+
+                    SetLastMoveNotationToEnPassant(oldPos, newPos);
                     return (Pawn)occupier;
                 }
             }
@@ -296,12 +364,10 @@ namespace ChessGameModes {
         /// <summary>
         /// Called in CalculateAvailableMoves. Determines if a pawn can promote on their move.
         /// </summary>
-        /// <param name="mover">Moving pawn.</param>
         /// <param name="availableMoves">The pawn's available moves to check.</param>
-        /// <returns></returns>
-        protected virtual bool CanPromote(Pawn mover, BoardCoord[] availableMoves) {
+        protected bool IsPromotionMoveAvailable(Pawn mover, BoardCoord[] availableMoves) {
             for (int i = 0; i < availableMoves.Length; i++) {
-                if (availableMoves[i].y == WHITE_BACKROW || availableMoves[i].y == BLACK_BACKROW) {
+                if (IsAPromotionMove(availableMoves[i])) {
                     return true;
                 }
             }
@@ -310,56 +376,47 @@ namespace ChessGameModes {
 
         /// <summary>
         /// Called in MovePiece. If a promoting move was made, the pawn is removed from the board and replaced with the selected pawn promotion.
+        /// TODO: The only variant using this virtual method is Sovereign chess. Maybe find a way to remove this?
         /// </summary>
-        /// <param name="mover">Moving pawn.</param>
-        /// <returns></returns>
-        protected virtual ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
-            if (mover.GetRelativeBoardCoord(0, 1).y < WHITE_BACKROW || mover.GetRelativeBoardCoord(0, 1).y > BLACK_BACKROW) {
-                KillPiece(mover);
+        protected virtual ChessPiece TryPerformPawnPromotion(Pawn mover) {
+            if (PerformedAPromotionMove(mover)) {
+                CapturePiece(mover);
 
-                ChessPiece newPromotedPiece = ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition());
-                moveNotation += string.Format("={0}", newPromotedPiece.GetLetterNotation());
+                ChessPiece newPromotedPiece = AddNewPieceToBoard(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition());
 
-                return AddPieceToBoard(newPromotedPiece);
+                AddPromotionToLastMoveNotation(newPromotedPiece.GetLetterNotation());
+                return newPromotedPiece;
             }
             return null;
         }
 
         /// <summary>
+        /// Determines whether the move is a potential promotion move. Override this to change the condition for potential promotion moves.
+        /// </summary>
+        protected virtual bool IsAPromotionMove(BoardCoord move) {
+            return move.y == WHITE_BACKROW || move.y == BLACK_BACKROW;
+        }
+
+        /// <summary>
+        /// Determines whether the mover should be promoted. Override this to change the condition for piece promotion.
+        /// </summary>
+        protected virtual bool PerformedAPromotionMove(Pawn mover) {
+            return mover.GetRelativeBoardCoord(0, 1).y < WHITE_BACKROW || mover.GetRelativeBoardCoord(0, 1).y > BLACK_BACKROW;
+        }
+
+        /// <summary>
         /// Simulates a move, checks whether the piece-to-check is in check, then reverts the simulated move.
         /// </summary>
-        /// <param name="pieceToCheck">Piece to check (usually the current or opposing royal piece).</param>
-        /// <param name="mover">Piece to move.</param>
-        /// <param name="dest">Destination to move to.</param>
-        /// <returns>True if the piece-to-check is in check after the simulated move.</returns>
-        protected virtual bool IsPieceInCheckAfterThisMove(ChessPiece pieceToCheck, ChessPiece mover, BoardCoord dest) {
-            if (AssertContainsCoord(dest)) {
+        protected virtual bool IsPieceInCheckAfterThisMove(ChessPiece pieceToCheck, ChessPiece mover, BoardCoord destination) {
+            if (Board.ContainsCoord(destination)) {
                 if (checkingForCheck) return false;
 
-                // Temporarily simulate the move actually happening
-                ChessPiece originalOccupier = Board.GetCoordInfo(dest).occupier;
-                ChessPiece originalLastMover;
-                BoardCoord oldPos = mover.GetBoardPosition();
-                SimulateMove(mover, dest, originalOccupier, out originalLastMover);
+                bool isInCheck = false;
 
-                ChessPiece occupier = null;
-                if (mover is Pawn) {
-                    string dummy = string.Empty;
-                    occupier = CheckPawnEnPassantCapture((Pawn)mover, oldPos, ref dummy);
+                if (SimulateMove(mover, destination)) {
+                    isInCheck = IsPieceInCheck(pieceToCheck);
+                    RevertSimulatedMove();
                 }
-
-                // Check whether the piece is in check after this temporary move
-                bool isInCheck = IsPieceInCheck(pieceToCheck);
-
-                if (occupier != null) {
-                    mover.CaptureCount--;
-                    Board.GetCoordInfo(occupier.GetBoardPosition()).occupier = occupier;
-                    occupier.IsAlive = true;
-                    occupier.gameObject.SetActive(true);
-                }
-
-                // Revert the temporary move back to normal
-                RevertSimulatedMove(mover, dest, originalOccupier, originalLastMover, oldPos);
 
                 return isInCheck;
             }
@@ -369,8 +426,6 @@ namespace ChessGameModes {
         /// <summary>
         /// Determines whether the piece-to-check is currently in check.
         /// </summary>
-        /// <param name="pieceToCheck">Piece to check (usually the current or opposing royal piece).</param>
-        /// <returns>True if the piece-to-check is in check.</returns>
         protected virtual bool IsPieceInCheck(ChessPiece pieceToCheck) {
             if (checkingForCheck) return false;
 
@@ -392,89 +447,63 @@ namespace ChessGameModes {
         /// Gets all possible check threats against the piece-to-check. This should vary between game-modes 
         /// that involve pieces that don't move directionally.
         /// </summary>
-        /// <param name="pieceToCheck">Piece to check (usually the current or opposing royal piece).</param>
         /// <returns>A list of chess pieces that can check the piece-to-check.</returns>
         protected virtual List<ChessPiece> GetAllPossibleCheckThreats(ChessPiece pieceToCheck) {
             List<ChessPiece> possibleCheckThreats = new List<ChessPiece>();
 
             for (int i = (int)MoveDirection.Up; i <= (int)MoveDirection.DownRight; i++) {
-                int xModifier, yModifier;
-                GetMoveDirectionModifiers(pieceToCheck, (MoveDirection)i, out xModifier, out yModifier);
-                BoardCoord coord = pieceToCheck.GetBoardPosition() + new BoardCoord(xModifier, yModifier);
+                BoardCoord coordStep = pieceToCheck.GetCoordStepInDirection((MoveDirection)i, true);
+                BoardCoord coord = pieceToCheck.GetBoardPosition() + coordStep;
 
                 while (Board.ContainsCoord(coord)) {
-                    if (IsThreat(pieceToCheck, coord)) {
-                        possibleCheckThreats.Add(Board.GetCoordInfo(coord).occupier);
+                    if (pieceToCheck.IsThreatTowards(coord)) {
+                        possibleCheckThreats.Add(Board.GetCoordInfo(coord).GetAliveOccupier());
                     }
-                    coord.x += xModifier;
-                    coord.y += yModifier;
+                    coord += coordStep;
                 }
             }
 
-            foreach (Knight knight in GetPiecesOfType<Knight>()) {
-                if (IsThreat(pieceToCheck, knight.GetBoardPosition())) {
-                    possibleCheckThreats.Add(knight);
-                }
-            }
+            possibleCheckThreats.AddRange(GetAlivePiecesOfType<Knight>(pieceToCheck.GetOpposingTeam()));
 
             return possibleCheckThreats;
         }
 
-        /// <summary>
-        /// Called in CalculateAvailableMoves. If an enpassant move is available, returns the enpassant move.
-        /// </summary>
-        /// <param name="mover">Moving pawn.</param>
-        /// <returns>Enpassant coordinate, otherwise null.</returns>
-        protected virtual BoardCoord TryAddAvailableEnPassantMove(Pawn mover) {
-            const int LEFT = -1;
-            const int RIGHT = 1;
-
-            if (mover.canEnPassantCapture) {
-                for (int i = LEFT; i <= RIGHT; i += 2) {
-                    BoardCoord coord = TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 0), threatOnly: true);
-                    if (Board.ContainsCoord(coord)) {
-                        ChessPiece piece = Board.GetCoordInfo(coord).occupier;
-                        if (piece is Pawn && piece == GetLastMovedOpposingPiece(mover) && ((Pawn)piece).validEnPassant) {
-                            if (IsPieceInCheckAfterThisMove(currentRoyalPiece, mover, mover.GetRelativeBoardCoord(i, 1)) == false) {
-                                return TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(i, 1));
-                            }
-                        }
-                    }
-                }
+        public virtual void DisplayPromotionOptionsUIIfCanPromote(ChessPiece mover, BoardCoord[] availableMoves) {
+            if (IsPromotionMoveAvailable((Pawn)mover, availableMoves)) {
+                OnDisplayPromotionUI(true);
             }
-            return BoardCoord.NULL;
         }
 
         /// <summary>
         /// Called in CalculateAvailableMoves. Determines if a castling move can be made for a chess piece.
         /// </summary>
-        /// <param name="king">Moving piece.</param>
+        /// <param name="castler">Moving piece.</param>
         /// <param name="castleTypes">Which types of pieces can the moving piece castle with?</param>
         /// <param name="castlingDistance">How many squares should the piece move when castling?</param>
         /// <param name="canCastleLeftward">Can the piece castle leftwards?</param>
         /// <param name="canCastleRightward">Can the piece castle rightwards?</param>
         /// <returns>A list of board coordinates for available castle moves.</returns>
-        protected virtual BoardCoord[] TryAddAvailableCastleMoves(ChessPiece king, Piece[] castlerOptions, int castlingDistance = 2, bool canCastleLeftward = true, bool canCastleRightward = true) {
+        protected virtual BoardCoord[] TryAddAvailableCastleMoves(ChessPiece castler, Piece[] castlerOptions, int castlingDistance = 2, bool canCastleLeftward = true, bool canCastleRightward = true) {
             const int LEFT = -1;
             const int RIGHT = 1;
 
-            if(castlerOptions.Length == 0) {
+            if(castler.MoveCount > 0 || castlerOptions.Length == 0) {
                 return new BoardCoord[0];
             }
 
-            if (IsPieceInCheck(king) == false) {
+            if (IsPieceInCheck(castler) == false) {
                 List<BoardCoord> castleMoves = new List<BoardCoord>(2);
 
                 for (int i = LEFT; i <= RIGHT; i += 2) {
                     if (!canCastleLeftward && i == LEFT) continue;
                     if (!canCastleRightward && i == RIGHT) break;
 
-                    int x = king.GetBoardPosition().x + i;
-                    int y = king.GetBoardPosition().y;
+                    int x = castler.GetBoardPosition().x + i;
+                    int y = castler.GetBoardPosition().y;
                     BoardCoord coord = new BoardCoord(x, y);
 
                     while (Board.ContainsCoord(coord)) {
-                        ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
+                        ChessPiece occupier = Board.GetCoordInfo(coord).GetAliveOccupier();
                         if (occupier != null) {
                             bool validCastler = false;
                             for (int j = 0; j < castlerOptions.Length; j++) {
@@ -487,14 +516,17 @@ namespace ChessGameModes {
                             if (validCastler && occupier.MoveCount == 0) {
                                 bool inCheck = false;
                                 for (int k = 1; k <= castlingDistance; k++) {
-                                    if (IsPieceInCheckAfterThisMove(king, king, king.GetBoardPosition() + new BoardCoord(i * k, 0))) {
+                                    if (IsPieceInCheckAfterThisMove(castler, castler, castler.GetBoardPosition() + new BoardCoord(i * k, 0))) {
                                         inCheck = true;
                                         break;
                                     }
                                 }
 
                                 if (!inCheck) {
-                                    castleMoves.Add(TryGetSpecificMove(king, king.GetBoardPosition() + new BoardCoord(i * castlingDistance, 0)));
+                                    BoardCoord castlingCoord = castler.GetBoardPosition() + new BoardCoord(i * castlingDistance, 0);
+                                    if (Board.ContainsCoord(castlingCoord) && castler.IsAllyTowards(castlingCoord) == false) {
+                                        castleMoves.Add(castlingCoord);
+                                    }
                                 }
                             }
                             break;
@@ -511,10 +543,8 @@ namespace ChessGameModes {
         /// <summary>
         /// Checks whether any piece on the team is able to move.
         /// </summary>
-        /// <param name="team">Team to check.</param>
-        /// <returns>True if a piece is able to move.</returns>
         protected bool TeamHasAnyMoves(Team team) {
-            foreach (ChessPiece piece in GetPieces(team)) {
+            foreach (ChessPiece piece in GetPiecesOfType<ChessPiece>(team)) {
                 if (piece.IsAlive) {
                     if (CalculateAvailableMoves(piece).Count > 0) {
                         return true;
@@ -525,15 +555,51 @@ namespace ChessGameModes {
         }
 
         protected void AddCheckToLastMoveNotation() {
-            string moveNotation = GameMoveNotations.Pop();
-            moveNotation += "+";
-            GameMoveNotations.Push(moveNotation);
+            if (checkingSimulatedMove == false) {
+                string moveNotation = GameMoveNotations.Pop();
+                moveNotation += "+";
+                GameMoveNotations.Push(moveNotation);
+            }
         }
 
         protected void AddCheckmateToLastMoveNotation() {
-            string moveNotation = GameMoveNotations.Pop();
-            moveNotation += "#";
-            GameMoveNotations.Push(moveNotation);
+            if (checkingSimulatedMove == false) {
+                string moveNotation = GameMoveNotations.Pop();
+                moveNotation += "#";
+                GameMoveNotations.Push(moveNotation);
+            }
+        }
+
+        protected void AddPromotionToLastMoveNotation(string promotedPieceNotation) {
+            if (checkingSimulatedMove == false) {
+                string moveNotation = GameMoveNotations.Pop();
+                moveNotation += string.Format("={0}", promotedPieceNotation);
+                GameMoveNotations.Push(moveNotation);
+            }
+        }
+
+        protected void SetLastMoveNotationToEnPassant(BoardCoord oldPos, BoardCoord newPos) {
+            if (checkingSimulatedMove == false) {
+                string moveNotation = GameMoveNotations.Pop();
+                moveNotation = Board.GetCoordInfo(oldPos).file + "x" + Board.GetCoordInfo(newPos).algebraicKey + "e.p.";
+                GameMoveNotations.Push(moveNotation);
+            }
+        }
+
+        protected void SetLastMoveNotationToKingSideCastle() {
+            if (checkingSimulatedMove == false) {
+                string moveNotation = GameMoveNotations.Pop();
+                moveNotation = "O-O";
+                GameMoveNotations.Push(moveNotation);
+            }
+        }
+
+        protected void SetLastMoveNotationToQueenSideCastle() {
+            if (checkingSimulatedMove == false) {
+                string moveNotation = GameMoveNotations.Pop();
+                moveNotation = "O-O-O";
+                GameMoveNotations.Push(moveNotation);
+            }
         }
 
         /// <summary>
@@ -564,10 +630,8 @@ namespace ChessGameModes {
         }
 
         /// <summary>
-        /// Module function to get the last moved piece from a specific team.
+        /// Gets the last moved piece from a specific team.
         /// </summary>
-        /// <param name="team">Team to get the last mover from.</param>
-        /// <returns>The last moved chess piece from the team.</returns>
         public ChessPiece GetLastMovedPiece(Team team) {
             if (team == Team.WHITE) {
                 return lastMovedWhitePiece;
@@ -577,9 +641,8 @@ namespace ChessGameModes {
         }
 
         /// <summary>
-        /// Module function to set the last moved piece. This will update the last mover of the piece's team.
+        /// Sets the last moved piece. This will update the last mover of the piece's team.
         /// </summary>
-        /// <param name="piece">Piece to set to.</param>
         public void SetLastMovedPiece(ChessPiece piece) {
             if (piece != null) {
                 if (piece.GetTeam() == Team.WHITE) {
@@ -591,7 +654,7 @@ namespace ChessGameModes {
         }
 
         /// <summary>
-        /// Module function to get the last moved opposing team's piece based on the mover's team.
+        /// Gets the last moved opposing team's piece based on the mover's team.
         /// </summary>
         /// <param name="mover">Piece to determine the opposing team.</param>
         /// <returns>The last moved piece from the opposing team based on the mover's team.</returns>
@@ -606,148 +669,82 @@ namespace ChessGameModes {
         /// <summary>
         /// Display the UI for showing pawn promotion options to choose from.
         /// </summary>
-        /// <param name="value"></param>
         protected void OnDisplayPromotionUI(bool value) {
-            if (_DisplayPromotionUI != null) _DisplayPromotionUI.Invoke(true);
+            OnDisplayPromotionOptions?.Invoke(true);
         }
 
         /// <summary>
         /// Set the current pawn promotion option to a specified piece.
         /// </summary>
-        /// <param name="piece">Piece to set the pawn promotion option to.</param>
         public virtual void SetPawnPromotionTo(Piece piece) {
             this.SelectedPawnPromotion = piece;
         }
 
-        /// <summary>
-        /// Gets a list of a specific type of chess pieces in the game.
-        /// </summary>
-        /// <typeparam name="T">Type of chess piece to retrieve.</typeparam>
-        /// <param name="team">Team to get pieces from.</param>
-        /// <param name="aliveOnly">Should only pieces that are currently on the board be retrieved?</param>
-        /// <returns>A list of T chess pieces.</returns>
-        public List<T> GetPiecesOfType<T>(Team team, bool aliveOnly = true) where T : ChessPiece {
-            List<T> selectionOfPieces = new List<T>();
-            switch (team) {
-                case Team.WHITE:
-                    foreach (ChessPiece piece in whitePieces) {
-                        if (piece is T && piece.IsAlive) {
-                            selectionOfPieces.Add((T)piece);
-                        }
-                    }
-                    break;
-                case Team.BLACK:
-                    foreach (ChessPiece piece in blackPieces) {
-                        if (piece is T && piece.IsAlive) {
-                            selectionOfPieces.Add((T)piece);
-                        }
-                    }
-                    break;
-            }
+        public List<T> GetPiecesOfType<T>() where T : ChessPiece {
+            List<T> selectionOfPieces = new List<T>(whitePieces.Count + blackPieces.Count);
+
+            selectionOfPieces.AddRange(GetPiecesOfType<T>(Team.WHITE));
+            selectionOfPieces.AddRange(GetPiecesOfType<T>(Team.BLACK));
+
             return selectionOfPieces;
         }
 
-        /// <summary>
-        /// Gets a list of a specific type of chess pieces in the game.
-        /// </summary>
-        /// <typeparam name="T">Type of chess piece to retrieve.</typeparam>
-        /// <param name="aliveOnly">Should only pieces that are currently on the board be retrieved?</param>
-        /// <returns>A list of T chess pieces.</returns>
-        public List<T> GetPiecesOfType<T>(bool aliveOnly = true) where T : ChessPiece {
+        public List<T> GetAlivePiecesOfType<T>() where T : ChessPiece {
             List<T> selectionOfPieces = new List<T>();
-            foreach (ChessPiece piece in whitePieces) {
-                if (piece is T && piece.IsAlive) {
-                    selectionOfPieces.Add((T)piece);
-                }
-            }
-            foreach (ChessPiece piece in blackPieces) {
-                if (piece is T && piece.IsAlive) {
+
+            selectionOfPieces.AddRange(GetAlivePiecesOfType<T>(Team.WHITE));
+            selectionOfPieces.AddRange(GetAlivePiecesOfType<T>(Team.BLACK));
+
+            return selectionOfPieces;
+        }
+
+        public List<T> GetPiecesOfType<T>(Team team) where T : ChessPiece {
+            List<ChessPiece> selectedArmy = GetPiecesFrom(team);
+            return GetPiecesOfType<T>(selectedArmy);
+        }
+
+        public List<T> GetAlivePiecesOfType<T>(Team team) where T : ChessPiece {
+            List<ChessPiece> selectedArmy = GetPiecesFrom(team);
+            return GetAlivePiecesOfType<T>(selectedArmy);
+        }
+
+        private List<T> GetPiecesOfType<T>(List<ChessPiece> pieceCollection) where T : ChessPiece {
+            List<T> selectionOfPieces = new List<T>();
+
+            foreach (ChessPiece piece in pieceCollection) {
+                if (piece is T) {
                     selectionOfPieces.Add((T)piece);
                 }
             }
             return selectionOfPieces;
         }
 
-        /// <summary>
-        /// Gets a list of all chess pieces in the current game.
-        /// </summary>
-        /// <param name="aliveOnly">Should only pieces that are currently on the board be retrieved?</param>
-        /// <returns>A list of all chess pieces in the current game.</returns>
-        public List<ChessPiece> GetPieces(bool aliveOnly = true) {
-            List<ChessPiece> pieces = new List<ChessPiece>(whitePieces.Count + blackPieces.Count);
-            if (aliveOnly) {
-                whitePieces.ForEach(x => { if (x.IsAlive) pieces.Add(x); });
-                blackPieces.ForEach(x => { if (x.IsAlive) pieces.Add(x); });
+        private List<T> GetAlivePiecesOfType<T>(List<ChessPiece> pieceCollection) where T : ChessPiece {
+            List<T> selectionOfPieces = new List<T>();
+
+            foreach (ChessPiece piece in pieceCollection) {
+                if (piece is T && piece.IsAlive) {
+                    selectionOfPieces.Add((T)piece);
+                }
+            }
+            return selectionOfPieces;
+        }
+
+        private List<ChessPiece> GetPiecesFrom(Team team) {
+            List<ChessPiece> selectedArmy = new List<ChessPiece>();
+
+            if (team == Team.WHITE) {
+                selectedArmy = whitePieces;
             } else {
-                pieces.AddRange(whitePieces);
-                pieces.AddRange(blackPieces);
+                selectedArmy = blackPieces;
             }
-            return pieces;
-        }
 
-        /// <summary>
-        /// Gets a list of all chess pieces in the current game.
-        /// </summary>
-        /// <param name="team">Team to get pieces from.</param>
-        /// <param name="aliveOnly">Should only pieces that are currently on the board be retrieved?</param>
-        /// <returns>A list of all chess pieces in the current game.</returns>
-        public List<ChessPiece> GetPieces(Team team, bool aliveOnly = true) {
-            List<ChessPiece> pieces = new List<ChessPiece>();
-            if (aliveOnly) {
-                if (team == Team.WHITE) {
-                    whitePieces.ForEach(x => { if (x.IsAlive) pieces.Add(x); });
-                } else {
-                    blackPieces.ForEach(x => { if (x.IsAlive) pieces.Add(x); });
-                }
-                return pieces;
-            } else {
-                if (team == Team.WHITE) {
-                    return new List<ChessPiece>(whitePieces);
-                }
-                return new List<ChessPiece>(blackPieces);
-            }
-        }
-
-        /// <summary>
-        /// Determines whether or not a specific coord is considered an ally against the specified chess piece.
-        /// </summary>
-        /// <param name="mover">Piece to compare against.</param>
-        /// <param name="coord">Board coordinate to test.</param>
-        /// <returns>True if the specified square is an ally to mover.</returns>
-        protected virtual bool IsAlly(ChessPiece mover, BoardCoord coord) {
-            if (AssertContainsCoord(coord)) {
-                ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
-                if (occupier != null) {
-                    return occupier.GetTeam() == mover.GetTeam();
-                } else {
-                    return false;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Determines whether or not a specific coord is considered a threat against the specified chess piece.
-        /// </summary>
-        /// <param name="mover">Piece to compare against.</param>
-        /// <param name="coord">Board coordinate to test.</param>
-        /// <returns>True if the specified square is a threat to mover.</returns>
-        protected virtual bool IsThreat(ChessPiece mover, BoardCoord coord) {
-            if (AssertContainsCoord(coord)) {
-                ChessPiece occupier = Board.GetCoordInfo(coord).occupier;
-                if (occupier != null) {
-                    return occupier.GetTeam() != mover.GetTeam();
-                } else {
-                    return false;
-                }
-            }
-            return false;
+            return selectedArmy;
         }
 
         /// <summary>
         /// Returns a string that describes who's turn it is currently.
         /// </summary>
-        /// <returns></returns>
         public virtual string GetCurrentTurnLabel() {
             if (currentTeamTurn == Team.WHITE) {
                 return "White's move";
@@ -759,8 +756,7 @@ namespace ChessGameModes {
         /// <summary>
         /// Adds a chess piece to a team based on it's own team value.
         /// </summary>
-        /// <param name="piece">Piece to add.</param>
-        protected void AddPieceToActiveTeam(ChessPiece piece) {
+        protected void AddPieceToTeam(ChessPiece piece) {
             if (piece.GetTeam() == Team.WHITE) {
                 whitePieces.Add(piece);
             } else {
@@ -771,9 +767,8 @@ namespace ChessGameModes {
         /// <summary>
         /// Removes a chess piece from it's team.
         /// </summary>
-        /// <param name="piece">Piece to remove.</param>
         /// <returns>True if the removal was successful.</returns>
-        protected bool RemovePieceFromActiveTeam(ChessPiece piece) {
+        protected bool RemovePieceFromTeam(ChessPiece piece) {
             if (piece.GetTeam() == Team.WHITE) {
                 return whitePieces.Remove(piece);
             } else {
@@ -784,104 +779,90 @@ namespace ChessGameModes {
         /// <summary>
         /// Used to update the occupiers of affected squares after a move is played.
         /// </summary>
-        /// <param name="previousPosition"></param>
-        /// <param name="newPosition"></param>
-        private void UpdateSquareOccupiers(BoardCoord previousPosition, BoardCoord newPosition) {
-            if (AssertContainsCoord(previousPosition) && AssertContainsCoord(newPosition)) {
-                ChessPiece oldCoordOccupier = Board.GetCoordInfo(previousPosition).occupier;
-                if (oldCoordOccupier != null) {
-                    Board.GetCoordInfo(previousPosition).occupier = null;
-                    if (IsThreat(oldCoordOccupier, newPosition)) {
-                        KillPiece(Board.GetCoordInfo(newPosition).occupier);
-                    }
-                    Board.GetCoordInfo(newPosition).occupier = oldCoordOccupier;
-                }
-            }
+        private void UpdateSquareOccupiers(ChessPiece piece, BoardCoord previousPosition, BoardCoord newPosition) {
+            Board.GetCoordInfo(previousPosition).RemoveOccupier(piece);
+            Board.GetCoordInfo(newPosition).AddOccupier(piece);
         }
 
         /// <summary>
-        /// Directly moves a chess piece from it's current position to the destination. Ignores promotions, enpassant, and castling rules. 
+        /// Directly moves a chess piece from it's current position to the destination and adds it's move notation. 
+        /// Ignores promotions, enpassant, and castling rules. 
         /// If rules are desired, use the virtual method MovePiece for more flexible behaviour. 
-        /// Ensure that this method is always called for moving pieces.
         /// </summary>
-        /// <param name="mover"></param>
-        /// <param name="destination"></param>
-        /// <param name="isLastMover"></param>
-        /// <returns>The basic algebraic notation describing this move. Returns null if invalid or not last mover.</returns>
-        protected string MakeDirectMove(ChessPiece mover, BoardCoord destination, bool isLastMover = true) {
-            StringBuilder moveNotation = new StringBuilder(null, 4);
+        protected bool MakeBaseMove(ChessPiece mover, BoardCoord destination) {
+            if (Board.ContainsCoord(destination)) {
+                bool capturingThreat = mover.IsThreatTowards(destination);
 
-            if (AssertContainsCoord(destination)) {
-                BoardCoord previousPosition = mover.GetBoardPosition();
-                bool attackingThreat = IsThreat(mover, destination);
+                mover.MoveCount++;
+                SetLastMovedPiece(mover);
 
-                // Determine the move notation & other details for the moving piece.
-                // The only time this isn't true is if the piece we are moving is a castling piece (e.g. rook).
-                // In that case we ignore it's move notation, count, etc.
-                if (isLastMover) {
-                    moveNotation.Append(mover.GetLetterNotation());
-                    moveNotation.Append(ResolveMoveNotationAmbiguity(mover, destination));
-
-                    if (attackingThreat) {
-                        if(mover is Pawn) {
-                            moveNotation.Append(Board.GetCoordInfo(previousPosition).file);
-                        }
-                        moveNotation.Append('x');
-                        mover.CaptureCount++;
+                if (capturingThreat) {
+                    CapturePiece(Board.GetCoordInfo(destination).GetAliveOccupier());
+                    mover.CaptureCount++;
+                } else {
+                    if ((mover is Pawn) == false) {
+                        numConsecutiveCapturelessMoves++;
                     }
-                    mover.MoveCount++;
-                    numConsecutiveCapturelessMoves = (attackingThreat == false && (mover is Pawn) == false) ? numConsecutiveCapturelessMoves + 1 : 0;
-                    SetLastMovedPiece(mover);
+                }
 
-                    moveNotation.Append(Board.GetCoordInfo(destination).algebraicKey);
+                // Determine base move notation for this move. Skipped for simulated moves.
+                // This condition is also needed to avoid a stack overflow when checking for check in simulated moves.
+                if (checkingSimulatedMove == false) {
+                    string moveNotation = DetermineBaseNotationOfMove(mover, destination, capturingThreat);
+                    GameMoveNotations.Push(moveNotation);
                 }
 
                 // Physically move the piece.
-                mover.SetBoardPosition(destination);
-                mover.gameObject.transform.position = destination;
-                UpdateSquareOccupiers(previousPosition, mover.GetBoardPosition());
+                UpdatePiecePositionAndOccupance(mover, destination);
+                return true;
             }
+            return false;
+        }
 
+        /// <summary>
+        /// Determines the base move notation for a move. 
+        /// Does not include enpassant, castling, promotion, check, or checkmate notation.
+        /// Those notations are appended at a higher level.
+        /// </summary>
+        private string DetermineBaseNotationOfMove(ChessPiece mover, BoardCoord destination, bool capturingThreat) {
+            BoardCoord previousPosition = mover.GetBoardPosition();
+            StringBuilder moveNotation = new StringBuilder(null, 4);
+
+            // Example move: Queen takes Bishop on e4 with check.
+
+            moveNotation.Append(mover.GetLetterNotation()); // Notation: Q
+            moveNotation.Append(ResolveMoveNotationAmbiguity(mover, destination)); // Notation: Q (No ambiguity)
+            
+            if (capturingThreat) {
+                if (mover is Pawn) {
+                    moveNotation.Append(Board.GetCoordInfo(previousPosition).file);
+                }
+                moveNotation.Append('x'); // Notation: Qx
+            }
+            
+            moveNotation.Append(Board.GetCoordInfo(destination).algebraicKey); // Notation: Qxe4
+
+            // As this is only the base move notation (Qxe4), the final notation including the check (Qxe4+) will be appended later.
             return moveNotation.ToString();
-        }
-
-        /// <summary>
-        /// Returns the turn number for each team's moves in a turn.
-        /// </summary>
-        /// <returns></returns>
-        public int GetNotationTurn() {
-            return Mathf.CeilToInt((float)GameMoveNotations.Count / NotationTurnDivider);
-        }
-
-        /// <summary>
-        /// Updates all pieces' state histories to be up to date with the total move count. Is called by GameManager when a move is completed.
-        /// </summary>
-        public void UpdateGameStateHistory() {
-            teamTurnStateHistory.Push(new TeamTurnState(currentTeamTurn, opposingTeamTurn, currentRoyalPiece, opposingRoyalPiece));
-
-            foreach (ChessPiece piece in GetPieces(aliveOnly: false)) {
-                piece.UpdatePieceMoveStateHistory();
-            }
         }
 
         /// <summary>
         /// Resolves notation ambiguity between same-type pieces that can move to the same destination.
         /// </summary>
-        /// <param name="mover"></param>
-        /// <param name="destination"></param>
         /// <returns>The resolved notation to be appended.</returns>
-        public virtual string ResolveMoveNotationAmbiguity(ChessPiece mover, BoardCoord destination) {
-            string result = string.Empty;
-
+        public string ResolveMoveNotationAmbiguity(ChessPiece mover, BoardCoord destination) {
             int numAmbiguousMovers = 0;
             bool atLeastOneFileMatched = false;
             bool atLeastOneRankMatched = false;
 
-            foreach (ChessPiece piece in GetPieces(currentTeamTurn)) {
+            foreach (ChessPiece piece in GetPiecesOfType<ChessPiece>(mover.GetTeam())) {
+                // Ensure piece is not the mover but the same type of piece as the mover.
                 if (piece != mover && piece.GetPieceType() == mover.GetPieceType()) {
+                    // Check if the piece could potentially move to the same destination as the mover.
                     if (piece.CalculateTemplateMoves().Contains(destination)) {
+                        // Check if that move would be valid.
                         if (IsPieceInCheckAfterThisMove(currentRoyalPiece, piece, destination) == false) {
-                            // If so, perform file/rank comparisons.
+                            // If so, this is an ambigious mover.
                             numAmbiguousMovers++;
 
                             // If the files are the same...
@@ -898,152 +879,182 @@ namespace ChessGameModes {
             }
 
             if ((atLeastOneRankMatched && !atLeastOneFileMatched) || (numAmbiguousMovers > 0 && !atLeastOneRankMatched && !atLeastOneFileMatched)) {
-                result = Board.GetCoordInfo(mover.GetBoardPosition()).file;
+                return Board.GetCoordInfo(mover.GetBoardPosition()).file;
+
             } else if (atLeastOneFileMatched && !atLeastOneRankMatched) {
-                result = Board.GetCoordInfo(mover.GetBoardPosition()).rank;
+                return Board.GetCoordInfo(mover.GetBoardPosition()).rank;
+
             } else if (atLeastOneFileMatched && atLeastOneRankMatched) {
                 // If both file and rank matched, that means there at least 2 other movers, so the whole key is required.
-                result = Board.GetCoordInfo(mover.GetBoardPosition()).algebraicKey;
-            }
+                return Board.GetCoordInfo(mover.GetBoardPosition()).algebraicKey;
 
-            return result;
+            } else {
+                return string.Empty;
+            }
         }
 
         /// <summary>
-        /// Called after a move is played. Switches the current and opposing teams around,
-        /// resets the pawn promotion value, and switches the current and opposing royal pieces around.
+        /// Returns the turn number for each team's moves in a turn.
+        /// </summary>
+        public int GetNotationTurn() {
+            return (int)Math.Ceiling((double)GameMoveNotations.Count / (double)NotationTurnDivider);
+        }
+
+        /// <summary>
+        /// Updates all pieces' state histories to be up to date with the total move count. Is called by GameManager when a move is completed.
+        /// </summary>
+        public virtual void IncrementGameAndPieceStateHistory() {
+            gameStateHistory.Push(new GameStateSnapshot(currentTeamTurn, opposingTeamTurn, currentRoyalPiece, opposingRoyalPiece,
+                GetLastMovedPiece(opposingTeamTurn), GetLastMovedPiece(currentTeamTurn), (uint)GetNumConseqCapturelessMoves()));
+
+            foreach (ChessPiece piece in GetPiecesOfType<ChessPiece>()) {
+                piece.UpdateStateHistory();
+            }
+        }
+
+        /// <summary>
+        /// Called after a move is played.
         /// </summary>
         public virtual void OnMoveComplete() {
             currentTeamTurn = (currentTeamTurn == Team.WHITE) ? Team.BLACK : Team.WHITE;
             opposingTeamTurn = (currentTeamTurn == Team.WHITE) ? Team.BLACK : Team.WHITE;
 
+            SwapCurrentAndOpposingRoyaltyPieces();
+
+            SelectedPawnPromotion = Piece.Queen;
+        }
+
+        protected virtual void SwapCurrentAndOpposingRoyaltyPieces() {
             if (currentRoyalPiece != null && opposingRoyalPiece != null) {
                 ChessPiece temp = currentRoyalPiece;
                 currentRoyalPiece = opposingRoyalPiece;
                 opposingRoyalPiece = temp;
             }
-
-            SelectedPawnPromotion = Piece.Queen;
         }
 
         /// <summary>
-        /// Kills a chess piece and hides it from the board.
+        /// Captures a chess piece. All we do is hide it from the board and set it to not alive.
         /// </summary>
-        /// <param name="piece">Piece to kill.</param>
-        /// <returns>True if the kill was successful.</returns>
-        protected bool KillPiece(ChessPiece piece) {
-            if (piece != null) {
-                piece.gameObject.SetActive(false);
-                piece.IsAlive = false;
-                Board.GetCoordInfo(piece.GetBoardPosition()).occupier = null;
+        protected void CapturePiece(ChessPiece piece) {
+            piece.IsAlive = false;
+
+            OnChessPieceCaptured?.Invoke(piece);
+        }
+
+        private void RewindGameStateToPreviousMove() {
+            if (gameStateHistory.Count > 1) {
+                gameStateHistory.Pop();
+
+                GameStateSnapshot gameStateToRestore = gameStateHistory.Peek();
+
+                currentTeamTurn = gameStateToRestore.currentTeam;
+                opposingTeamTurn = gameStateToRestore.opposingTeam;
+
+                currentRoyalPiece = gameStateToRestore.currentRoyalPiece;
+                opposingRoyalPiece = gameStateToRestore.opposingRoyalPiece;
+
+                SetLastMovedPiece(gameStateToRestore.lastMovedWhitePiece);
+                SetLastMovedPiece(gameStateToRestore.lastMovedBlackPiece);
+
+                numConsecutiveCapturelessMoves = gameStateToRestore.numConsequtiveCapturelessMoves;
+            }
+        }
+
+        private void RewindPieceStateToPreviousMove(ChessPiece piece) {
+            if (piece.StateHistory.Count > 1) {
+                piece.StateHistory.RemoveAt(piece.StateHistory.Count - 1);
+
+                PieceStateSnapshot pieceStateToRestore = piece.StateHistory[piece.StateHistory.Count - 1];
+
+                // If the piece is being brought back to life, alert any listeners to take care of the visuals.
+                if (!piece.IsAlive && pieceStateToRestore.wasAlive) {
+                    OnUndoChessPieceCapture?.Invoke(piece);
+                }
+
+                piece.IsAlive = pieceStateToRestore.wasAlive;
+
+                UpdatePiecePositionAndOccupance(piece, pieceStateToRestore.position);
+
+                piece.MoveCount = pieceStateToRestore.moveCount;
+                piece.CaptureCount = pieceStateToRestore.captureCount;
+
+            } else if (piece.StateHistory.Count == 1 && piece.IsAlive) {
+                // This occurs for promoted pieces. A promoted pawn is considered a new piece, so once the new piece has no states left,
+                // we completely remove it from the game and bring back the pawn.
+                DestroyPieceFromBoard(piece);
+            }
+        }
+
+        /// <summary>
+        /// Reverts all chess pieces' states and overarching game state to the previous move.
+        /// </summary>
+        public virtual bool UndoLastMove() {
+            if (gameStateHistory.Count > 1) {
+                RewindGameStateToPreviousMove();
+
+                foreach (ChessPiece piece in GetPiecesOfType<ChessPiece>()) {
+                    RewindPieceStateToPreviousMove(piece);
+                }
+
+                if (checkingSimulatedMove == false) {
+                    GameMoveNotations.Pop();
+                }
+
                 return true;
             }
             return false;
         }
 
         /// <summary>
-        /// Reverts all chess pieces' states to the previous move.
-        /// </summary>
-        public virtual void UndoLastGameMove() {
-            foreach (ChessPiece piece in GetPieces(aliveOnly: false)) {
-                if (piece.MoveStateHistory.Count > 1) {
-                    // Remove piece state to be undone.
-                    piece.MoveStateHistory.Pop();
-
-                    PieceMoveState pieceMoveStateToRestore = piece.MoveStateHistory.Peek();
-
-                    // Only undo moves where the piece is alive or is about to be brought back. 
-                    // This resolves an issue where square occupance can be overridden by dead pieces.
-                    if (piece.IsAlive || (piece.IsAlive == false && pieceMoveStateToRestore.wasAlive)) {
-                        // Undo position and occupance.
-                        Board.GetCoordInfo(piece.GetBoardPosition()).occupier = null;
-                        piece.SetBoardPosition(pieceMoveStateToRestore.position);
-                        piece.gameObject.transform.position = piece.GetBoardPosition();
-                        Board.GetCoordInfo(piece.GetBoardPosition()).occupier = piece;
-
-                        // Undo move/capture counts.
-                        piece.MoveCount = pieceMoveStateToRestore.moveCount;
-                        piece.CaptureCount = pieceMoveStateToRestore.captureCount;
-
-                        // Undo alive status.
-                        piece.IsAlive = pieceMoveStateToRestore.wasAlive;
-                        piece.gameObject.SetActive(piece.IsAlive);
-                    }
-                } else if (piece.MoveStateHistory.Count == 1 && piece.IsAlive) {
-                    // This occurs for promoted pieces. A promoted pawn is considered a new piece, so once the new piece has no states left,
-                    // we kill it and bring back the pawn.
-                    KillPiece(piece);
-                }
-            }
-
-            // Undo current team status.
-            teamTurnStateHistory.Pop();
-            TeamTurnState teamTurnStateToRestore = teamTurnStateHistory.Peek();
-            currentTeamTurn = teamTurnStateToRestore.currentTeam;
-            opposingTeamTurn = teamTurnStateToRestore.opposingTeam;
-            currentRoyalPiece = teamTurnStateToRestore.currentRoyalPiece;
-            opposingRoyalPiece = teamTurnStateToRestore.opposingRoyalPiece;
-
-            // Remove last game notation that was undone.
-            GameMoveNotations.Pop();
-        }
-
-        /// <summary>
         /// Adds a chess piece to the game board and assigns it to a team based on it's own team value.
         /// </summary>
-        /// <param name="piece">Piece to add.</param>
         /// <returns>Returns the chess piece added to the game board.</returns>
-        protected ChessPiece AddPieceToBoard(ChessPiece piece) {
-            if (CheckValidPlacement(piece)) {
-                Board.GetCoordInfo(piece.GetBoardPosition()).occupier = piece;
-                piece.IsAlive = true;
-                GameManager.Instance.InstantiateChessPiece(piece);
-                AddPieceToActiveTeam(piece);
+        protected ChessPiece AddNewPieceToBoard(Piece pieceType, Team team, BoardCoord position) {
+            if (Board.ContainsCoord(position)) {
+                ChessPiece piece = ChessPieceFactory.Create(pieceType, team, position, Board);
 
-                if (piece.GetTeam() == Team.BLACK && Board.isFlipped) {
-                    piece.gameObject.transform.Rotate(new Vector3(0, 0, 180));
+                if (Board.GetCoordInfo(piece.GetBoardPosition()).GetAliveOccupier() != null && Board.GetCoordInfo(piece.GetBoardPosition()).GetAliveOccupier().IsAlive) {
+                    CoordInfo posInfo = Board.GetCoordInfo(piece.GetBoardPosition());
+
+                    RaiseEventOnLogErrorMessage(string.Format("OCCUPIED EXCEPTION :: {0} failed to instantiate because a {1} is already at it's position! Location: {3}.",
+                        piece.ToString(), posInfo.GetAliveOccupier().ToString(), posInfo.algebraicKey, piece.GetBoardPosition().ToString()));
+
+                } else {
+                    Board.GetCoordInfo(piece.GetBoardPosition()).AddOccupier(piece);
+                    piece.IsAlive = true;
+                    AddPieceToTeam(piece);
+
+                    // Alert listeners that this chess piece has been created.
+                    OnChessPieceCreated?.Invoke(piece);
+
+                    return piece;
                 }
-                return piece;
+            }
+            return null;
+        }
+
+        protected ChessPiece AddNewPieceToBoard(Piece pieceType, Team team, string algebraicKey) {
+            if (Board.TryGetCoordWithKey(algebraicKey, out BoardCoord position)) {
+                return AddNewPieceToBoard(pieceType, team, position);
             }
             return null;
         }
 
         /// <summary>
-        /// Used to ensure the chess piece added to the game board has been placed in a valid position.
+        /// Completely destroys a chess piece. Only used when a promoted piece is undo'd back to a pawn.
         /// </summary>
-        /// <param name="piece">Piece to check.</param>
-        /// <returns>True if valid placement.</returns>
-        private bool CheckValidPlacement(ChessPiece piece) {
-            if (AssertContainsCoord(piece.GetBoardPosition()) == false) {
-                return false;
-            } else if (Board.GetCoordInfo(piece.GetBoardPosition()).occupier != null && Board.GetCoordInfo(piece.GetBoardPosition()).occupier.IsAlive) {
-                CoordInfo posInfo = Board.GetCoordInfo(piece.GetBoardPosition());
-                Debug.LogErrorFormat("OCCUPIED EXCEPTION :: " +
-                    "{0} failed to instantiate because a {1} is already at it's position! Location: {3}."
-                    , piece.ToString(), posInfo.occupier.ToString(), posInfo.algebraicKey, piece.GetBoardPosition().ToString());
-                return false;
-            }
-            return true;
-        }
+        /// <param name="piece"></param>
+        private void DestroyPieceFromBoard(ChessPiece piece) {
+            CapturePiece(piece);
+            RemovePieceFromTeam(piece);
 
-        /// <summary>
-        /// Assert that the current game board contains a specified coordinate.
-        /// </summary>
-        /// <param name="coord">Coordinate to check.</param>
-        /// <returns>True if game board contains the coordinate.</returns>
-        public bool AssertContainsCoord(BoardCoord coord) {
-            if (!Board.ContainsCoord(coord)) {
-                Debug.LogErrorFormat("ERROR: {0} is not a valid position on the GameBoard!", coord.ToString());
-                return false;
-            }
-            return true;
+            // Alert listeners that this chess piece has been destroyed.
+            OnChessPieceDestroyed?.Invoke(piece);
         }
 
         /// <summary>
         /// Determines whether a selected chess piece is it's team's turn to move.
         /// </summary>
-        /// <param name="mover"></param>
-        /// <returns></returns>
         public virtual bool IsMoversTurn(ChessPiece mover) {
             return mover.GetTeam() == currentTeamTurn;
         }
@@ -1051,202 +1062,26 @@ namespace ChessGameModes {
         /// <summary>
         /// Simulates a move being played. NOTE: Must be followed by RevertSimulatedMove.
         /// </summary>
-        /// <param name="mover">Piece to move.</param>
-        /// <param name="dest">Destination to move to.</param>
-        /// <param name="originalOccupier">The occupier at the destination prior to this simulated move.</param>
-        /// <param name="originalLastMover">The last moved piece prior to this simulated move.</param>
-        protected void SimulateMove(ChessPiece mover, BoardCoord dest, ChessPiece originalOccupier, out ChessPiece originalLastMover) {
-            originalLastMover = null;
-            if (AssertContainsCoord(dest)) {
-                originalLastMover = GetLastMovedPiece(mover.GetTeam());
-                SetLastMovedPiece(mover);
+        protected bool SimulateMove(ChessPiece mover, BoardCoord destination) {
+            checkingSimulatedMove = true;
 
-                if (originalOccupier != null) {
-                    originalOccupier.IsAlive = false;
-                }
-
-                Board.GetCoordInfo(mover.GetBoardPosition()).occupier = null;
-                Board.GetCoordInfo(dest).occupier = mover;
-                mover.SetBoardPosition(dest);
+            if (MovePiece(mover, destination)) {
+                OnMoveComplete();
+                IncrementGameAndPieceStateHistory();
+                return true;
             }
+
+            checkingSimulatedMove = false;
+            return false;
         }
 
         /// <summary>
         /// Reverts a simulated move. NOTE: Must be preceeded by SimulateMove.
         /// </summary>
-        /// <param name="mover">Piece to move.</param>
-        /// <param name="dest">Destination to move to.</param>
-        /// <param name="originalOccupier">The occupier at the destination prior to this simulated move.</param>
-        /// <param name="originalLastMover">The last moved piece prior to this simulated move.</param>
-        /// <param name="oldPos">The position of the mover prior to this simulated move.</param>
-        protected void RevertSimulatedMove(ChessPiece mover, BoardCoord dest, ChessPiece originalOccupier, ChessPiece originalLastMover, BoardCoord oldPos) {
-            if (AssertContainsCoord(dest)) {
-                mover.SetBoardPosition(oldPos);
-                Board.GetCoordInfo(mover.GetBoardPosition()).occupier = mover;
+        protected void RevertSimulatedMove() {
+            UndoLastMove();
 
-                if (originalOccupier != null) {
-                    originalOccupier.IsAlive = true;
-                    Board.GetCoordInfo(dest).occupier = originalOccupier;
-                } else {
-                    Board.GetCoordInfo(dest).occupier = null;
-                }
-
-                SetLastMovedPiece(originalLastMover);
-            }
-        }
-
-        /// <summary>
-        /// Gets a list of moves that a chess piece can move to. This method is used to build up a chess piece's list of template moves.
-        /// </summary>
-        /// <param name="mover">Piece to calculate moves for.</param>
-        /// <param name="dir">Move direction to test moves for.</param>
-        /// <param name="cap">Number of squares to test before stopping (0 = unbounded).</param>
-        /// <param name="threatAttackLimit">Number of threats to test before stopping (0 = unbounded).</param>
-        /// <param name="threatsOnly">Only get attacking moves?</param>
-        /// <param name="teamSensitive">Is the move direction relative to the team or to the game board?</param>
-        /// <returns></returns>
-        public BoardCoord[] TryGetDirectionalMoves(ChessPiece mover, MoveDirection dir, uint cap = 0, uint threatAttackLimit = 1, bool threatsOnly = false, bool teamSensitive = true) {
-            int x = mover.GetBoardPosition().x;
-            int y = mover.GetBoardPosition().y;
-            int xModifier;
-            int yModifier;
-            GetMoveDirectionModifiers(mover, dir, out xModifier, out yModifier, teamSensitive);
-
-            bool xWrap = mover.HasXWrapping;
-            bool yWrap = mover.HasYWrapping;
-
-            uint iter = 0;
-            uint threats = 0;
-            BoardCoord coord;
-            List<BoardCoord> moves = new List<BoardCoord>();
-            while (true) {
-                iter++;
-                x += xModifier;
-                y += yModifier;
-                if (xWrap) x = MathExtensions.mod(x, Board.GetWidth());
-                if (yWrap) y = MathExtensions.mod(y, Board.GetHeight());
-                coord = new BoardCoord(x, y);
-
-                if (Board.ContainsCoord(coord) == false) break;
-                if (IsAlly(mover, coord)) break;
-                if (IsThreat(mover, coord)) {
-                    if (threatAttackLimit == 0) break;
-                    moves.Add(coord);
-                    if (++threats == threatAttackLimit) break;
-                } else {
-                    if (threatsOnly) break;
-                    moves.Add(coord);
-                }
-
-                if (iter == cap) break;
-            }
-            return moves.ToArray();
-        }
-
-        /// <summary>
-        /// Gets a list of moves that a chess piece can move to. This method is used to build up a chess piece's list of template moves.
-        /// </summary>
-        /// <param name="mover">Piece to calculate moves for.</param>
-        /// <param name="xVariance">Custom direction's x step from the mover's position.</param>
-        /// <param name="yVariance">Custom direction's y step from the mover's position.</param>
-        /// <param name="cap">Number of squares to test before stopping (0 = unbounded).</param>
-        /// <param name="threatsOnly">Only get attacking moves?</param>
-        /// <returns></returns>
-        public BoardCoord[] TryGetCustomDirectionalMoves(ChessPiece mover, int xVariance, int yVariance, uint cap = 0, bool threatsOnly = false) {
-            int x = mover.GetBoardPosition().x;
-            int y = mover.GetBoardPosition().y;
-            int xModifier = mover.TeamSensitiveMove(xVariance);
-            int yModifier = mover.TeamSensitiveMove(yVariance);
-
-            bool xWrap = mover.HasXWrapping;
-            bool yWrap = mover.HasYWrapping;
-
-            uint iter = 0;
-            BoardCoord coord;
-            List<BoardCoord> moves = new List<BoardCoord>();
-            while (true) {
-                iter++;
-                x += xModifier;
-                y += yModifier;
-                if (xWrap) x = MathExtensions.mod(x, Board.GetWidth());
-                if (yWrap) y = MathExtensions.mod(y, Board.GetHeight());
-                coord = new BoardCoord(x, y);
-
-                if (Board.ContainsCoord(coord) == false) break;
-                if (IsAlly(mover, coord)) break;
-                if (IsThreat(mover, coord) == false && threatsOnly) break;
-                moves.Add(coord);
-
-                if (iter == cap) break;
-            }
-            return moves.ToArray();
-        }
-
-        /// <summary>
-        /// Calculates to see if a specific move for a chess piece can be made.
-        /// </summary>
-        /// <param name="mover">Piece to move.</param>
-        /// <param name="destination">Destination to move to.</param>
-        /// <param name="threatOnly">Destination occupier must be a threat?</param>
-        /// <returns>The coordinate that the piece can move to; otherwise NULL.</returns>
-        public BoardCoord TryGetSpecificMove(ChessPiece mover, BoardCoord destination, bool threatOnly = false) {
-            if (Board.ContainsCoord(destination)) {
-                if (threatOnly && (IsThreat(mover, destination) == false)) {
-                    return BoardCoord.NULL;
-                } else if (IsAlly(mover, destination) == false) {
-                    return destination;
-                }
-            }
-            return BoardCoord.NULL;
-        }
-
-        /// <summary>
-        /// Returns the x and y step values for a specific move direction.
-        /// </summary>
-        /// <param name="mover">Piece to move.</param>
-        /// <param name="dir">Move direction to test.</param>
-        /// <param name="xModifier">X step value to be returned.</param>
-        /// <param name="yModifier">Y step value to be returned.</param>
-        /// <param name="teamSensitive">Is the move direction relative to the team or to the game board?</param>
-        public void GetMoveDirectionModifiers(ChessPiece mover, MoveDirection dir, out int xModifier, out int yModifier, bool teamSensitive = true) {
-            switch (dir) {
-                case MoveDirection.Up:
-                    xModifier = 0;
-                    yModifier = (teamSensitive) ? mover.TeamSensitiveMove(1) : 1;
-                    break;
-                case MoveDirection.Down:
-                    xModifier = 0;
-                    yModifier = (teamSensitive) ? mover.TeamSensitiveMove(-1) : -1;
-                    break;
-                case MoveDirection.Left:
-                    xModifier = (teamSensitive) ? mover.TeamSensitiveMove(-1) : -1;
-                    yModifier = 0;
-                    break;
-                case MoveDirection.Right:
-                    xModifier = (teamSensitive) ? mover.TeamSensitiveMove(1) : 1;
-                    yModifier = 0;
-                    break;
-                case MoveDirection.UpLeft:
-                    xModifier = (teamSensitive) ? mover.TeamSensitiveMove(-1) : -1;
-                    yModifier = (teamSensitive) ? mover.TeamSensitiveMove(1) : 1;
-                    break;
-                case MoveDirection.UpRight:
-                    xModifier = (teamSensitive) ? mover.TeamSensitiveMove(1) : 1;
-                    yModifier = (teamSensitive) ? mover.TeamSensitiveMove(1) : 1;
-                    break;
-                case MoveDirection.DownLeft:
-                    xModifier = (teamSensitive) ? mover.TeamSensitiveMove(-1) : -1;
-                    yModifier = (teamSensitive) ? mover.TeamSensitiveMove(-1) : -1;
-                    break;
-                case MoveDirection.DownRight:
-                    xModifier = (teamSensitive) ? mover.TeamSensitiveMove(1) : 1;
-                    yModifier = (teamSensitive) ? mover.TeamSensitiveMove(-1) : -1;
-                    break;
-                default:
-                    xModifier = 0;
-                    yModifier = 0;
-                    break;
-            }
+            checkingSimulatedMove = false;
         }
     }
 }

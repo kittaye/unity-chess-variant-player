@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
@@ -38,13 +37,6 @@ namespace ChessGameModes {
             AllowEnpassantCapture = false;
         }
 
-        private void AddPromotionSquare(string algebraicKeyPosition) {
-            BoardCoord coord;
-            if (Board.TryGetCoordWithKey(algebraicKeyPosition, out coord)) {
-                promotionSquares.Add(coord);
-            }
-        }
-
         public override string ToString() {
             return "Legan Chess";
         }
@@ -63,70 +55,64 @@ namespace ChessGameModes {
             );
         }
 
+        private void AddPromotionSquare(string algebraicKeyPosition) {
+            BoardCoord coord;
+            if (Board.TryGetCoordWithKey(algebraicKeyPosition, out coord)) {
+                promotionSquares.Add(coord);
+            }
+        }
+
         public override void PopulateBoard() {
-            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, "h1"));
-            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, "a8"));
+            currentRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.WHITE, "h1");
+            opposingRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.BLACK, "a8");
 
-            AddPieceToBoard(new Knight(Team.WHITE, "g1"));
-            AddPieceToBoard(new Knight(Team.WHITE, "h3"));
-            AddPieceToBoard(new Knight(Team.BLACK, "b8"));
-            AddPieceToBoard(new Knight(Team.BLACK, "a6"));
+            AddNewPieceToBoard(Piece.Knight, Team.WHITE, "g1");
+            AddNewPieceToBoard(Piece.Knight, Team.WHITE, "h3");
+            AddNewPieceToBoard(Piece.Knight, Team.BLACK, "b8");
+            AddNewPieceToBoard(Piece.Knight, Team.BLACK, "a6");
 
-            AddPieceToBoard(new Bishop(Team.WHITE, "h2"));
-            AddPieceToBoard(new Bishop(Team.WHITE, "f1"));
-            AddPieceToBoard(new Bishop(Team.BLACK, "c8"));
-            AddPieceToBoard(new Bishop(Team.BLACK, "a7"));
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, "h2");
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, "f1");
+            AddNewPieceToBoard(Piece.Bishop, Team.BLACK, "c8");
+            AddNewPieceToBoard(Piece.Bishop, Team.BLACK, "a7");
 
-            AddPieceToBoard(new Rook(Team.WHITE, "e1"));
-            AddPieceToBoard(new Rook(Team.WHITE, "h4"));
-            AddPieceToBoard(new Rook(Team.BLACK, "a5"));
-            AddPieceToBoard(new Rook(Team.BLACK, "d8"));
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, "e1");
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, "h4");
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, "a5");
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, "d8");
 
-            AddPieceToBoard(new Queen(Team.WHITE, "g2"));
-            AddPieceToBoard(new Queen(Team.BLACK, "b7"));
+            AddNewPieceToBoard(Piece.Queen, Team.WHITE, "g2");
+            AddNewPieceToBoard(Piece.Queen, Team.BLACK, "b7");
 
             // White pawns
-            AddPieceToBoard(new LeganPawn(Team.WHITE, "f2"));
-            AddPieceToBoard(new LeganPawn(Team.WHITE, "g3"));
-            AddPieceToBoard(new LeganPawn(Team.WHITE, "e4"));
+            AddNewPieceToBoard(Piece.LeganPawn, Team.WHITE, "f2");
+            AddNewPieceToBoard(Piece.LeganPawn, Team.WHITE, "g3");
+            AddNewPieceToBoard(Piece.LeganPawn, Team.WHITE, "e4");
             BoardCoord coord = new BoardCoord(3, 0);
             while (Board.ContainsCoord(coord)) {
-                AddPieceToBoard(new LeganPawn(Team.WHITE, coord));
+                AddNewPieceToBoard(Piece.LeganPawn, Team.WHITE, coord);
                 coord.x++;
                 coord.y++;
             }
 
             // Black pawns
-            AddPieceToBoard(new LeganPawn(Team.BLACK, "b6"));
-            AddPieceToBoard(new LeganPawn(Team.BLACK, "c7"));
-            AddPieceToBoard(new LeganPawn(Team.BLACK, "d5"));
+            AddNewPieceToBoard(Piece.LeganPawn, Team.BLACK, "b6");
+            AddNewPieceToBoard(Piece.LeganPawn, Team.BLACK, "c7");
+            AddNewPieceToBoard(Piece.LeganPawn, Team.BLACK, "d5");
             coord = new BoardCoord(0, 3);
             while (Board.ContainsCoord(coord)) {
-                AddPieceToBoard(new LeganPawn(Team.BLACK, coord));
+                AddNewPieceToBoard(Piece.LeganPawn, Team.BLACK, coord);
                 coord.x++;
                 coord.y++;
             }
         }
 
-        protected override bool CanPromote(Pawn mover, BoardCoord[] availableMoves) {
-            for (int i = 0; i < availableMoves.Length; i++) {
-                if (promotionSquares.Contains(availableMoves[i])) {
-                    return true;
-                }
-            }
-            return false;
+        protected override bool IsAPromotionMove(BoardCoord move) {
+            return promotionSquares.Contains(move);
         }
 
-        protected override ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
-            if (promotionSquares.Contains(mover.GetBoardPosition())) {
-                KillPiece(mover);
-
-                ChessPiece newPromotedPiece = ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition());
-                moveNotation += string.Format("={0}", newPromotedPiece.GetLetterNotation());
-
-                return AddPieceToBoard(newPromotedPiece);
-            }
-            return null;
+        protected override bool PerformedAPromotionMove(Pawn mover) {
+            return promotionSquares.Contains(mover.GetBoardPosition());
         }
     }
 }

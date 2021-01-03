@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
@@ -34,7 +33,7 @@ namespace ChessGameModes {
 
         public override bool CheckWinState() {
             if (GetCurrentTeamTurn() == Team.WHITE) {
-                if (GetPieces(Team.WHITE).TrueForAll((x) => (x.IsAlive == false))) {
+                if (GetAlivePiecesOfType<ChessPiece>(Team.WHITE).Count == 0) {
                     UIManager.Instance.LogCustom("Team Black wins by elimination!");
                     return true;
                 }
@@ -50,27 +49,29 @@ namespace ChessGameModes {
         }
 
         public override void PopulateBoard() {
-            AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(1, 4), initialMoveLimit: 1));
-            AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(2, 4), initialMoveLimit: 1));
-            AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(5, 4), initialMoveLimit: 1));
-            AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(6, 4), initialMoveLimit: 1));
-            AddPieceToBoard(new Queen(Team.BLACK, new BoardCoord(3, BLACK_BACKROW)));
+            ((Pawn)AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(1, 4))).initialMoveLimit = 1;
+            ((Pawn)AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(2, 4))).initialMoveLimit = 1;
+            ((Pawn)AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(5, 4))).initialMoveLimit = 1;
+            ((Pawn)AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(6, 4))).initialMoveLimit = 1;
 
-            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, new BoardCoord(4, BLACK_BACKROW)));
-            AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(0, BLACK_BACKROW)));
-            AddPieceToBoard(new Rook(Team.BLACK, new BoardCoord(7, BLACK_BACKROW)));
+            AddNewPieceToBoard(Piece.Queen, Team.BLACK, new BoardCoord(3, BLACK_BACKROW));
+
+            currentRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.BLACK, new BoardCoord(4, BLACK_BACKROW));
+
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, new BoardCoord(0, BLACK_BACKROW));
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, new BoardCoord(7, BLACK_BACKROW));
 
             for (int x = 0; x < BOARD_WIDTH; x++) {
-                AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, 0)));
-                AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, 1)));
-                AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, 2), initialMoveLimit: 1));
-                AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, 3), initialMoveLimit: 1));
-                AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(x, BLACK_PAWNROW)));
+                AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(x, 0));
+                AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(x, 1));
+                ((Pawn)AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(x, 2))).initialMoveLimit = 1;
+                ((Pawn)AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(x, 3))).initialMoveLimit = 1;
+                AddNewPieceToBoard(Piece.Pawn, Team.BLACK, new BoardCoord(x, BLACK_PAWNROW));
 
                 if (x == 1 || x == BOARD_WIDTH - 2) {
-                    AddPieceToBoard(new Knight(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
+                    AddNewPieceToBoard(Piece.Knight, Team.BLACK, new BoardCoord(x, BLACK_BACKROW));
                 } else if (x == 2 || x == BOARD_WIDTH - 3) {
-                    AddPieceToBoard(new Bishop(Team.BLACK, new BoardCoord(x, BLACK_BACKROW)));
+                    AddNewPieceToBoard(Piece.Bishop, Team.BLACK, new BoardCoord(x, BLACK_BACKROW));
                 }
             }
         }
@@ -85,7 +86,10 @@ namespace ChessGameModes {
                 // Special rule for when a white pawn from the 8th rank moves to the 7th -- they are still able to double-move.
                 if (mover is Pawn && (mover.GetBoardPosition().y == 1) && mover.MoveCount == 1) {
                     if (availableMoves.Contains(mover.GetRelativeBoardCoord(0, 1))) {
-                        availableMoves.Add(TryGetSpecificMove(mover, mover.GetRelativeBoardCoord(0, 2)));
+                        BoardCoord doublemoveCoord = mover.GetRelativeBoardCoord(0, 2);
+                        if (Board.ContainsCoord(doublemoveCoord) && mover.IsAllyTowards(doublemoveCoord) == false) {
+                            availableMoves.Add(doublemoveCoord);
+                        }
                     }
                 }
 

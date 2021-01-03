@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ChessGameModes {
     /// <summary>
@@ -23,7 +22,7 @@ namespace ChessGameModes {
         private List<BoardCoord> promotionSquares;
 
         public LadderChess() : base(BOARD_WIDTH, BOARD_HEIGHT) {
-            Board.RemoveBoardCoordinates(new string[]
+            Board.RemoveAndDestroyBoardCoordinates(new string[]
             { "b1", "c1", "d1", "e1",
               "c2", "d2", "e2",
               "d3", "e3",
@@ -72,30 +71,17 @@ namespace ChessGameModes {
             }
         }
 
-        protected override bool CanPromote(Pawn mover, BoardCoord[] availableMoves) {
-            for (int i = 0; i < availableMoves.Length; i++) {
-                if (promotionSquares.Contains(availableMoves[i])) {
-                    return true;
-                }
-            }
-            return false;
+        protected override bool IsAPromotionMove(BoardCoord move) {
+            return promotionSquares.Contains(move);
         }
 
-        protected override ChessPiece CheckPawnPromotion(Pawn mover, ref string moveNotation) {
-            if (promotionSquares.Contains(mover.GetBoardPosition())) {
-                KillPiece(mover);
-
-                ChessPiece newPromotedPiece = ChessPieceFactory.Create(SelectedPawnPromotion, mover.GetTeam(), mover.GetBoardPosition());
-                moveNotation += string.Format("={0}", newPromotedPiece.GetLetterNotation());
-
-                return AddPieceToBoard(newPromotedPiece);
-            }
-            return null;
+        protected override bool PerformedAPromotionMove(Pawn mover) {
+            return promotionSquares.Contains(mover.GetBoardPosition());
         }
 
         public override void PopulateBoard() {
-            currentRoyalPiece = (King)AddPieceToBoard(new King(Team.WHITE, "a1"));
-            opposingRoyalPiece = (King)AddPieceToBoard(new King(Team.BLACK, "e12"));
+            currentRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.WHITE, "a1");
+            opposingRoyalPiece = (King)AddNewPieceToBoard(Piece.King, Team.BLACK, "e12");
 
             AddPromotionSquare("a1");
             AddPromotionSquare("b2");
@@ -108,21 +94,21 @@ namespace ChessGameModes {
             AddPromotionSquare("d11");
             AddPromotionSquare("e12");
 
-            AddPieceToBoard(new Queen(Team.WHITE, "b2"));
-            AddPieceToBoard(new Queen(Team.BLACK, "d11"));
+            AddNewPieceToBoard(Piece.Queen, Team.WHITE, "b2");
+            AddNewPieceToBoard(Piece.Queen, Team.BLACK, "d11");
 
-            AddPieceToBoard(new Bishop(Team.WHITE, "c3"));
-            AddPieceToBoard(new Bishop(Team.BLACK, "c10"));
+            AddNewPieceToBoard(Piece.Bishop, Team.WHITE, "c3");
+            AddNewPieceToBoard(Piece.Bishop, Team.BLACK, "c10");
 
-            AddPieceToBoard(new Knight(Team.WHITE, "d4"));
-            AddPieceToBoard(new Knight(Team.BLACK, "b9"));
+            AddNewPieceToBoard(Piece.Knight, Team.WHITE, "d4");
+            AddNewPieceToBoard(Piece.Knight, Team.BLACK, "b9");
 
-            AddPieceToBoard(new Rook(Team.WHITE, "e5"));
-            AddPieceToBoard(new Rook(Team.BLACK, "a8"));
+            AddNewPieceToBoard(Piece.Rook, Team.WHITE, "e5");
+            AddNewPieceToBoard(Piece.Rook, Team.BLACK, "a8");
 
             for (int x = 0; x < BOARD_WIDTH; x++) {
-                AddPieceToBoard(new Pawn(Team.WHITE, new BoardCoord(x, x + 1)));
-                AddPieceToBoard(new Pawn(Team.BLACK, new BoardCoord(x, x + 6)));
+                AddNewPieceToBoard(Piece.Pawn, Team.WHITE, new BoardCoord(x, x + 1));
+                AddNewPieceToBoard(Piece.Pawn, Team.BLACK, new BoardCoord(x, x + 6));
             }
         }
     }

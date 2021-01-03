@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-
+﻿
 namespace ChessGameModes {
     /// <summary>
     /// Board layout: FIDE standard.
