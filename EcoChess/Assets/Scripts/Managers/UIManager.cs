@@ -30,6 +30,8 @@ public class UIManager : MonoBehaviour {
     private List<GameObject> promotionOptions;
     private bool settingsVisible;
 
+    public MonoBehaviour mouseController;
+
     private int currentNotationTurn = 0;
     private Text currentNotationLine;
 
@@ -255,6 +257,10 @@ public class UIManager : MonoBehaviour {
     public void OnClickSettingsButton() {
         settingsVisible = !settingsVisible;
         settingsWindow.SetActive(settingsVisible);
+    }
+
+    public void BlockMouseController(bool value) {
+        mouseController.enabled = !value;
     }
 
     public void OnToggleFlipBoard() {
